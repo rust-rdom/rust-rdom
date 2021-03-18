@@ -1,4 +1,3 @@
-use std::cell::RefCell;
 use std::sync::Weak;
 
 use crate::sandbox::Sandbox;

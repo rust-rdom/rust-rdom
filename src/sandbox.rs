@@ -1,9 +1,9 @@
 use once_cell::sync::OnceCell;
 use std::marker::Sync;
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
 
 use crate::config::ScreenMetrics;
-use crate::document::Document;
+use crate::node::Document;
 use crate::window::Window;
 
 #[derive(Clone)]
@@ -22,8 +22,8 @@ impl Sandbox {
         });
         let sandbox_weak = Arc::downgrade(&sandbox);
 
-        let mut win = Arc::new(Window::new(sandbox_weak.clone()));
-        let mut doc = Arc::new(Document::new(sandbox_weak.clone()));
+        let win = Arc::new(Window::new(sandbox_weak.clone()));
+        let doc = Arc::new(Document::new(sandbox_weak.clone()));
 
         let mut sbox = Arc::get_mut(&mut sandbox).expect("Could not construct sandbox");
         (*sbox).window = Some(win);

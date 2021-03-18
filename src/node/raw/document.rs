@@ -1,21 +1,20 @@
-use std::boxed::Box;
-use std::cell::RefCell;
-use std::sync::{Arc, Weak};
+use std::sync::Weak;
 
-use crate::element::{BodyElement, DocumentElement, Element};
 use crate::error::DomError;
+use crate::node::Element;
+use crate::node::raw::AnyNode;
 use crate::sandbox::Sandbox;
 
 pub struct Document {
     sandbox: Weak<Sandbox>,
-    //document_element: DocumentElement,
 }
+impl AnyNode for Document {}
 
 impl Document {
     pub(crate) fn new(sandbox: Weak<Sandbox>) -> Self {
         Document {
+            // Since Document is the root node, it contains a link to the Sandbox
             sandbox: sandbox.clone(),
-            //document_element: DocumentElement::new(sandbox.clone()),
         }
     }
 

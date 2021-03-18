@@ -3,17 +3,12 @@
 #[macro_use]
 extern crate downcast_rs;
 
-use lazy_static::lazy_static;
-use std::sync::{Arc, Mutex};
-
 use crate::config::ScreenMetrics;
-use crate::document::Document;
 use crate::window::Window;
 
 mod config;
-mod document;
-mod element;
 mod error;
+mod node;
 mod sandbox;
 mod window;
 
