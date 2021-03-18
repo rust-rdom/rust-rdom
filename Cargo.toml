@@ -1,7 +1,8 @@
 [package]
 name = "rdom"
 description = "A Rust-based simulated DOM (browser-independent replacement for web_sys)"
-version = "0.1.0"
+repository = "https://github.com/philip-peterson/rdom/"
+version = "0.1.1"
 authors = ["Philip Peterson <philip.c.peterson@gmail.com>"]
 edition = "2018"
 license = "MIT"
