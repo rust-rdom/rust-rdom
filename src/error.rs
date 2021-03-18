@@ -1,4 +1,4 @@
-use thiserror::{Error as ThisError};
+use thiserror::Error as ThisError;
 
 /// A static rendering DOM exception
 #[derive(Debug, ThisError)]

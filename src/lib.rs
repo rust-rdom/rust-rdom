@@ -1,18 +1,21 @@
 //! The public interface to static rendering functionality.
 
+#[macro_use]
+extern crate downcast_rs;
+
 use lazy_static::lazy_static;
 use std::sync::{Arc, Mutex};
 
+use crate::config::ScreenMetrics;
 use crate::document::Document;
 use crate::window::Window;
-use crate::config::ScreenMetrics;
 
 mod config;
 mod document;
 mod element;
 mod error;
-mod window;
 mod sandbox;
+mod window;
 
 #[cfg(test)]
 mod tests {

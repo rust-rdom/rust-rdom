@@ -1,4 +1,5 @@
-use std::cell::RefCell;
+use once_cell::sync::OnceCell;
+use std::marker::Sync;
 use std::sync::{Arc, Mutex};
 
 use crate::config::ScreenMetrics;
@@ -17,7 +18,7 @@ impl Sandbox {
         let mut sandbox = Arc::new(Sandbox {
             screen_metrics,
             document: None,
-            window: None
+            window: None,
         });
         let sandbox_weak = Arc::downgrade(&sandbox);
 
@@ -29,5 +30,13 @@ impl Sandbox {
         (*sbox).document = Some(doc);
 
         sandbox
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn does_compile() {
+        struct Foo {}
     }
 }

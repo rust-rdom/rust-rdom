@@ -10,8 +10,6 @@ pub struct Window {
 
 impl Window {
     pub(crate) fn new(context: Weak<Sandbox>) -> Self {
-        Window {
-            context
-        }
+        Window { context }
     }
 }
