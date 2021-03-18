@@ -4,6 +4,7 @@ description = "A Rust-based simulated DOM (browser-independent replacement for w
 version = "0.1.0"
 authors = ["Philip Peterson <philip.c.peterson@gmail.com>"]
 edition = "2018"
+license = "MIT"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
