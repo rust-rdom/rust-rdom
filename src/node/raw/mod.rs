@@ -13,20 +13,6 @@ pub use element::document::DocumentElement;
 pub use element::body::BodyElement;
 pub use element::AnyElement;
 
-//impl From<&DocumentElement> for &Element {
-//    fn from(_: &DocumentElement) -> &Element {
-//        // TODO!
-//        &Element {}
-//    }
-//}
-//
-// impl From<&BodyElement> for Element {
-//     fn from(_: &BodyElement) -> Element {
-//         // TODO!
-//         Element {}
-//     }
-// }
-
 pub struct Node {
     children: Vec<Arc<Node>>,
     parent: Option<Weak<Node>>,
