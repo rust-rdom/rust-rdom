@@ -13,10 +13,10 @@ use crate::node::raw::{self as raw_node, element as raw_element};
 use crate::sandbox::Sandbox;
 
 /// Any wrapped Element
-pub struct Element(Arc<dyn raw_element::AnyRawElement>);
+pub struct Element(pub Arc<dyn raw_element::AnyRawElement>);
 
 /// Any wrapped Node
-pub struct Node(Arc<dyn raw_node::AnyRawNode>);
+pub struct Node(pub Arc<dyn raw_node::AnyRawNode>);
 
 macro_rules! impl_wrapped_nodes {
     ($((
@@ -37,7 +37,7 @@ macro_rules! impl_wrapped_nodes {
                     ") node"
                     $(" " $postlude)?
                 ]
-                pub struct $ty(Arc<$raw_ty>);
+                pub struct $ty(pub Arc<$raw_ty>);
             }
 
             paste! {
