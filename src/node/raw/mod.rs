@@ -12,21 +12,16 @@ use crate::sandbox::Sandbox;
 
 pub mod element;
 
-/// The common structure of all DOM nodes
-pub struct Node {
-    context: Option<Weak<Sandbox>>,
-}
-
 /// Linkages to other nodes
 pub struct NodeLinkages {
     /// Descendant nodes of this node
-    pub children: Vec<Arc<Node>>,
+    pub children: Vec<Weak<dyn AnyRawNode>>,
     /// Parent node of this node
-    pub parent: Option<Weak<Node>>,
-    /// Right sibling
-    pub right_sibling: Option<Weak<Node>>,
-    /// Left sibling
-    pub left_sibling: Option<Weak<Node>>,
+    pub parent: Option<Weak<dyn AnyRawNode>>,
+    /// Right sibling of this node
+    pub right_sibling: Option<Weak<dyn AnyRawNode>>,
+    /// Left sibling of this node
+    pub left_sibling: Option<Weak<dyn AnyRawNode>>,
 }
 
 /// An input event
@@ -61,7 +56,7 @@ macro_rules! impl_raw_nodes {
                     /// Reference to the sandbox to which this node belongs
                     pub context: Weak<Sandbox>,
 
-                    /// Linkages to other Nodes
+                    /// Linkages to other nodes
                     pub linkages: NodeLinkages,
                 }
             }
