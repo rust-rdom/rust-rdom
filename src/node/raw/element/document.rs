@@ -4,7 +4,7 @@ use crate::sandbox::Sandbox;
 use crate::node::raw::{AnyRawNode, AnyRawElement};
 
 /// The [root document element](https://developer.mozilla.org/en-US/docs/Web/API/Document/documentElement)
-/// element type
+/// element type. (<HTML />)
 pub struct DocumentElement {
     /// Reference to the sandbox to which this node belongs
     pub context: Weak<Sandbox>,

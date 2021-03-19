@@ -71,7 +71,7 @@ macro_rules! impl_element {
 pub struct BodyElement(pub Arc<raw::BodyElement>);
 impl_element!(BodyElement, raw::BodyElement);
 
-/// A wrapped Document element (this is like <HTML />)
+/// A wrapped Document element (<HTML />)
 pub struct DocumentElement(pub Arc<raw::DocumentElement>);
 impl_element!(DocumentElement, raw::DocumentElement);
 
