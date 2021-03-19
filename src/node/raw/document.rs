@@ -6,7 +6,7 @@ use crate::node::raw::AnyRawNode;
 use crate::sandbox::Sandbox;
 
 pub struct Document {
-    sandbox: Weak<Sandbox>,
+    pub sandbox: Weak<Sandbox>,
 }
 impl AnyRawNode for Document {}
 

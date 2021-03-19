@@ -1,3 +1,6 @@
+//! Wrapped representation of a DOM Element. See [node](../index.html) module for distinction from
+//! raw representation.
+
 use downcast_rs::DowncastSync;
 
 use std::convert::TryFrom;
@@ -33,7 +36,7 @@ macro_rules! impl_node_base {
 
 macro_rules! impl_node {
     ($ty:ident, $raw_ty:ty) => {
-        pub struct $ty(Arc<$raw_ty>);
+        pub struct $ty(pub Arc<$raw_ty>);
 
         impl_node_base!($ty, $raw_ty);
     };
@@ -43,7 +46,7 @@ macro_rules! impl_element {
     ($ty:ident, $raw_ty:ty) => {
         impl_node_base!($ty, $raw_ty);
 
-        pub struct $ty(Arc<$raw_ty>);
+        pub struct $ty(pub Arc<$raw_ty>);
 
         impl From<$ty> for Element {
             fn from(source: $ty) -> Element {

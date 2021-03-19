@@ -1,16 +1,27 @@
 //! The public interface to static rendering functionality.
 
+// #![deny(
+//     missing_docs,
+//     missing_debug_implementations,
+//     missing_copy_implementations,
+//     trivial_casts,
+//     trivial_numeric_casts,
+//     unsafe_code,
+//     unstable_features,
+//     unused_qualifications
+// )]
+
 #[macro_use]
 extern crate downcast_rs;
 
 use crate::config::ScreenMetrics;
 use crate::window::Window;
 
-mod config;
-mod error;
-mod node;
-mod sandbox;
-mod window;
+pub mod config;
+pub mod error;
+pub mod node;
+pub mod sandbox;
+pub mod window;
 
 #[cfg(test)]
 mod tests {

@@ -1,3 +1,5 @@
+//! Errors that may occur while using rdom.
+
 use thiserror::Error as ThisError;
 
 /// A static rendering DOM exception

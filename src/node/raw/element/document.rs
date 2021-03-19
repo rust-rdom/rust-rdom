@@ -4,7 +4,7 @@ use crate::sandbox::Sandbox;
 use crate::node::raw::{AnyRawNode, AnyRawElement};
 
 pub struct DocumentElement {
-    context: Weak<Sandbox>,
+    pub context: Weak<Sandbox>,
 }
 
 impl DocumentElement {
