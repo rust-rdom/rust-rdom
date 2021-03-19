@@ -1,4 +1,4 @@
-//! The public interface to static rendering functionality.
+//! A Rust-based simulated DOM (browser-independent replacement for web_sys)
 
 #![deny(
     missing_docs,
