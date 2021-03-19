@@ -5,7 +5,9 @@ use crate::node::Element;
 use crate::node::raw::AnyRawNode;
 use crate::sandbox::Sandbox;
 
+/// The root [Document](https://developer.mozilla.org/en-US/docs/Web/API/Document) node type
 pub struct Document {
+    /// Reference to the sandbox to which this node belongs
     pub sandbox: Weak<Sandbox>,
 }
 impl AnyRawNode for Document {}

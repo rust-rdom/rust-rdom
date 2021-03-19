@@ -1,3 +1,6 @@
+//! A sandbox represents a virtual browser tab. It contains a document and a window,
+//! as well as some configuration information for screen dimensions.
+
 use once_cell::sync::OnceCell;
 use std::marker::Sync;
 use std::sync::Arc;
@@ -6,6 +9,8 @@ use crate::config::ScreenMetrics;
 use crate::node::Document;
 use crate::window::Window;
 
+/// A sandbox represents a virtual browser tab. It contains a document and a window,
+/// as well as some configuration information for screen dimensions.
 #[derive(Clone)]
 pub struct Sandbox {
     screen_metrics: ScreenMetrics,

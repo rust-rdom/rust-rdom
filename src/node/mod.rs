@@ -29,6 +29,9 @@ pub use wrapped::*;
 pub mod raw;
 pub mod wrapped;
 
+/// Represents an abstract wrapped Node. In other words, it is a wrapped Node of any
+/// sub-type (Document, ButtonElement, etc.)
 #[derive(Debug)]
 pub struct Node {}
+
 impl AnyRawNode for Node {}

@@ -1,3 +1,6 @@
+//! Raw representation of a DOM Element. See [node](../index.html) module for distinction from
+//! wrapped representation.
+
 use downcast_rs::DowncastSync;
 
 use std::rc::Rc;
@@ -13,6 +16,7 @@ pub use element::document::DocumentElement;
 pub use element::body::BodyElement;
 pub use element::AnyRawElement;
 
+/// The common structure of all DOM nodes
 pub struct Node {
     children: Vec<Arc<Node>>,
     parent: Option<Weak<Node>>,
@@ -20,19 +24,18 @@ pub struct Node {
     left_sibling: Option<Weak<Node>>,
 }
 
+/// A text node
 pub struct TextNode {}
 
+/// An input event
 pub struct InputEvent {}
 
+/// A button element
 pub struct ButtonElement {}
 
+/// A textarea element
 pub struct TextAreaElement {}
 
-// #[derive(Debug)]
-// pub struct InputElement {}
-// impl AnyRawElement for InputElement {}
-// impl AnyRawNode for InputElement {}
-
-
+/// A base trait for all raw node types
 pub trait AnyRawNode: DowncastSync {}
 impl_downcast!(sync AnyRawNode);

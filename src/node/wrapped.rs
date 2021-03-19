@@ -10,7 +10,10 @@ use std::sync::{Arc, Weak};
 use crate::node::raw;
 use crate::sandbox::Sandbox;
 
+/// Any wrapped Element
 pub struct Element(Arc<dyn raw::AnyRawElement>);
+
+/// Any wrapped Node
 pub struct Node(Arc<dyn raw::AnyRawNode>);
 
 macro_rules! impl_node_base {
@@ -36,7 +39,6 @@ macro_rules! impl_node_base {
 
 macro_rules! impl_node {
     ($ty:ident, $raw_ty:ty) => {
-        pub struct $ty(pub Arc<$raw_ty>);
 
         impl_node_base!($ty, $raw_ty);
     };
@@ -45,8 +47,6 @@ macro_rules! impl_node {
 macro_rules! impl_element {
     ($ty:ident, $raw_ty:ty) => {
         impl_node_base!($ty, $raw_ty);
-
-        pub struct $ty(pub Arc<$raw_ty>);
 
         impl From<$ty> for Element {
             fn from(source: $ty) -> Element {
@@ -67,10 +67,16 @@ macro_rules! impl_element {
     };
 }
 
+/// A wrapped Body element
+pub struct BodyElement(pub Arc<raw::BodyElement>);
 impl_element!(BodyElement, raw::BodyElement);
 
+/// A wrapped Document element (this is like <HTML />)
+pub struct DocumentElement(pub Arc<raw::DocumentElement>);
 impl_element!(DocumentElement, raw::DocumentElement);
 
+/// A wrapped Document node
+pub struct Document(pub Arc<raw::Document>);
 impl_node!(Document, raw::Document);
 impl Document {
     pub(crate) fn new(context: Weak<Sandbox>) -> Self {

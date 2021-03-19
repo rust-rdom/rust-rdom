@@ -1,3 +1,5 @@
+//! A virtual browser window.
+
 use std::sync::Weak;
 
 use crate::sandbox::Sandbox;
