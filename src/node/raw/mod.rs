@@ -15,10 +15,18 @@ pub mod element;
 /// The common structure of all DOM nodes
 pub struct Node {
     context: Option<Weak<Sandbox>>,
-    children: Vec<Arc<Node>>,
-    parent: Option<Weak<Node>>,
-    right_sibling: Option<Weak<Node>>,
-    left_sibling: Option<Weak<Node>>,
+}
+
+/// Linkages to other nodes
+pub struct NodeLinkages {
+    /// Descendant nodes of this node
+    pub children: Vec<Arc<Node>>,
+    /// Parent node of this node
+    pub parent: Option<Weak<Node>>,
+    /// Right sibling
+    pub right_sibling: Option<Weak<Node>>,
+    /// Left sibling
+    pub left_sibling: Option<Weak<Node>>,
 }
 
 /// An input event
@@ -52,13 +60,24 @@ macro_rules! impl_raw_nodes {
                 pub struct $ty {
                     /// Reference to the sandbox to which this node belongs
                     pub context: Weak<Sandbox>,
+
+                    /// Linkages to other Nodes
+                    pub linkages: NodeLinkages,
                 }
             }
 
             paste! {
                 impl $ty {
                     pub(crate) fn new(context: Weak<Sandbox>) -> Self {
-                        $ty { context }
+                        $ty {
+                            context,
+                            linkages: NodeLinkages {
+                                parent: None,
+                                left_sibling: None,
+                                right_sibling: None,
+                                children: Vec::new()
+                            }
+                        }
                     }
 
                     $($rest)*
