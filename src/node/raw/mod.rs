@@ -1,20 +1,16 @@
-//! Raw representation of a DOM Element. See [node](../index.html) module for distinction from
+//! Raw representation of a DOM node. See [node](../index.html) module for distinction from
 //! wrapped representation.
 
 use downcast_rs::DowncastSync;
+use paste::paste;
 
 use std::rc::Rc;
 use std::sync::{Arc, Weak};
 
+use crate::error::DomError;
 use crate::sandbox::Sandbox;
 
-mod document;
-mod element;
-
-pub use document::Document;
-pub use element::document::DocumentElement;
-pub use element::body::BodyElement;
-pub use element::AnyRawElement;
+pub mod element;
 
 /// The common structure of all DOM nodes
 pub struct Node {
@@ -24,18 +20,62 @@ pub struct Node {
     left_sibling: Option<Weak<Node>>,
 }
 
-/// A text node
-pub struct TextNode {}
-
 /// An input event
 pub struct InputEvent {}
-
-/// A button element
-pub struct ButtonElement {}
-
-/// A textarea element
-pub struct TextAreaElement {}
 
 /// A base trait for all raw node types
 pub trait AnyRawNode: DowncastSync {}
 impl_downcast!(sync AnyRawNode);
+
+macro_rules! impl_raw_nodes {
+    ($((
+        $ty: ty,
+        $blurb: literal,
+        $link: literal,
+        impl { $( $rest:tt )* }
+        $(, $postlude: literal)?
+    ))*) => {
+        $(
+            paste! {
+                #[doc =
+                    "The ["
+                    $blurb
+                    "](https://developer.mozilla.org/en-US/docs/Web/API/"
+                    $link
+                    ") node type"
+                    $(" " $postlude)?
+                ]
+                pub struct $ty {
+                    /// Reference to the sandbox to which this node belongs
+                    pub context: Weak<Sandbox>,
+                }
+            }
+
+            paste! {
+                impl $ty {
+                    pub(crate) fn new(context: Weak<Sandbox>) -> Self {
+                        $ty { context }
+                    }
+
+                    $($rest)*
+                }
+                impl AnyRawNode for $ty {}
+            }
+        )*
+    }
+}
+
+impl_raw_nodes! {
+    (
+        TextNode,
+        "text",
+        "Text",
+        impl {}
+    )
+    (
+        Document,
+        "document",
+        "Document",
+        impl {}
+    )
+}

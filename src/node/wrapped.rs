@@ -2,38 +2,24 @@
 //! raw representation.
 
 use downcast_rs::DowncastSync;
+use paste::paste;
 
 use std::convert::TryFrom;
 use std::result::Result;
 use std::sync::{Arc, Weak};
 
-use crate::node::raw;
+use crate::error::DomError;
+use crate::node::raw::{self as raw_node, element as raw_element};
 use crate::sandbox::Sandbox;
 
 /// Any wrapped Element
-pub struct Element(Arc<dyn raw::AnyRawElement>);
+pub struct Element(Arc<dyn raw_element::AnyRawElement>);
 
 /// Any wrapped Node
-pub struct Node(Arc<dyn raw::AnyRawNode>);
+pub struct Node(Arc<dyn raw_node::AnyRawNode>);
 
 macro_rules! impl_node_base {
     ($ty:ident, $raw_ty:ty) => {
-        impl From<$ty> for Node {
-            fn from(source: $ty) -> Node {
-                Node(source.0)
-            }
-        }
-
-        impl TryFrom<Node> for $ty {
-            type Error = Node;
-
-            fn try_from(elem: Node) -> Result<$ty, Node> {
-                elem.0
-                    .downcast_arc::<$raw_ty>()
-                    .map($ty)
-                    .map_err(Node)
-            }
-        }
     };
 }
 
@@ -67,19 +53,82 @@ macro_rules! impl_element {
     };
 }
 
-/// A wrapped Body element
-pub struct BodyElement(pub Arc<raw::BodyElement>);
-impl_element!(BodyElement, raw::BodyElement);
+macro_rules! impl_wrapped_nodes {
+    ($((
+        $ty: ty,
+        $raw_ty: ty,
+        $blurb: literal,
+        $link: literal,
+        impl { $( $rest:tt )* }
+        $(, $postlude: literal)?
+    ))*) => {
+        $(
+            paste! {
+                #[doc =
+                    "A wrapped ["
+                    $blurb
+                    "](https://developer.mozilla.org/en-US/docs/Web/API/"
+                    $link
+                    ") node"
+                    $(" " $postlude)?
+                ]
+                pub struct $ty(Arc<$raw_ty>);
+            }
 
-/// A wrapped Document element (<HTML />)
-pub struct DocumentElement(pub Arc<raw::DocumentElement>);
-impl_element!(DocumentElement, raw::DocumentElement);
+            paste! {
+                impl $ty {
+                    pub(crate) fn new(context: Weak<Sandbox>) -> Self {
+                        $ty(Arc::new($raw_ty::new(context)))
+                    }
 
-/// A wrapped Document node
-pub struct Document(pub Arc<raw::Document>);
-impl_node!(Document, raw::Document);
-impl Document {
-    pub(crate) fn new(context: Weak<Sandbox>) -> Self {
-        Document(Arc::new(raw::Document::new(context)))
+                    $($rest)*
+                }
+                impl raw_node::AnyRawNode for $ty {}
+
+                // impl From<$ty> for Node {
+                //     fn from(source: $ty) -> Node {
+                //         Node(source.0)
+                //     }
+                // }
+
+                // impl TryFrom<Node> for $ty {
+                //     type Error = Node;
+
+                //     fn try_from(elem: Node) -> Result<$ty, Node> {
+                //         elem.0
+                //             .downcast_arc::<$raw_ty>()
+                //             .map($ty)
+                //             .map_err(Node)
+                //     }
+                // }
+            }
+        )*
     }
+}
+
+impl_wrapped_nodes! {
+    (
+        TextNode,
+        raw_node::TextNode,
+        "text",
+        "Text",
+        impl {}
+    )
+    (
+        Document,
+        raw_node::Document,
+        "document",
+        "Document",
+        impl {
+            // fn query_selector(&self, selectors: &str) -> Result<Option<Element>, DomError> {
+            //     match selectors {
+            //         //"html" => {
+            //         //    Ok(Some(self.document_element.into()))
+            //         //},
+            //         //"body" => Ok(Some((&*self.body).into())),
+            //         _ => Err(DomError::InvalidQuerySelector),
+            //     }
+            // }
+        }
+    )
 }
