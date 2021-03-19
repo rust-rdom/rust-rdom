@@ -53,18 +53,18 @@ impl_raw_elements! {
         HtmlHtmlElement,
         "root document element",
         "Document/documentElement",
-        "(<HTML />)"
+        "(&lt;HTML /&gt;)"
     )
     (
         HtmlBodyElement,
         "body",
         "Document/body",
-        "(<BODY />)"
+        "(&lt;BODY /&gt;)"
     )
     (
         HtmlButtonElement,
         "button",
         "HTMLButtonElement",
-        "(<BUTTON />)"
+        "(&lt;BUTTON /&gt;)"
     )
 }
