@@ -11,7 +11,7 @@ mod element;
 pub use document::Document;
 pub use element::document::DocumentElement;
 pub use element::body::BodyElement;
-pub use element::AnyElement;
+pub use element::AnyRawElement;
 
 pub struct Node {
     children: Vec<Arc<Node>>,
@@ -30,9 +30,9 @@ pub struct TextAreaElement {}
 
 // #[derive(Debug)]
 // pub struct InputElement {}
-// impl AnyElement for InputElement {}
-// impl AnyNode for InputElement {}
+// impl AnyRawElement for InputElement {}
+// impl AnyRawNode for InputElement {}
 
 
-pub trait AnyNode: DowncastSync {}
-impl_downcast!(sync AnyNode);
+pub trait AnyRawNode: DowncastSync {}
+impl_downcast!(sync AnyRawNode);

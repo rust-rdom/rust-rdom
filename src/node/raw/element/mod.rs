@@ -1,14 +1,14 @@
 use downcast_rs::DowncastSync;
 
-use super::AnyNode;
+use super::AnyRawNode;
 
 pub mod body;
 pub mod document;
 
-pub trait AnyElement: DowncastSync + AnyNode {}
-impl_downcast!(sync AnyElement);
+pub trait AnyRawElement: DowncastSync + AnyRawNode {}
+impl_downcast!(sync AnyRawElement);
 
 #[derive(Debug)]
 pub struct Element {}
-impl AnyElement for Element {}
-impl AnyNode for Element {}
+impl AnyRawElement for Element {}
+impl AnyRawNode for Element {}

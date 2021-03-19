@@ -7,8 +7,8 @@ use std::sync::{Arc, Weak};
 use crate::node::raw;
 use crate::sandbox::Sandbox;
 
-pub struct Element(Arc<dyn raw::AnyElement>);
-pub struct Node(Arc<dyn raw::AnyNode>);
+pub struct Element(Arc<dyn raw::AnyRawElement>);
+pub struct Node(Arc<dyn raw::AnyRawNode>);
 
 macro_rules! impl_node_base {
     ($ty:ident, $raw_ty:ty) => {

@@ -2,13 +2,13 @@ use std::sync::Weak;
 
 use crate::error::DomError;
 use crate::node::Element;
-use crate::node::raw::AnyNode;
+use crate::node::raw::AnyRawNode;
 use crate::sandbox::Sandbox;
 
 pub struct Document {
     sandbox: Weak<Sandbox>,
 }
-impl AnyNode for Document {}
+impl AnyRawNode for Document {}
 
 impl Document {
     pub(crate) fn new(sandbox: Weak<Sandbox>) -> Self {

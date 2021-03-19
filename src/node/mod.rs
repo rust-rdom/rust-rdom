@@ -1,6 +1,6 @@
 use downcast_rs::DowncastSync;
 
-use crate::node::raw::AnyNode;
+use crate::node::raw::AnyRawNode;
 
 pub use wrapped::*;
 
@@ -9,4 +9,4 @@ mod wrapped;
 
 #[derive(Debug)]
 pub struct Node {}
-impl AnyNode for Node {}
+impl AnyRawNode for Node {}

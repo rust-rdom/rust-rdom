@@ -1,7 +1,7 @@
 use std::sync::{Weak};
 
 use crate::sandbox::Sandbox;
-use crate::node::raw::{AnyNode, AnyElement};
+use crate::node::raw::{AnyRawNode, AnyRawElement};
 
 pub struct BodyElement {
     context: Weak<Sandbox>,
@@ -12,5 +12,5 @@ impl BodyElement {
         BodyElement { context }
     }
 }
-impl AnyElement for BodyElement {}
-impl AnyNode for BodyElement {}
+impl AnyRawElement for BodyElement {}
+impl AnyRawNode for BodyElement {}

@@ -1,7 +1,7 @@
 use std::sync::{Weak};
 
 use crate::sandbox::Sandbox;
-use crate::node::raw::{AnyNode, AnyElement};
+use crate::node::raw::{AnyRawNode, AnyRawElement};
 
 pub struct DocumentElement {
     context: Weak<Sandbox>,
@@ -12,5 +12,5 @@ impl DocumentElement {
         DocumentElement { context }
     }
 }
-impl AnyElement for DocumentElement {}
-impl AnyNode for DocumentElement {}
+impl AnyRawElement for DocumentElement {}
+impl AnyRawNode for DocumentElement {}
