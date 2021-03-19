@@ -18,41 +18,6 @@ pub struct Element(Arc<dyn raw_element::AnyRawElement>);
 /// Any wrapped Node
 pub struct Node(Arc<dyn raw_node::AnyRawNode>);
 
-macro_rules! impl_node_base {
-    ($ty:ident, $raw_ty:ty) => {
-    };
-}
-
-macro_rules! impl_node {
-    ($ty:ident, $raw_ty:ty) => {
-
-        impl_node_base!($ty, $raw_ty);
-    };
-}
-
-macro_rules! impl_element {
-    ($ty:ident, $raw_ty:ty) => {
-        impl_node_base!($ty, $raw_ty);
-
-        impl From<$ty> for Element {
-            fn from(source: $ty) -> Element {
-                Element(source.0)
-            }
-        }
-
-        impl TryFrom<Element> for $ty {
-            type Error = Element;
-
-            fn try_from(elem: Element) -> Result<$ty, Element> {
-                elem.0
-                    .downcast_arc::<$raw_ty>()
-                    .map($ty)
-                    .map_err(Element)
-            }
-        }
-    };
-}
-
 macro_rules! impl_wrapped_nodes {
     ($((
         $ty: ty,
@@ -85,22 +50,22 @@ macro_rules! impl_wrapped_nodes {
                 }
                 impl raw_node::AnyRawNode for $ty {}
 
-                // impl From<$ty> for Node {
-                //     fn from(source: $ty) -> Node {
-                //         Node(source.0)
-                //     }
-                // }
+                impl From<$ty> for Node {
+                    fn from(source: $ty) -> Node {
+                        Node(source.0)
+                    }
+                }
 
-                // impl TryFrom<Node> for $ty {
-                //     type Error = Node;
+                impl TryFrom<Node> for $ty {
+                    type Error = Node;
 
-                //     fn try_from(elem: Node) -> Result<$ty, Node> {
-                //         elem.0
-                //             .downcast_arc::<$raw_ty>()
-                //             .map($ty)
-                //             .map_err(Node)
-                //     }
-                // }
+                    fn try_from(elem: Node) -> Result<$ty, Node> {
+                        elem.0
+                            .downcast_arc::<$raw_ty>()
+                            .map($ty)
+                            .map_err(Node)
+                    }
+                }
             }
         )*
     }
@@ -120,15 +85,15 @@ impl_wrapped_nodes! {
         "document",
         "Document",
         impl {
-            // fn query_selector(&self, selectors: &str) -> Result<Option<Element>, DomError> {
-            //     match selectors {
-            //         //"html" => {
-            //         //    Ok(Some(self.document_element.into()))
-            //         //},
-            //         //"body" => Ok(Some((&*self.body).into())),
-            //         _ => Err(DomError::InvalidQuerySelector),
-            //     }
-            // }
+            fn query_selector(&self, selectors: &str) -> Result<Option<Element>, DomError> {
+                match selectors {
+                    //"html" => {
+                    //    Ok(Some(self.document_element.into()))
+                    //},
+                    //"body" => Ok(Some((&*self.body).into())),
+                    _ => Err(DomError::InvalidQuerySelector),
+                }
+            }
         }
     )
 }
