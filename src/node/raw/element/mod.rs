@@ -38,7 +38,11 @@ macro_rules! impl_raw_elements {
                     }
                 }
                 impl AnyRawElement for $ty {}
-                impl AnyRawNode for $ty {}
+                impl AnyRawNode for $ty {
+                    fn get_context(&self) -> Weak<Sandbox> {
+                        self.context.clone()
+                    }
+                }
             }
         )*
     }

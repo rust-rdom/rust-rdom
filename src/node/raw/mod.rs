@@ -14,6 +14,7 @@ pub mod element;
 
 /// The common structure of all DOM nodes
 pub struct Node {
+    context: Option<Weak<Sandbox>>,
     children: Vec<Arc<Node>>,
     parent: Option<Weak<Node>>,
     right_sibling: Option<Weak<Node>>,
@@ -24,7 +25,10 @@ pub struct Node {
 pub struct InputEvent {}
 
 /// A base trait for all raw node types
-pub trait AnyRawNode: DowncastSync {}
+pub trait AnyRawNode: DowncastSync {
+    /// Gives a weak reference to the sandbox the node was created in.
+    fn get_context(&self) -> Weak<Sandbox>;
+}
 impl_downcast!(sync AnyRawNode);
 
 macro_rules! impl_raw_nodes {
@@ -59,7 +63,11 @@ macro_rules! impl_raw_nodes {
 
                     $($rest)*
                 }
-                impl AnyRawNode for $ty {}
+                impl AnyRawNode for $ty {
+                    fn get_context(&self) -> Weak<Sandbox> {
+                        self.context.clone()
+                    }
+                }
             }
         )*
     }

@@ -9,4 +9,9 @@ pub enum DomError {
     /// "body" and "html".
     #[error("invalid query selector")]
     InvalidQuerySelector,
+
+    /// The object being operated on was created in a sandbox that has since
+    /// disappeared.
+    #[error("the sandbox was dropped")]
+    SandboxDropped,
 }

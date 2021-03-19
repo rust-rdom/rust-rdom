@@ -28,5 +28,3 @@ pub use wrapped::*;
 
 pub mod raw;
 pub mod wrapped;
-
-impl AnyRawNode for Node {}
