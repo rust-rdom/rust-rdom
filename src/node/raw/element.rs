@@ -5,9 +5,8 @@ use downcast_rs::DowncastSync;
 use paste::paste;
 use std::sync::Weak;
 
+use crate::node::raw::AnyRawNode;
 use crate::sandbox::Sandbox;
-
-use super::AnyRawNode;
 
 /// A base trait for all raw element types
 pub trait AnyRawElement: DowncastSync + AnyRawNode {}
