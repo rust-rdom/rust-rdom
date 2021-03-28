@@ -23,10 +23,11 @@ pub trait AnyWrappedNode {
 }
 
 #[macro_export]
+/// Provides the trait implementations for all wrapped node types
 macro_rules! node_base {
     ($ty: ty, impl { $($rest:tt)* }) => {
         impl AnyWrappedNode for $ty {
-            fn get_context(&self) -> Weak<Sandbox> {
+            fn get_context(&self) -> Weak<$crate::sandbox::Sandbox> {
                 self.0.clone().get_context()
             }
         }
@@ -59,7 +60,7 @@ macro_rules! impl_wrapped_nodes {
                 pub struct $ty(pub Arc<$raw_ty>);
 
                 node_base!($ty, impl {        
-                    pub(crate) fn new(context: Weak<Sandbox>) -> Self {
+                    pub(crate) fn new(context: Weak<$crate::sandbox::Sandbox>) -> Self {
                         Self(<$raw_ty>::new(context))
                     }
                     $($rest)*

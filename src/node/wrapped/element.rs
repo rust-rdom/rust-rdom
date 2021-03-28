@@ -5,12 +5,14 @@ use std::result::Result;
 use std::sync::{Arc, Weak};
 
 use crate::node_base;
+use crate::sandbox::Sandbox;
 use crate::node::raw::{self as raw_node, element as raw_element, AnyRawNode};
 use super::AnyWrappedNode;
 
 /// A base trait for all wrapped element types
 pub trait AnyWrappedElement: AnyWrappedNode {}
 
+/// Provides the trait implementations for all wrapped element types
 macro_rules! element_base {
     ($ty: ty, impl { $($rest:tt)* }) => {
         impl AnyWrappedElement for $ty {}
@@ -45,7 +47,7 @@ macro_rules! impl_wrapped_elements {
                 pub struct $ty(pub Arc<$raw_ty>);
 
                 element_base!($ty, impl {        
-                    pub(crate) fn new(context: Weak<Sandbox>) -> Self {
+                    pub(crate) fn new(context: Weak<$crate::sandbox::Sandbox>) -> Self {
                         Self(Arc::new(<$raw_ty>::new(context)))
                     }
                     $($rest)*
