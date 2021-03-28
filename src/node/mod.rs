@@ -11,10 +11,10 @@
 //! to perform the operation. However, this `Arc` does not ensure that the whole sandbox
 //! is retained, due to the possibility that the sandbox is dropped at an arbitrary time
 //! while you hold this reference.
-//! 
+//!
 //! As a result, you must be careful to not drop the sandbox until you are totally done
 //! performing DOM operations, else you may find that those operations fail.
-//! 
+//!
 //! Rdom opts for weak pointers in all but one direction (down), so if the sandbox is
 //! dropped, most of the elements will be dropped with it. This design is
 //! chosen to help with preventing memory leaks, but it has the side effect of causing some

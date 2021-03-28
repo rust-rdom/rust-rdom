@@ -17,11 +17,11 @@ extern crate downcast_rs;
 use crate::config::ScreenMetrics;
 use crate::window::Window;
 
-pub mod sandbox;
 pub mod behavior;
 pub mod config;
 pub mod error;
 pub mod node;
+pub mod sandbox;
 pub mod window;
 
 #[cfg(test)]

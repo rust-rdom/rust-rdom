@@ -59,7 +59,7 @@ macro_rules! impl_wrapped_nodes {
                 ]
                 pub struct $ty(pub Arc<$raw_ty>);
 
-                node_base!($ty, impl {        
+                node_base!($ty, impl {
                     pub(crate) fn new(context: Weak<$crate::sandbox::Sandbox>) -> Self {
                         Self(<$raw_ty>::new(context))
                     }

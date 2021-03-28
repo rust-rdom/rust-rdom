@@ -6,17 +6,18 @@
 use std::sync::{Arc, Weak};
 
 use crate::error::DomError;
+use crate::node::raw::element as raw_element;
 use crate::node::raw::AnyRawNode;
-use crate::node::raw::{element as raw_element};
 
 /// Behavior according to the DOM class called Node
 pub struct NodeBehavior {
     /// Reference back up to the raw Node
     node: Weak<dyn AnyRawNode>,
+
     parent_node: Option<Weak<dyn AnyRawNode>>,
     left_sibling: Option<Weak<dyn AnyRawNode>>,
     right_sibling: Option<Weak<dyn AnyRawNode>>,
-    child_nodes: Vec<Arc<dyn AnyRawNode>>
+    child_nodes: Vec<Arc<dyn AnyRawNode>>,
 }
 
 impl NodeBehavior {
@@ -26,7 +27,7 @@ impl NodeBehavior {
             parent_node: None,
             left_sibling: None,
             right_sibling: None,
-            child_nodes: Vec::new()
+            child_nodes: Vec::new(),
         }
     }
 
@@ -43,7 +44,10 @@ impl NodeBehavior {
     }
 
     pub(crate) fn clone_node(&self) -> Result<Arc<dyn AnyRawNode>, DomError> {
-        let raw_node = self.node.upgrade().ok_or_else(|| DomError::SandboxDropped)?;
+        let raw_node = self
+            .node
+            .upgrade()
+            .ok_or_else(|| DomError::SandboxDropped)?;
         Ok((*raw_node).clone_node())
     }
 }
@@ -56,8 +60,6 @@ pub struct ElementBehavior {
 
 impl ElementBehavior {
     pub(crate) fn new(element: Weak<dyn raw_element::AnyRawElement>) -> ElementBehavior {
-        ElementBehavior {
-            element,
-        }
+        ElementBehavior { element }
     }
 }

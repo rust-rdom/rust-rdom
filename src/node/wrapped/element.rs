@@ -4,10 +4,10 @@ use std::convert::TryFrom;
 use std::result::Result;
 use std::sync::{Arc, Weak};
 
+use super::AnyWrappedNode;
+use crate::node::raw::{self as raw_node, element as raw_element, AnyRawNode};
 use crate::node_base;
 use crate::sandbox::Sandbox;
-use crate::node::raw::{self as raw_node, element as raw_element, AnyRawNode};
-use super::AnyWrappedNode;
 
 /// A base trait for all wrapped element types
 pub trait AnyWrappedElement: AnyWrappedNode {}
@@ -46,7 +46,7 @@ macro_rules! impl_wrapped_elements {
                 ]
                 pub struct $ty(pub Arc<$raw_ty>);
 
-                element_base!($ty, impl {        
+                element_base!($ty, impl {
                     pub(crate) fn new(context: Weak<$crate::sandbox::Sandbox>) -> Self {
                         Self(<$raw_ty>::new(context))
                     }
