@@ -48,7 +48,7 @@ macro_rules! impl_wrapped_elements {
 
                 element_base!($ty, impl {        
                     pub(crate) fn new(context: Weak<$crate::sandbox::Sandbox>) -> Self {
-                        Self(Arc::new(<$raw_ty>::new(context)))
+                        Self(<$raw_ty>::new(context))
                     }
                     $($rest)*
                 });

@@ -32,12 +32,16 @@ pub struct InputEvent {}
 pub trait AnyRawNode: DowncastSync {
     /// Gives a weak reference to the sandbox the node was created in.
     fn get_context(&self) -> Weak<Sandbox>;
+
+    /// Clones the node
+    fn clone_node(&self) -> Arc<dyn AnyRawNode>;
 }
 impl_downcast!(sync AnyRawNode);
 
 macro_rules! impl_raw_nodes {
     ($((
         $ty: ty,
+        $storage: ty,
         $blurb: literal,
         $link: literal,
         impl { $( $rest:tt )* }
@@ -57,11 +61,10 @@ macro_rules! impl_raw_nodes {
                     /// Reference to the sandbox to which this node belongs
                     pub context: Weak<Sandbox>,
 
-                    /// Linkages to other nodes
-                    pub linkages: NodeLinkages,
-
                     /// Node behavior (fields/methods associated with the DOM class called Node)
                     pub node_behavior: Option<Arc<NodeBehavior>>,
+
+                    pub(crate) storage: $storage,
                 }
             }
 
@@ -70,13 +73,8 @@ macro_rules! impl_raw_nodes {
                     pub(crate) fn new(context: Weak<Sandbox>) -> Arc<$ty> {
                         let mut construction = Arc::new($ty {
                             context,
-                            linkages: NodeLinkages {
-                                parent: None,
-                                left_sibling: None,
-                                right_sibling: None,
-                                children: Vec::new()
-                            },
-                            node_behavior: None
+                            node_behavior: None,
+                            storage: Default::default()
                         });
 
                         let construction_weak = Arc::downgrade(&construction);
@@ -96,6 +94,15 @@ macro_rules! impl_raw_nodes {
                     fn get_context(&self) -> Weak<Sandbox> {
                         self.context.clone()
                     }
+
+                    fn clone_node(&self) -> Arc<dyn AnyRawNode> {
+                        let mut construction = $ty::new(self.get_context());
+
+                        let mut cons = Arc::get_mut(&mut construction).expect("Could not construct node");
+                        (*cons).storage = self.storage.clone();
+
+                        construction
+                    }
                 }
             }
         )*
@@ -105,12 +112,14 @@ macro_rules! impl_raw_nodes {
 impl_raw_nodes! {
     (
         TextNode,
+        (),
         "text",
         "Text",
         impl {}
     )
     (
         Document,
+        (),
         "document",
         "Document",
         impl {}
