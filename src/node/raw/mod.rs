@@ -7,6 +7,7 @@ use paste::paste;
 use std::rc::Rc;
 use std::sync::{Arc, Weak};
 
+use crate::behavior::NodeBehavior;
 use crate::error::DomError;
 use crate::sandbox::Sandbox;
 
@@ -58,25 +59,39 @@ macro_rules! impl_raw_nodes {
 
                     /// Linkages to other nodes
                     pub linkages: NodeLinkages,
+
+                    /// Node behavior (fields/methods associated with the DOM class called Node)
+                    pub node_behavior: Option<Arc<NodeBehavior>>,
                 }
             }
 
             paste! {
                 impl $ty {
-                    pub(crate) fn new(context: Weak<Sandbox>) -> Self {
-                        $ty {
+                    pub(crate) fn new(context: Weak<Sandbox>) -> Arc<$ty> {
+                        let mut construction = Arc::new($ty {
                             context,
                             linkages: NodeLinkages {
                                 parent: None,
                                 left_sibling: None,
                                 right_sibling: None,
                                 children: Vec::new()
-                            }
-                        }
+                            },
+                            node_behavior: None
+                        });
+
+                        let construction_weak = Arc::downgrade(&construction);
+
+                        let node_behavior = Arc::new(NodeBehavior::new(construction_weak.clone()));
+
+                        let mut cons = Arc::get_mut(&mut construction).expect("Could not construct node");
+                        (*cons).node_behavior = Some(node_behavior);
+
+                        construction
                     }
 
                     $($rest)*
                 }
+
                 impl AnyRawNode for $ty {
                     fn get_context(&self) -> Weak<Sandbox> {
                         self.context.clone()
