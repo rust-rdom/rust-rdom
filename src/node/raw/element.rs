@@ -16,9 +16,9 @@ impl_downcast!(sync AnyRawElement);
 macro_rules! impl_raw_elements {
     ($((
         $ty: ty,
-        $storage: ty,
-        $blurb: literal,
-        $link: literal,
+        storage: $storage: ty,
+        blurb: $blurb: literal,
+        link: $link: literal,
         impl { $( $rest:tt )* }
         $(, $postlude: literal)?
     ))*) => {
@@ -85,25 +85,25 @@ macro_rules! impl_raw_elements {
 impl_raw_elements! {
     (
         HtmlHtmlElement,
-        (),
-        "root document element",
-        "Document/documentElement",
+        storage: (),
+        blurb: "root document element",
+        link: "Document/documentElement",
         impl {},
         "(&lt;HTML /&gt;)"
     )
     (
         HtmlBodyElement,
-        (),
-        "body",
-        "Document/body",
+        storage: (),
+        blurb: "body",
+        link: "Document/body",
         impl {},
         "(&lt;BODY /&gt;)"
     )
     (
         HtmlButtonElement,
-        (),
-        "button",
-        "HTMLButtonElement",
+        storage: (),
+        blurb: "button",
+        link: "HTMLButtonElement",
         impl {},
         "(&lt;BUTTON /&gt;)"
     )

@@ -41,9 +41,9 @@ impl_downcast!(sync AnyRawNode);
 macro_rules! impl_raw_nodes {
     ($((
         $ty: ty,
-        $storage: ty,
-        $blurb: literal,
-        $link: literal,
+        storage: $storage: ty,
+        blurb: $blurb: literal,
+        link: $link: literal,
         impl { $( $rest:tt )* }
         $(, $postlude: literal)?
     ))*) => {
@@ -112,16 +112,16 @@ macro_rules! impl_raw_nodes {
 impl_raw_nodes! {
     (
         TextNode,
-        (),
-        "text",
-        "Text",
+        storage: (),
+        blurb: "text",
+        link: "Text",
         impl {}
     )
     (
         Document,
-        (),
-        "document",
-        "Document",
+        storage: (),
+        blurb: "document",
+        link: "Document",
         impl {}
     )
 }

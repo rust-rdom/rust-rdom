@@ -41,9 +41,9 @@ macro_rules! node_base {
 macro_rules! impl_wrapped_nodes {
     ($((
         $ty: ty,
-        $raw_ty: ty,
-        $blurb: literal,
-        $link: literal,
+        raw: $raw_ty: ty,
+        blurb: $blurb: literal,
+        link: $link: literal,
         impl { $( $rest:tt )* }
         $(, $postlude: literal)?
     ))*) => {
@@ -90,16 +90,16 @@ macro_rules! impl_wrapped_nodes {
 impl_wrapped_nodes! {
     (
         TextNode,
-        raw_node::TextNode,
-        "text",
-        "Text",
+        raw: raw_node::TextNode,
+        blurb: "text",
+        link: "Text",
         impl {}
     )
     (
         Document,
-        raw_node::Document,
-        "document",
-        "Document",
+        raw: raw_node::Document,
+        blurb: "document",
+        link: "Document",
         impl {
             fn query_selector(&self, selectors: &str) -> Result<Option<Element>, DomError> {
                 let sandbox = self.get_context().upgrade().ok_or_else(|| DomError::SandboxDropped)?;
