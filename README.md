@@ -1,11 +1,15 @@
-rdom: DOM in Rust without a browser
-===================================
+![rdom logo](rdom-logo.png)
+
+DOM in Rust without a browser
+===
 
 Hello and welcome. This library provides server-side or browserless simulation of a DOM.
 
+[<img alt="docs.rs" src="https://docs.rs/rdom/badge.svg" />](https://docs.rs/rdom/latest/rdom/)
+
 Is this library ready yet?
 ----
-No, it's still a pre-alpha work in progress.
+No, it's still a pre-alpha work in progress. However, it is open to collaboration.
 
 What's the difference between this library and say, web-sys or Dodrio?
 -----
