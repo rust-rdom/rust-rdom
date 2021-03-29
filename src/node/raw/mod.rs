@@ -107,6 +107,13 @@ macro_rules! impl_raw_nodes {
 
 impl_raw_nodes! {
     (
+        AttrNode,
+        storage: (),
+        blurb: "attr (attribute)",
+        link: "Attr",
+        impl {}
+    )
+    (
         TextNode,
         storage: (),
         blurb: "text",

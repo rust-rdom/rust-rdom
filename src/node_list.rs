@@ -6,10 +6,10 @@ use std::sync::{Arc, Weak};
 use crate::node::raw::{AnyRawNode, private::PrivateAnyRawNode};
 use crate::sandbox::Sandbox;
 
-/// Represents a [NodeList](https://developer.mozilla.org/en-US/docs/Web/API/NodeList), which
-/// may be either "live" or "static". Note that these are not strongly retained by the Sandbox,
-/// and there is no guarantee they will work after the Sandbox has been dropped. So, to use
-/// a NodeList, make sure you have retained both the Sandbox and an Rc to the NodeList before
+/// Represents a [NodeList](https://developer.mozilla.org/en-US/docs/Web/API/NodeList) structure,
+/// which may be either "live" or "static". Note that these are not strongly retained by the
+/// Sandbox, and there is no guarantee they will work after the Sandbox has been dropped. So, to
+/// use a NodeList, make sure you have retained both the Sandbox and an Rc to the NodeList before
 /// performing any operations.
 ///
 /// Also note that retaining a NodeList may cause other Nodes to be retained. For example,
@@ -34,10 +34,6 @@ impl NodeList {
     pub(crate) fn new_static(context: Weak<Sandbox>, elements: Vec<Arc<dyn AnyRawNode>>) -> Arc<NodeList> {
         let nodelist_storage = NodeListStorage::Static(elements);
         return NodeList::new(context, nodelist_storage);
-    }
-
-    fn get_context(&self) -> Weak<Sandbox> {
-        self.context.clone()
     }
 
     fn length(&self) -> usize {

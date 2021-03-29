@@ -21,6 +21,7 @@ pub mod behavior;
 pub mod config;
 pub mod error;
 pub mod node;
+pub mod named_node_map;
 pub mod node_list;
 pub mod sandbox;
 pub mod window;

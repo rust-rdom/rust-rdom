@@ -67,3 +67,17 @@ impl ElementBehavior {
         ElementBehavior { element }
     }
 }
+
+/// Behavior according to the DOM class called ParentNode
+pub struct ParentNodeBehavior {
+    /// Reference back up to the raw Node
+    node: Weak<dyn AnyRawNode>,
+}
+
+impl ParentNodeBehavior {
+    pub(crate) fn new(node: Weak<dyn AnyRawNode>) -> ParentNodeBehavior {
+        ParentNodeBehavior {
+            node,
+        }
+    }
+}
