@@ -12,18 +12,7 @@ use crate::error::DomError;
 use crate::sandbox::Sandbox;
 
 pub mod element;
-
-/// Linkages to other nodes
-pub struct NodeLinkages {
-    /// Descendant nodes of this node
-    pub children: Vec<Weak<dyn AnyRawNode>>,
-    /// Parent node of this node
-    pub parent: Option<Weak<dyn AnyRawNode>>,
-    /// Right sibling of this node
-    pub right_sibling: Option<Weak<dyn AnyRawNode>>,
-    /// Left sibling of this node
-    pub left_sibling: Option<Weak<dyn AnyRawNode>>,
-}
+pub mod node_list;
 
 /// An input event
 pub struct InputEvent {}
