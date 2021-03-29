@@ -39,17 +39,12 @@ impl NodeBehavior {
         self.child_nodes.last()
     }
 
-    pub(crate) fn append_child(&mut self, other: Arc<dyn AnyRawNode>) -> Result<(), DomError> {
-        // NOTE: child_nodes is limited to u32::MAX to imitate web_sys
-        if self.child_nodes.len() == u32::MAX as usize {
-            return Err(DomError::ObjectOutOfMemory);
-        }
-        self.child_nodes.push(other);
-        Ok(())
+    pub(crate) fn append_child(&mut self, other: Arc<dyn AnyRawNode>) {
+        self.child_nodes.push(other)
     }
 
-    pub(crate) fn static_child_nodes(&self) -> (u32, Vec<Arc<dyn AnyRawNode>>) {
-        (self.child_nodes.len() as u32, self.child_nodes.clone())
+    pub(crate) fn static_child_nodes(&self) -> Vec<Arc<dyn AnyRawNode>> {
+        self.child_nodes.clone()
     }
 
     pub(crate) fn clone_node(&self) -> Result<Arc<dyn AnyRawNode>, DomError> {

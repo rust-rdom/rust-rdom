@@ -31,39 +31,44 @@ impl NodeList {
         })
     }
 
-    pub(crate) fn new_static(context: Weak<Sandbox>, elements: Vec<Arc<dyn AnyRawNode>>) -> Option<Arc<NodeList>> {
-        if elements.len() >= u32::MAX as usize {
-            return None;
-        }
+    pub(crate) fn new_static(context: Weak<Sandbox>, elements: Vec<Arc<dyn AnyRawNode>>) -> Arc<NodeList> {
         let nodelist_storage = NodeListStorage::Static(elements);
-        return Some(NodeList::new(context, nodelist_storage));
+        return NodeList::new(context, nodelist_storage);
     }
 
     fn get_context(&self) -> Weak<Sandbox> {
         self.context.clone()
     }
 
-    fn length(&self) -> u32 {
+    fn length(&self) -> usize {
         match &self.nodelist_storage {
-            NodeListStorage::Static(list) => list.len() as u32,
+            NodeListStorage::Static(list) => list.len(),
             NodeListStorage::Live(query) => {
                 match query {
                     Query::ChildNodes { children_of } => {
-                        let (size, _) = (*children_of).get_node_behavior().static_child_nodes();
-                        size
+                        children_of.get_node_behavior().static_child_nodes().len()
                     }
                 }
             }
         }
     }
 
-    // fn item(&self, index: u32) -> u32 {
+    fn item(&self, index: usize) -> Option<Arc<dyn AnyRawNode>> {
+        match &self.nodelist_storage {
+            NodeListStorage::Static(list) => list.get(index).map(|r| r.clone()),
+            NodeListStorage::Live(query) => {
+                match query {
+                    Query::ChildNodes { children_of } => {
+                        children_of.get_node_behavior().static_child_nodes().get(index).map(|r| r.clone())
+                    }
+                }
+            }
+        }
+    }
 
-    // }
-
-    // fn get(&self, index: u32) -> u32 {
-    //     self.item(index)
-    // }
+    fn get(&self, index: usize) -> Option<Arc<dyn AnyRawNode>> {
+        self.item(index)
+    }
 }
 
 /// An encapsulation of how the NodeList will respond to operations.
