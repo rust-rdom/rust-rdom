@@ -7,18 +7,19 @@ use paste::paste;
 use std::rc::Rc;
 use std::sync::{Arc, Weak};
 
+use crate::node::raw::private::PrivateAnyRawNode;
 use crate::behavior::NodeBehavior;
 use crate::error::DomError;
 use crate::sandbox::Sandbox;
 
+pub(crate) mod private;
 pub mod element;
-pub mod node_list;
 
 /// An input event
 pub struct InputEvent {}
 
 /// A base trait for all raw node types
-pub trait AnyRawNode: DowncastSync {
+pub trait AnyRawNode: DowncastSync + PrivateAnyRawNode {
     /// Gives a weak reference to the sandbox the node was created in.
     fn get_context(&self) -> Weak<Sandbox>;
 
@@ -51,7 +52,7 @@ macro_rules! impl_raw_nodes {
                     pub context: Weak<Sandbox>,
 
                     /// Node behavior (fields/methods associated with the DOM class called Node)
-                    pub node_behavior: Option<Arc<NodeBehavior>>,
+                    pub(crate) node_behavior: Option<Arc<NodeBehavior>>,
 
                     pub(crate) storage: $storage,
                 }
@@ -91,6 +92,12 @@ macro_rules! impl_raw_nodes {
                         (*cons).storage = self.storage.clone();
 
                         construction
+                    }
+                }
+
+                impl PrivateAnyRawNode for $ty {
+                    fn get_node_behavior(&self) -> Arc<NodeBehavior> {
+                        self.node_behavior.clone().unwrap()
                     }
                 }
             }

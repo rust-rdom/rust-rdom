@@ -14,4 +14,9 @@ pub enum DomError {
     /// disappeared.
     #[error("the sandbox was dropped")]
     SandboxDropped,
+
+    /// The object being operated on is out of memory. This does not mean the
+    /// sandbox as a whole is out of memory.
+    #[error("object out of memory")]
+    ObjectOutOfMemory,
 }

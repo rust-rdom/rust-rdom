@@ -6,7 +6,8 @@ use paste::paste;
 use std::sync::{Arc, Weak};
 
 use crate::behavior::NodeBehavior;
-use crate::node::raw::AnyRawNode;
+use crate::node::raw::private::PrivateAnyRawNode;
+use crate::node::raw::{AnyRawNode};
 use crate::sandbox::Sandbox;
 
 /// A base trait for all raw element types
@@ -37,7 +38,7 @@ macro_rules! impl_raw_elements {
                     pub context: Weak<Sandbox>,
 
                     /// Node behavior (fields/methods associated with the DOM class called Node)
-                    pub node_behavior: Option<Arc<NodeBehavior>>,
+                    pub(crate) node_behavior: Option<Arc<NodeBehavior>>,
 
                     pub(crate) storage: $storage,
                 }
@@ -75,6 +76,12 @@ macro_rules! impl_raw_elements {
                         (*cons).storage = self.storage.clone();
 
                         construction
+                    }
+                }
+
+                impl PrivateAnyRawNode for $ty {
+                    fn get_node_behavior(&self) -> Arc<NodeBehavior> {
+                        self.node_behavior.clone().unwrap()
                     }
                 }
             }
