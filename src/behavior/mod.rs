@@ -76,8 +76,6 @@ pub struct ParentNodeBehavior {
 
 impl ParentNodeBehavior {
     pub(crate) fn new(node: Weak<dyn AnyRawNode>) -> ParentNodeBehavior {
-        ParentNodeBehavior {
-            node,
-        }
+        ParentNodeBehavior { node }
     }
 }

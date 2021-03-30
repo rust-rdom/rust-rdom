@@ -24,7 +24,7 @@ impl Sandbox {
             let win = Window::new(sandbox_weak.clone());
             Sandbox {
                 screen_metrics,
-                window: win
+                window: win,
             }
         });
 

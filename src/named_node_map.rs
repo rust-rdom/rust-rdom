@@ -3,7 +3,7 @@
 
 use std::sync::{Arc, Weak};
 
-use crate::node::raw::{AnyRawNode, AttrNode, element::AnyRawElement, private::PrivateAnyRawNode};
+use crate::node::raw::{element::AnyRawElement, private::PrivateAnyRawNode, AnyRawNode, AttrNode};
 use crate::sandbox::Sandbox;
 
 /// A [NamedNodeMap](https://developer.mozilla.org/en-US/docs/Web/API/NamedNodeMap) structure
@@ -23,7 +23,7 @@ impl NamedNodeMap {
         Arc::new(NamedNodeMap {
             context,
             element,
-            attribute_list: Vec::new()
+            attribute_list: Vec::new(),
         })
     }
 

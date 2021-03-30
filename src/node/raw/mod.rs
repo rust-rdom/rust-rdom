@@ -7,14 +7,14 @@ use paste::paste;
 use std::rc::Rc;
 use std::sync::{Arc, Weak};
 
-use crate::node::raw::private::PrivateAnyRawNode;
-use crate::window::Window;
 use crate::behavior::NodeBehavior;
 use crate::error::DomError;
+use crate::node::raw::private::PrivateAnyRawNode;
 use crate::sandbox::Sandbox;
+use crate::window::Window;
 
-pub(crate) mod private;
 pub mod element;
+pub(crate) mod private;
 
 /// An input event
 pub struct InputEvent {}

@@ -3,7 +3,7 @@
 
 use std::sync::{Arc, Weak};
 
-use crate::node::raw::{AnyRawNode, private::PrivateAnyRawNode};
+use crate::node::raw::{private::PrivateAnyRawNode, AnyRawNode};
 use crate::sandbox::Sandbox;
 
 /// Represents a [NodeList](https://developer.mozilla.org/en-US/docs/Web/API/NodeList) structure,
@@ -27,11 +27,14 @@ impl NodeList {
     fn new(context: Weak<Sandbox>, nodelist_storage: NodeListStorage) -> Arc<NodeList> {
         Arc::new(NodeList {
             context,
-            nodelist_storage
+            nodelist_storage,
         })
     }
 
-    pub(crate) fn new_static(context: Weak<Sandbox>, elements: Vec<Arc<dyn AnyRawNode>>) -> Arc<NodeList> {
+    pub(crate) fn new_static(
+        context: Weak<Sandbox>,
+        elements: Vec<Arc<dyn AnyRawNode>>,
+    ) -> Arc<NodeList> {
         let nodelist_storage = NodeListStorage::Static(elements);
         return NodeList::new(context, nodelist_storage);
     }
@@ -39,26 +42,24 @@ impl NodeList {
     fn length(&self) -> usize {
         match &self.nodelist_storage {
             NodeListStorage::Static(list) => list.len(),
-            NodeListStorage::Live(query) => {
-                match query {
-                    Query::ChildNodes { children_of } => {
-                        children_of.get_node_behavior().static_child_nodes().len()
-                    }
+            NodeListStorage::Live(query) => match query {
+                Query::ChildNodes { children_of } => {
+                    children_of.get_node_behavior().static_child_nodes().len()
                 }
-            }
+            },
         }
     }
 
     fn item(&self, index: usize) -> Option<Arc<dyn AnyRawNode>> {
         match &self.nodelist_storage {
             NodeListStorage::Static(list) => list.get(index).map(|r| r.clone()),
-            NodeListStorage::Live(query) => {
-                match query {
-                    Query::ChildNodes { children_of } => {
-                        children_of.get_node_behavior().static_child_nodes().get(index).map(|r| r.clone())
-                    }
-                }
-            }
+            NodeListStorage::Live(query) => match query {
+                Query::ChildNodes { children_of } => children_of
+                    .get_node_behavior()
+                    .static_child_nodes()
+                    .get(index)
+                    .map(|r| r.clone()),
+            },
         }
     }
 
@@ -77,7 +78,5 @@ pub(crate) enum NodeListStorage {
 }
 
 pub(crate) enum Query {
-    ChildNodes {
-        children_of: Arc<dyn AnyRawNode>
-    },
+    ChildNodes { children_of: Arc<dyn AnyRawNode> },
 }
