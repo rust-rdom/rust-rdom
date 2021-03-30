@@ -6,7 +6,7 @@ DOM in Rust without a browser
 Hello and welcome. This library provides server-side or browserless simulation of a DOM.
 
 [<img alt="docs.rs" src="https://docs.rs/rdom/badge.svg" />](https://docs.rs/rdom/latest/rdom/)
-[![Discord Chat](https://img.shields.io/discord/308323056592486420.svg)](https://discord.gg/a6AWa35Sj8)
+[![Discord Chat](https://img.shields.io/discord/826351203637133373.svg)](https://discord.gg/a6AWa35Sj8)
 
 Is this library ready yet?
 ----
