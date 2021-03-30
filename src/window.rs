@@ -15,7 +15,7 @@ pub struct Window {
 impl Window {
     pub(crate) fn new(context: Weak<Sandbox>) -> Arc<Window> {
         let window = Arc::new_cyclic(|win_weak| -> Window {
-            let mut document: Arc<Document> = Document::new(
+            let document: Arc<Document> = Document::new(
                 context.clone(),
                 DocumentStorage {
                     default_view: win_weak.clone(),

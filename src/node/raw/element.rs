@@ -1,5 +1,3 @@
-#![feature(arc_new_cyclic)]
-
 //! Raw representation of a DOM element. See [node](../../index.html) module for distinction from
 //! wrapped representation.
 

@@ -54,13 +54,13 @@ impl NodeList {
     /// NodeList#item
     pub fn item(&self, index: usize) -> Option<Arc<dyn AnyRawNode>> {
         match &self.nodelist_storage {
-            NodeListStorage::Static(list) => list.get(index).map(|r| r.clone()),
+            NodeListStorage::Static(list) => list.get(index).cloned(),
             NodeListStorage::Live(query) => match query {
                 Query::ChildNodes { children_of } => children_of
                     .get_node_behavior()
                     .static_child_nodes()
                     .get(index)
-                    .map(|r| r.clone()),
+                    .cloned(),
             },
         }
     }

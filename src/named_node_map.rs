@@ -32,6 +32,6 @@ impl NamedNodeMap {
     }
 
     fn item(&self, index: usize) -> Option<Arc<AttrNode>> {
-        self.attribute_list.get(index).map(|v| v.clone())
+        self.attribute_list.get(index).cloned()
     }
 }
