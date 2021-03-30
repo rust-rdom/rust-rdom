@@ -11,7 +11,7 @@ use crate::node::raw::AnyRawNode;
 fn it_works() {
     let metrics: ScreenMetrics = Default::default();
     let sbox = Sandbox::new(metrics);
-    let mut doc = sbox.clone().window().document();
+    let doc = sbox.clone().window().document();
     let document_element = HtmlHtmlElement::new(Arc::downgrade(&sbox), ());
     let text = doc.create_text_node("Hello, world!".to_string());
     doc.append_child(document_element);

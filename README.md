@@ -8,6 +8,32 @@ Hello and welcome. This library provides server-side or browserless simulation o
 [<img alt="docs.rs" src="https://docs.rs/rdom/badge.svg" />](https://docs.rs/rdom/latest/rdom/)
 [![Discord Chat](https://img.shields.io/discord/826351203637133373.svg)](https://discord.gg/a6AWa35Sj8)
 
+Example Usage
+---
+
+```rust
+use std::sync::Arc;
+
+use rdom::config::ScreenMetrics;
+use rdom::sandbox::Sandbox;
+use rdom::node::raw::element::{HtmlHtmlElement, HtmlBodyElement};
+use rdom::node::raw::AnyRawNode;
+
+fn main() {
+    let metrics: ScreenMetrics = Default::default();
+    let sbox = Sandbox::new(metrics);
+    let doc = sbox.clone().window().document();
+    let document_element = HtmlHtmlElement::new(Arc::downgrade(&sbox), ());
+    doc.append_child(document_element);
+
+    // We don't use the text node, but those are available
+    let _text = doc.create_text_node("Hello, world!".to_string());
+
+    println!("Doc has {} child node(s)", doc.child_nodes().length());
+    // Prints out Doc has 1 child node(s)
+}
+```
+
 Is this library ready yet?
 ----
 No, it's still a pre-alpha work in progress. However, it is open to collaboration.
