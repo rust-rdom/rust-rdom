@@ -3,9 +3,9 @@
 use std::sync::Arc;
 
 use crate::config::ScreenMetrics;
-use crate::sandbox::Sandbox;
-use crate::node::raw::element::{HtmlHtmlElement, HtmlBodyElement};
+use crate::node::raw::element::{HtmlBodyElement, HtmlHtmlElement};
 use crate::node::raw::AnyRawNode;
+use crate::sandbox::Sandbox;
 
 #[test]
 fn it_works() {

@@ -3,12 +3,12 @@
 //! this module provides several structures that provide the same behavior but in a Rust-
 //! friendly way (using composition instead of inheritance).
 
-use std::sync::{Arc, Weak, RwLock};
+use std::sync::{Arc, RwLock, Weak};
 
 use crate::error::DomError;
-use crate::node_list::{NodeList, NodeListStorage, Query};
 use crate::node::raw::element as raw_element;
 use crate::node::raw::AnyRawNode;
+use crate::node_list::{NodeList, NodeListStorage, Query};
 
 /// Behavior according to the DOM class called Node
 pub struct NodeBehavior {
@@ -54,10 +54,11 @@ impl NodeBehavior {
     pub(crate) fn child_nodes(&self) -> Arc<NodeList> {
         let strong_ref = self.node.upgrade().expect("Sandbox dropped");
 
-        NodeList::new(strong_ref.get_context(),
+        NodeList::new(
+            strong_ref.get_context(),
             NodeListStorage::Live(Query::ChildNodes {
-                children_of: strong_ref
-            })
+                children_of: strong_ref,
+            }),
         )
     }
 

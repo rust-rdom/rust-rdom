@@ -6,9 +6,9 @@ use paste::paste;
 use std::sync::{Arc, Weak};
 
 use crate::behavior::NodeBehavior;
-use crate::node_list::NodeList;
 use crate::node::raw::private::PrivateAnyRawNode;
 use crate::node::raw::AnyRawNode;
+use crate::node_list::NodeList;
 use crate::sandbox::Sandbox;
 
 /// A base trait for all raw element types
