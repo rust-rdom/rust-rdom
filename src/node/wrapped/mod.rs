@@ -61,7 +61,7 @@ macro_rules! impl_wrapped_nodes {
 
                 node_base!($ty, impl {
                     pub(crate) fn new(context: Weak<$crate::sandbox::Sandbox>) -> Self {
-                        Self(<$raw_ty>::new(context))
+                        Self(<$raw_ty>::new(context, Default::default()))
                     }
                     $($rest)*
                 });

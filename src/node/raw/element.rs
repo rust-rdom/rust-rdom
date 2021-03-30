@@ -1,3 +1,5 @@
+#![feature(arc_new_cyclic)]
+
 //! Raw representation of a DOM element. See [node](../../index.html) module for distinction from
 //! wrapped representation.
 
@@ -38,7 +40,7 @@ macro_rules! impl_raw_elements {
                     pub context: Weak<Sandbox>,
 
                     /// Node behavior (fields/methods associated with the DOM class called Node)
-                    pub(crate) node_behavior: Option<Arc<NodeBehavior>>,
+                    pub(crate) node_behavior: Arc<NodeBehavior>,
 
                     pub(crate) storage: $storage,
                 }
@@ -47,18 +49,13 @@ macro_rules! impl_raw_elements {
             paste! {
                 impl $ty {
                     pub(crate) fn new(context: Weak<Sandbox>) -> Arc<$ty> {
-                        let mut construction = Arc::new($ty {
-                            context,
-                            node_behavior: None,
-                            storage: Default::default()
+                        let construction: Arc<$ty> = Arc::new_cyclic(|construction_weak| -> $ty {
+                            $ty {
+                                context,
+                                node_behavior: Arc::new(NodeBehavior::new(construction_weak.clone())),
+                                storage: Default::default()
+                            }
                         });
-
-                        let construction_weak = Arc::downgrade(&construction);
-
-                        let node_behavior = Arc::new(NodeBehavior::new(construction_weak.clone()));
-
-                        let mut cons = Arc::get_mut(&mut construction).expect("Could not construct element");
-                        (*cons).node_behavior = Some(node_behavior);
 
                         construction
                     }
@@ -81,7 +78,7 @@ macro_rules! impl_raw_elements {
 
                 impl PrivateAnyRawNode for $ty {
                     fn get_node_behavior(&self) -> Arc<NodeBehavior> {
-                        self.node_behavior.clone().unwrap()
+                        self.node_behavior.clone()
                     }
                 }
             }

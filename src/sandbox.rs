@@ -14,34 +14,27 @@ use crate::window::Window;
 #[derive(Clone)]
 pub struct Sandbox {
     screen_metrics: ScreenMetrics,
-    document: Option<Arc<Document>>,
-    window: Option<Arc<Window>>,
+    window: Arc<Window>,
 }
 
 impl Sandbox {
-    fn new(screen_metrics: ScreenMetrics) -> Arc<Sandbox> {
-        let mut sandbox = Arc::new(Sandbox {
-            screen_metrics,
-            document: None,
-            window: None,
+    /// Creates a new sandbox (enclosure of a single DOM context)
+    pub fn new(screen_metrics: ScreenMetrics) -> Arc<Sandbox> {
+        let sandbox = Arc::new_cyclic(|sandbox_weak| -> Sandbox {
+            let win = Window::new(sandbox_weak.clone());
+            Sandbox {
+                screen_metrics,
+                window: win
+            }
         });
-        let sandbox_weak = Arc::downgrade(&sandbox);
-
-        let win = Arc::new(Window::new(sandbox_weak.clone()));
-        let doc = Arc::new(Document::new(sandbox_weak.clone()));
-
-        let mut sbox = Arc::get_mut(&mut sandbox).expect("Could not construct sandbox");
-        (*sbox).window = Some(win);
-        (*sbox).document = Some(doc);
 
         sandbox
     }
-}
 
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn does_compile() {
-        struct Foo {}
+    /// Gets the root window object
+    pub fn window(&self) -> Arc<Window> {
+        // Window is safe to unwrap, as it's only None during initialization.
+        // This will be fixable when arc_new_cyclic is stable.
+        self.window.clone()
     }
 }

@@ -8,6 +8,7 @@ use std::rc::Rc;
 use std::sync::{Arc, Weak};
 
 use crate::node::raw::private::PrivateAnyRawNode;
+use crate::window::Window;
 use crate::behavior::NodeBehavior;
 use crate::error::DomError;
 use crate::sandbox::Sandbox;
@@ -52,7 +53,7 @@ macro_rules! impl_raw_nodes {
                     pub context: Weak<Sandbox>,
 
                     /// Node behavior (fields/methods associated with the DOM class called Node)
-                    pub(crate) node_behavior: Option<Arc<NodeBehavior>>,
+                    pub(crate) node_behavior: Arc<NodeBehavior>,
 
                     pub(crate) storage: $storage,
                 }
@@ -60,19 +61,14 @@ macro_rules! impl_raw_nodes {
 
             paste! {
                 impl $ty {
-                    pub(crate) fn new(context: Weak<Sandbox>) -> Arc<$ty> {
-                        let mut construction = Arc::new($ty {
-                            context,
-                            node_behavior: None,
-                            storage: Default::default()
+                    pub(crate) fn new(context: Weak<Sandbox>, storage: $storage) -> Arc<$ty> {
+                        let construction: Arc<$ty> = Arc::new_cyclic(|construction_weak| -> $ty {
+                            $ty {
+                                context,
+                                node_behavior: Arc::new(NodeBehavior::new(construction_weak.clone())),
+                                storage,
+                            }
                         });
-
-                        let construction_weak = Arc::downgrade(&construction);
-
-                        let node_behavior = Arc::new(NodeBehavior::new(construction_weak.clone()));
-
-                        let mut cons = Arc::get_mut(&mut construction).expect("Could not construct node");
-                        (*cons).node_behavior = Some(node_behavior);
 
                         construction
                     }
@@ -86,7 +82,7 @@ macro_rules! impl_raw_nodes {
                     }
 
                     fn clone_node(&self) -> Arc<dyn AnyRawNode> {
-                        let mut construction = $ty::new(self.get_context());
+                        let mut construction = $ty::new(self.get_context(), Default::default());
 
                         let mut cons = Arc::get_mut(&mut construction).expect("Could not construct node");
                         (*cons).storage = self.storage.clone();
@@ -97,12 +93,18 @@ macro_rules! impl_raw_nodes {
 
                 impl PrivateAnyRawNode for $ty {
                     fn get_node_behavior(&self) -> Arc<NodeBehavior> {
-                        self.node_behavior.clone().unwrap()
+                        self.node_behavior.clone()
                     }
                 }
             }
         )*
     }
+}
+
+#[derive(Default, Clone)]
+pub(crate) struct DocumentStorage {
+    // Pointer back up to the window
+    pub(crate) default_view: Weak<Window>,
 }
 
 impl_raw_nodes! {
@@ -122,7 +124,7 @@ impl_raw_nodes! {
     )
     (
         Document,
-        storage: (),
+        storage: DocumentStorage,
         blurb: "document",
         link: "Document",
         impl {}
