@@ -48,7 +48,10 @@ macro_rules! impl_wrapped_elements {
 
                 element_base!($ty, impl {
                     pub(crate) fn new(context: Weak<$crate::sandbox::Sandbox>) -> Self {
-                        Self(<$raw_ty>::new(context))
+                        // TODO maybe just don't provide constructors in wrapped elements/nodes?
+                        // calling default for someone seems a bit disingenuous, and who says
+                        // we can just instantiate any type of node?
+                        Self(<$raw_ty>::new(context, Default::default()))
                     }
                     $($rest)*
                 });

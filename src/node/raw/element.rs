@@ -48,12 +48,12 @@ macro_rules! impl_raw_elements {
 
             paste! {
                 impl $ty {
-                    pub(crate) fn new(context: Weak<Sandbox>) -> Arc<$ty> {
+                    pub(crate) fn new(context: Weak<Sandbox>, storage: $storage) -> Arc<$ty> {
                         let construction: Arc<$ty> = Arc::new_cyclic(|construction_weak| -> $ty {
                             $ty {
                                 context,
                                 node_behavior: Arc::new(NodeBehavior::new(construction_weak.clone())),
-                                storage: Default::default()
+                                storage
                             }
                         });
 
@@ -67,12 +67,10 @@ macro_rules! impl_raw_elements {
                     }
 
                     fn clone_node(&self) -> Arc<dyn AnyRawNode> {
-                        let mut construction = $ty::new(self.get_context());
-
-                        let mut cons = Arc::get_mut(&mut construction).expect("Could not construct node");
-                        (*cons).storage = self.storage.clone();
-
-                        construction
+                        // TODO this call to clone should really be something
+                        // other than the standard clone trait. It is (will be/should be)
+                        // our own logic specific to rdom and NOT just a verbatim clone.
+                        $ty::new(self.get_context(), self.storage.clone())
                     }
                 }
 
