@@ -8,6 +8,7 @@ use paste::paste;
 use std::sync::{Arc, Weak};
 
 use crate::behavior::NodeBehavior;
+use crate::node_list::NodeList;
 use crate::node::raw::private::PrivateAnyRawNode;
 use crate::node::raw::AnyRawNode;
 use crate::sandbox::Sandbox;
@@ -71,6 +72,22 @@ macro_rules! impl_raw_elements {
                         // other than the standard clone trait. It is (will be/should be)
                         // our own logic specific to rdom and NOT just a verbatim clone.
                         $ty::new(self.get_context(), self.storage.clone())
+                    }
+
+                    fn first_child(&self) -> Option<Arc<dyn AnyRawNode>> {
+                        self.node_behavior.first_child()
+                    }
+
+                    fn last_child(&self) -> Option<Arc<dyn AnyRawNode>> {
+                        self.node_behavior.last_child()
+                    }
+
+                    fn append_child(&self, other: Arc<dyn AnyRawNode>) {
+                        self.node_behavior.append_child(other)
+                    }
+
+                    fn child_nodes(&self) -> Arc<NodeList> {
+                        self.node_behavior.child_nodes()
                     }
                 }
 

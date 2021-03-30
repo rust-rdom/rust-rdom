@@ -10,6 +10,7 @@ use std::sync::{Arc, Weak};
 use crate::behavior::NodeBehavior;
 use crate::error::DomError;
 use crate::node::raw::private::PrivateAnyRawNode;
+use crate::node_list::NodeList;
 use crate::sandbox::Sandbox;
 use crate::window::Window;
 
@@ -26,6 +27,18 @@ pub trait AnyRawNode: DowncastSync + PrivateAnyRawNode {
 
     /// Clones the node
     fn clone_node(&self) -> Arc<dyn AnyRawNode>;
+
+    /// Returns the node's first child in the tree
+    fn first_child(&self) -> Option<Arc<dyn AnyRawNode>>;
+
+    /// Returns the node's last child in the tree
+    fn last_child(&self) -> Option<Arc<dyn AnyRawNode>>;
+
+    /// Appends a node as a child
+    fn append_child(&self, other: Arc<dyn AnyRawNode>);
+
+    /// Returns a live NodeList representing the children of the node
+    fn child_nodes(&self) -> Arc<NodeList>;
 }
 impl_downcast!(sync AnyRawNode);
 
@@ -89,6 +102,22 @@ macro_rules! impl_raw_nodes {
 
                         construction
                     }
+
+                    fn first_child(&self) -> Option<Arc<dyn AnyRawNode>> {
+                        self.node_behavior.first_child()
+                    }
+
+                    fn last_child(&self) -> Option<Arc<dyn AnyRawNode>> {
+                        self.node_behavior.last_child()
+                    }
+
+                    fn append_child(&self, other: Arc<dyn AnyRawNode>) {
+                        self.node_behavior.append_child(other)
+                    }
+
+                    fn child_nodes(&self) -> Arc<NodeList> {
+                        self.node_behavior.child_nodes()
+                    }
                 }
 
                 impl PrivateAnyRawNode for $ty {
@@ -103,8 +132,14 @@ macro_rules! impl_raw_nodes {
 
 #[derive(Default, Clone)]
 pub(crate) struct DocumentStorage {
-    // Pointer back up to the window
+    /// Pointer back up to the window
     pub(crate) default_view: Weak<Window>,
+}
+
+#[derive(Default, Clone)]
+pub(crate) struct TextNodeStorage {
+    /// Text in the text node
+    pub(crate) text: String,
 }
 
 impl_raw_nodes! {
@@ -117,7 +152,7 @@ impl_raw_nodes! {
     )
     (
         TextNode,
-        storage: (),
+        storage: TextNodeStorage,
         blurb: "text",
         link: "Text",
         impl {}
@@ -127,6 +162,11 @@ impl_raw_nodes! {
         storage: DocumentStorage,
         blurb: "document",
         link: "Document",
-        impl {}
+        impl {
+            /// Creates a text node.
+            pub fn create_text_node(&self, text: String) -> Arc<TextNode> {
+                TextNode::new(self.get_context(), TextNodeStorage { text })
+            }
+        }
     )
 }

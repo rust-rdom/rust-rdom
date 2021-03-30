@@ -3,9 +3,10 @@
 //! this module provides several structures that provide the same behavior but in a Rust-
 //! friendly way (using composition instead of inheritance).
 
-use std::sync::{Arc, Weak};
+use std::sync::{Arc, Weak, RwLock};
 
 use crate::error::DomError;
+use crate::node_list::{NodeList, NodeListStorage, Query};
 use crate::node::raw::element as raw_element;
 use crate::node::raw::AnyRawNode;
 
@@ -17,7 +18,7 @@ pub struct NodeBehavior {
     parent_node: Option<Weak<dyn AnyRawNode>>,
     left_sibling: Option<Weak<dyn AnyRawNode>>,
     right_sibling: Option<Weak<dyn AnyRawNode>>,
-    child_nodes: Vec<Arc<dyn AnyRawNode>>,
+    child_nodes: RwLock<Vec<Arc<dyn AnyRawNode>>>,
 }
 
 impl NodeBehavior {
@@ -27,24 +28,37 @@ impl NodeBehavior {
             parent_node: None,
             left_sibling: None,
             right_sibling: None,
-            child_nodes: Vec::new(),
+            child_nodes: RwLock::new(Vec::new()),
         }
     }
 
-    pub(crate) fn first_child(&self) -> Option<&Arc<dyn AnyRawNode>> {
-        self.child_nodes.first()
+    pub(crate) fn first_child(&self) -> Option<Arc<dyn AnyRawNode>> {
+        let lock = self.child_nodes.read().unwrap();
+        (*lock).first().cloned()
     }
 
-    pub(crate) fn last_child(&self) -> Option<&Arc<dyn AnyRawNode>> {
-        self.child_nodes.last()
+    pub(crate) fn last_child(&self) -> Option<Arc<dyn AnyRawNode>> {
+        let lock = self.child_nodes.read().unwrap();
+        (*lock).last().cloned()
     }
 
-    pub(crate) fn append_child(&mut self, other: Arc<dyn AnyRawNode>) {
-        self.child_nodes.push(other)
+    pub(crate) fn append_child(&self, other: Arc<dyn AnyRawNode>) {
+        let mut lock = self.child_nodes.write().unwrap();
+        (*lock).push(other);
     }
 
     pub(crate) fn static_child_nodes(&self) -> Vec<Arc<dyn AnyRawNode>> {
-        self.child_nodes.clone()
+        self.child_nodes.read().unwrap().clone()
+    }
+
+    pub(crate) fn child_nodes(&self) -> Arc<NodeList> {
+        let strong_ref = self.node.upgrade().expect("Sandbox dropped");
+
+        NodeList::new(strong_ref.get_context(),
+            NodeListStorage::Live(Query::ChildNodes {
+                children_of: strong_ref
+            })
+        )
     }
 
     pub(crate) fn clone_node(&self) -> Result<Arc<dyn AnyRawNode>, DomError> {

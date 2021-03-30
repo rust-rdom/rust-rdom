@@ -24,7 +24,7 @@ pub struct NodeList {
 }
 
 impl NodeList {
-    fn new(context: Weak<Sandbox>, nodelist_storage: NodeListStorage) -> Arc<NodeList> {
+    pub(crate) fn new(context: Weak<Sandbox>, nodelist_storage: NodeListStorage) -> Arc<NodeList> {
         Arc::new(NodeList {
             context,
             nodelist_storage,
@@ -39,7 +39,8 @@ impl NodeList {
         return NodeList::new(context, nodelist_storage);
     }
 
-    fn length(&self) -> usize {
+    /// NodeList#length
+    pub fn length(&self) -> usize {
         match &self.nodelist_storage {
             NodeListStorage::Static(list) => list.len(),
             NodeListStorage::Live(query) => match query {
@@ -50,7 +51,8 @@ impl NodeList {
         }
     }
 
-    fn item(&self, index: usize) -> Option<Arc<dyn AnyRawNode>> {
+    /// NodeList#item
+    pub fn item(&self, index: usize) -> Option<Arc<dyn AnyRawNode>> {
         match &self.nodelist_storage {
             NodeListStorage::Static(list) => list.get(index).map(|r| r.clone()),
             NodeListStorage::Live(query) => match query {
@@ -63,7 +65,8 @@ impl NodeList {
         }
     }
 
-    fn get(&self, index: usize) -> Option<Arc<dyn AnyRawNode>> {
+    /// NodeList#get
+    pub fn get(&self, index: usize) -> Option<Arc<dyn AnyRawNode>> {
         self.item(index)
     }
 }
