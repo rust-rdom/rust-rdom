@@ -3,7 +3,7 @@
 
 use std::sync::{Arc, Weak};
 
-use crate::node::raw::{private::PrivateAnyRawNode, AnyRawNode};
+use crate::internal_prelude::*;
 use crate::sandbox::Sandbox;
 
 /// Represents a [NodeList](https://developer.mozilla.org/en-US/docs/Web/API/NodeList) structure,
@@ -36,7 +36,7 @@ impl NodeList {
         elements: Vec<Arc<dyn AnyRawNode>>,
     ) -> Arc<NodeList> {
         let nodelist_storage = NodeListStorage::Static(elements);
-        return NodeList::new(context, nodelist_storage);
+        NodeList::new(context, nodelist_storage)
     }
 
     /// NodeList#length

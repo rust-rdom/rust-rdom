@@ -15,9 +15,7 @@
 #[macro_use]
 extern crate downcast_rs;
 
-use crate::config::ScreenMetrics;
-use crate::window::Window;
-
+pub(crate) mod internal_prelude;
 pub(crate) mod behavior;
 pub mod config;
 pub mod error;

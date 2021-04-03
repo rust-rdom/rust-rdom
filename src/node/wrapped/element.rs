@@ -1,3 +1,6 @@
+//! Wrapped representation of a DOM Element. See [node](../../index.html) module for distinction from
+//! raw representation.
+
 use paste::paste;
 
 use std::convert::TryFrom;
@@ -5,9 +8,8 @@ use std::result::Result;
 use std::sync::{Arc, Weak};
 
 use super::AnyWrappedNode;
-use crate::node::raw::{self as raw_node, element as raw_element, AnyRawNode};
+use crate::internal_prelude::*;
 use crate::node_base;
-use crate::sandbox::Sandbox;
 
 /// A base trait for all wrapped element types
 pub trait AnyWrappedElement: AnyWrappedNode {}

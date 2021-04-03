@@ -14,7 +14,7 @@ pub struct Window {
 
 impl Window {
     pub(crate) fn new(context: Weak<Sandbox>) -> Arc<Window> {
-        let window = Arc::new_cyclic(|win_weak| -> Window {
+        Arc::new_cyclic(|win_weak| -> Window {
             let document: Arc<Document> = Document::new(
                 context.clone(),
                 DocumentStorage {
@@ -22,9 +22,7 @@ impl Window {
                 },
             );
             Window { context, document }
-        });
-
-        window
+        })
     }
 
     /// Gets the window's document

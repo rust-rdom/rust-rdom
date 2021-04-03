@@ -4,11 +4,9 @@
 use downcast_rs::DowncastSync;
 use paste::paste;
 
-use std::rc::Rc;
 use std::sync::{Arc, Weak};
 
 use crate::behavior::NodeBehavior;
-use crate::error::DomError;
 use crate::node::raw::private::PrivateAnyRawNode;
 use crate::node_list::NodeList;
 use crate::sandbox::Sandbox;

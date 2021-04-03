@@ -1,20 +1,15 @@
-//! Wrapped representation of a DOM Element. See [node](../index.html) module for distinction from
+//! Wrapped representation of a DOM Node. See [node](../index.html) module for distinction from
 //! raw representation.
 
-use downcast_rs::DowncastSync;
 use paste::paste;
 
 use std::convert::TryFrom;
 use std::result::Result;
 use std::sync::{Arc, Weak};
 
-use element::Element;
+use crate::internal_prelude::*;
 
-use crate::error::DomError;
-use crate::node::raw::{self as raw_node, element as raw_element, AnyRawNode};
-use crate::sandbox::Sandbox;
-
-mod element;
+pub mod element;
 
 /// A base trait for all wrapped node types
 pub trait AnyWrappedNode {
@@ -101,8 +96,10 @@ impl_wrapped_nodes! {
         blurb: "document",
         link: "Document",
         impl {
-            fn query_selector(&self, selectors: &str) -> Result<Option<Element>, DomError> {
-                let sandbox = self.get_context().upgrade().ok_or_else(|| DomError::SandboxDropped)?;
+            fn query_selector(&self, selectors: &str) -> Result<Option<wrapped_element::Element>, DomError> {
+                if self.get_context().upgrade().is_none() {
+                    return Err(DomError::SandboxDropped)
+                }
                 match selectors {
                     //"html" => {
                     //    Ok(Some(self.document_element.into()))

@@ -66,7 +66,7 @@ impl NodeBehavior {
         let raw_node = self
             .node
             .upgrade()
-            .ok_or_else(|| DomError::SandboxDropped)?;
+            .ok_or(DomError::SandboxDropped)?;
         Ok((*raw_node).clone_node())
     }
 }
