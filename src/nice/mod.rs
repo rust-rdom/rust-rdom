@@ -1,9 +1,9 @@
 //! This module contains a nicer, public representation of Nodes and Elements. This is
-//! nice in comparison to what rdom calls the "common" representation of Nodes and
+//! nice in comparison to what rdom calls the "core" representation of Nodes and
 //! Elements, which is a bit more cumbersome to deal with in some cases.
 //!
 //! For most purposes, a nice element is what you want. Nice elements store
-//! an `Arc` of the common element, which ensures that the underlying common element is retained
+//! an `Arc` of the core element, which ensures that the underlying core element is retained
 //! as long as you maintain that reference to it. (This is how all `Arc`s work.)
 //!
 //! For some DOM operations, ownership of said `Arc` (or nice element) is sufficient
@@ -54,7 +54,7 @@ macro_rules! node_base {
 macro_rules! impl_nice_nodes {
     ($((
         $ty: ty,
-        common: $common_ty: ty,
+        core: $core_ty: ty,
         blurb: $blurb: literal,
         link: $link: literal,
         impl { $( $rest:tt )* }
@@ -70,11 +70,11 @@ macro_rules! impl_nice_nodes {
                     ") node"
                     $(" " $postlude)?
                 ]
-                pub struct $ty(pub Arc<$common_ty>);
+                pub struct $ty(pub Arc<$core_ty>);
 
                 node_base!($ty, impl {
                     pub(crate) fn new(context: Weak<$crate::sandbox::Sandbox>) -> Self {
-                        Self(<$common_ty>::new(context, Default::default()))
+                        Self(<$core_ty>::new(context, Default::default()))
                     }
                     $($rest)*
                 });
@@ -90,7 +90,7 @@ macro_rules! impl_nice_nodes {
 
                     fn try_from(elem: Node) -> Result<$ty, Node> {
                         elem.0
-                            .downcast_arc::<$common_ty>()
+                            .downcast_arc::<$core_ty>()
                             .map($ty)
                             .map_err(Node)
                     }
@@ -103,14 +103,14 @@ macro_rules! impl_nice_nodes {
 impl_nice_nodes! {
     (
         TextNode,
-        common: node::TextNode,
+        core: node::TextNode,
         blurb: "text",
         link: "Text",
         impl {}
     )
     (
         Document,
-        common: node::Document,
+        core: node::Document,
         blurb: "document",
         link: "Document",
         impl {

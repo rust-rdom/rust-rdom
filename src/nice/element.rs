@@ -1,5 +1,5 @@
 //! Nice representation of a DOM Element. See `nice` module for distinction from
-//! common representation.
+//! core representation.
 
 use paste::paste;
 
@@ -30,7 +30,7 @@ element_base!(Element, impl {});
 macro_rules! impl_nice_elements {
     ($((
         $ty: ty,
-        $common_ty: ty,
+        $core_ty: ty,
         $blurb: literal,
         $link: literal,
         impl { $( $rest:tt )* }
@@ -46,14 +46,14 @@ macro_rules! impl_nice_elements {
                     ") element"
                     $(" " $postlude)?
                 ]
-                pub struct $ty(pub Arc<$common_ty>);
+                pub struct $ty(pub Arc<$core_ty>);
 
                 element_base!($ty, impl {
                     pub(crate) fn new(context: Weak<$crate::sandbox::Sandbox>) -> Self {
                         // TODO maybe just don't provide constructors in nice elements/nodes?
                         // calling default for someone seems a bit disingenuous, and who says
                         // we can just instantiate any type of node?
-                        Self(<$common_ty>::new(context, Default::default()))
+                        Self(<$core_ty>::new(context, Default::default()))
                     }
                     $($rest)*
                 });
@@ -69,7 +69,7 @@ macro_rules! impl_nice_elements {
 
                     fn try_from(elem: Element) -> Result<$ty, Element> {
                         elem.0
-                            .downcast_arc::<$common_ty>()
+                            .downcast_arc::<$core_ty>()
                             .map($ty)
                             .map_err(Element)
                     }

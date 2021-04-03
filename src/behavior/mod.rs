@@ -61,14 +61,14 @@ impl NodeBehavior {
     }
 
     pub(crate) fn clone_node(&self) -> Result<Arc<dyn AnyNode>, DomError> {
-        let node_common = self.node.upgrade().ok_or(DomError::SandboxDropped)?;
-        Ok((*node_common).clone_node())
+        let node_core = self.node.upgrade().ok_or(DomError::SandboxDropped)?;
+        Ok((*node_core).clone_node())
     }
 }
 
 /// Behavior according to the DOM class called Element
 pub struct ElementBehavior {
-    /// Reference back up to the common Element
+    /// Reference back up to the core Element
     element: Weak<dyn element::AnyElement>,
 }
 

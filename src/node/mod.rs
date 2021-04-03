@@ -1,4 +1,4 @@
-//! Common representation of a DOM node. See `nice` module for distinction from
+//! Core representation of a DOM node. See `nice` module for distinction from
 //! nice representation.
 
 use downcast_rs::DowncastSync;
