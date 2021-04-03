@@ -7,7 +7,7 @@ use paste::paste;
 use std::sync::{Arc, Weak};
 
 use crate::behavior::NodeBehavior;
-use crate::node::raw::private::PrivateAnyRawNode;
+use crate::internal_prelude::*;
 use crate::node_list::NodeList;
 use crate::sandbox::Sandbox;
 use crate::window::Window;

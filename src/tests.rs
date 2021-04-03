@@ -3,8 +3,8 @@
 use std::sync::Arc;
 
 use crate::config::ScreenMetrics;
+use crate::internal_prelude::*;
 use crate::node::raw::element::{HtmlBodyElement, HtmlHtmlElement};
-use crate::node::raw::AnyRawNode;
 use crate::sandbox::Sandbox;
 
 #[test]

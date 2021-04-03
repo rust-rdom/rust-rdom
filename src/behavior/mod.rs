@@ -5,9 +5,7 @@
 
 use std::sync::{Arc, RwLock, Weak};
 
-use crate::error::DomError;
-use crate::node::raw::element as raw_element;
-use crate::node::raw::AnyRawNode;
+use crate::internal_prelude::*;
 use crate::node_list::{NodeList, NodeListStorage, Query};
 
 /// Behavior according to the DOM class called Node
