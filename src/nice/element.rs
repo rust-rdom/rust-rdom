@@ -11,15 +11,17 @@ use super::AnyWrappedNode;
 use crate::internal_prelude::*;
 use crate::node_base;
 
+use crate::behavior::sandbox_member::SandboxMemberBehaviour;
+
 /// A base trait for all wrapped element types
 pub trait AnyWrappedElement: AnyWrappedNode {}
 
 /// Provides the trait implementations for all wrapped element types
 macro_rules! element_base {
     ($ty: ty, impl { $($rest:tt)* }) => {
-        impl AnyWrappedElement for $ty {}
-
         node_base!($ty, impl { $($rest)* });
+
+        impl AnyWrappedElement for $ty {}
     }
 }
 

@@ -25,25 +25,24 @@ use std::convert::TryFrom;
 use std::result::Result;
 use std::sync::{Arc, Weak};
 
-use crate::internal_prelude::*;
+use crate::{behavior::sandbox_member::SandboxMemberBehaviour, internal_prelude::*};
 
 pub mod element;
 
 /// A base trait for all wrapped node types
-pub trait AnyWrappedNode {
-    /// Gives a weak reference to the sandbox the node was created in.
-    fn get_context(&self) -> Weak<Sandbox>;
-}
+pub trait AnyWrappedNode: SandboxMemberBehaviour {}
 
 #[macro_export]
 /// Provides the trait implementations for all wrapped node types
 macro_rules! node_base {
     ($ty: ty, impl { $($rest:tt)* }) => {
-        impl AnyWrappedNode for $ty {
-            fn get_context(&self) -> Weak<$crate::sandbox::Sandbox> {
+        impl SandboxMemberBehaviour for $ty {
+            fn get_context(&self) -> Weak<Sandbox> {
                 self.0.clone().get_context()
             }
         }
+
+        impl AnyWrappedNode for $ty {}
 
         impl $ty {
             $($rest)*
