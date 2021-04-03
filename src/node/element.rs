@@ -10,7 +10,7 @@ use crate::internal_prelude::*;
 use crate::node_list::NodeList;
 use crate::sandbox::Sandbox;
 
-/// A base trait for all raw element types
+/// A base trait for all common element types
 pub trait AnyElement: DowncastSync + AnyNode {}
 impl_downcast!(sync AnyElement);
 

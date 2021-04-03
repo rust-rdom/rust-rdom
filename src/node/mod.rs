@@ -18,7 +18,7 @@ pub(crate) mod private;
 /// An input event
 pub struct InputEvent {}
 
-/// A base trait for all raw node types
+/// A base trait for all common node types
 pub trait AnyNode: DowncastSync + PrivateAnyNode {
     /// Gives a weak reference to the sandbox the node was created in.
     fn get_context(&self) -> Weak<Sandbox>;
