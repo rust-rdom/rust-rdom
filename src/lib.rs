@@ -15,10 +15,10 @@
 #[macro_use]
 extern crate downcast_rs;
 
-pub(crate) mod internal_prelude;
 pub(crate) mod behavior;
 pub mod config;
 pub mod error;
+pub(crate) mod internal_prelude;
 pub mod named_node_map;
 pub mod node;
 pub mod node_list;

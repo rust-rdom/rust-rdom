@@ -20,7 +20,10 @@ pub struct NamedNodeMap {
 }
 
 impl NamedNodeMap {
-    fn new(context: Weak<Sandbox>, element: Weak<dyn raw_element::AnyRawElement>) -> Arc<NamedNodeMap> {
+    fn new(
+        context: Weak<Sandbox>,
+        element: Weak<dyn raw_element::AnyRawElement>,
+    ) -> Arc<NamedNodeMap> {
         Arc::new(NamedNodeMap {
             context,
             element,
