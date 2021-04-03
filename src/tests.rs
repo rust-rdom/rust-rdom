@@ -6,6 +6,8 @@ use crate::config::ScreenMetrics;
 use crate::node::element::HtmlHtmlElement;
 use crate::sandbox::Sandbox;
 
+use crate::node::AnyNode;
+
 #[test]
 fn it_works() {
     let metrics: ScreenMetrics = Default::default();
