@@ -10,17 +10,17 @@ use crate::node_list::{NodeList, NodeListStorage, Query};
 
 /// Behavior according to the DOM class called Node
 pub struct NodeBehavior {
-    /// Reference back up to the raw Node
-    node: Weak<dyn AnyRawNode>,
+    /// Reference back up to the core Node
+    node: Weak<dyn AnyNode>,
 
-    parent_node: Option<Weak<dyn AnyRawNode>>,
-    left_sibling: Option<Weak<dyn AnyRawNode>>,
-    right_sibling: Option<Weak<dyn AnyRawNode>>,
-    child_nodes: RwLock<Vec<Arc<dyn AnyRawNode>>>,
+    parent_node: Option<Weak<dyn AnyNode>>,
+    left_sibling: Option<Weak<dyn AnyNode>>,
+    right_sibling: Option<Weak<dyn AnyNode>>,
+    child_nodes: RwLock<Vec<Arc<dyn AnyNode>>>,
 }
 
 impl NodeBehavior {
-    pub(crate) fn new(node: Weak<dyn AnyRawNode>) -> NodeBehavior {
+    pub(crate) fn new(node: Weak<dyn AnyNode>) -> NodeBehavior {
         NodeBehavior {
             node,
             parent_node: None,
@@ -30,22 +30,22 @@ impl NodeBehavior {
         }
     }
 
-    pub(crate) fn first_child(&self) -> Option<Arc<dyn AnyRawNode>> {
+    pub(crate) fn first_child(&self) -> Option<Arc<dyn AnyNode>> {
         let lock = self.child_nodes.read().unwrap();
         (*lock).first().cloned()
     }
 
-    pub(crate) fn last_child(&self) -> Option<Arc<dyn AnyRawNode>> {
+    pub(crate) fn last_child(&self) -> Option<Arc<dyn AnyNode>> {
         let lock = self.child_nodes.read().unwrap();
         (*lock).last().cloned()
     }
 
-    pub(crate) fn append_child(&self, other: Arc<dyn AnyRawNode>) {
+    pub(crate) fn append_child(&self, other: Arc<dyn AnyNode>) {
         let mut lock = self.child_nodes.write().unwrap();
         (*lock).push(other);
     }
 
-    pub(crate) fn static_child_nodes(&self) -> Vec<Arc<dyn AnyRawNode>> {
+    pub(crate) fn static_child_nodes(&self) -> Vec<Arc<dyn AnyNode>> {
         self.child_nodes.read().unwrap().clone()
     }
 
@@ -60,32 +60,32 @@ impl NodeBehavior {
         )
     }
 
-    pub(crate) fn clone_node(&self) -> Result<Arc<dyn AnyRawNode>, DomError> {
-        let raw_node = self.node.upgrade().ok_or(DomError::SandboxDropped)?;
-        Ok((*raw_node).clone_node())
+    pub(crate) fn clone_node(&self) -> Result<Arc<dyn AnyNode>, DomError> {
+        let node_core = self.node.upgrade().ok_or(DomError::SandboxDropped)?;
+        Ok((*node_core).clone_node())
     }
 }
 
 /// Behavior according to the DOM class called Element
 pub struct ElementBehavior {
-    /// Reference back up to the raw Element
-    element: Weak<dyn raw_element::AnyRawElement>,
+    /// Reference back up to the core Element
+    element: Weak<dyn element::AnyElement>,
 }
 
 impl ElementBehavior {
-    pub(crate) fn new(element: Weak<dyn raw_element::AnyRawElement>) -> ElementBehavior {
+    pub(crate) fn new(element: Weak<dyn element::AnyElement>) -> ElementBehavior {
         ElementBehavior { element }
     }
 }
 
 /// Behavior according to the DOM class called ParentNode
 pub struct ParentNodeBehavior {
-    /// Reference back up to the raw Node
-    node: Weak<dyn AnyRawNode>,
+    /// Reference back up to the core Node
+    node: Weak<dyn AnyNode>,
 }
 
 impl ParentNodeBehavior {
-    pub(crate) fn new(node: Weak<dyn AnyRawNode>) -> ParentNodeBehavior {
+    pub(crate) fn new(node: Weak<dyn AnyNode>) -> ParentNodeBehavior {
         ParentNodeBehavior { node }
     }
 }

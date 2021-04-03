@@ -1,5 +1,5 @@
-//! Raw representation of a DOM element. See [node](../../index.html) module for distinction from
-//! wrapped representation.
+//! Core representation of a DOM element. See `nice` module for distinction from
+//! nice representation.
 
 use downcast_rs::DowncastSync;
 use paste::paste;
@@ -10,11 +10,11 @@ use crate::internal_prelude::*;
 use crate::node_list::NodeList;
 use crate::sandbox::Sandbox;
 
-/// A base trait for all raw element types
-pub trait AnyRawElement: DowncastSync + AnyRawNode {}
-impl_downcast!(sync AnyRawElement);
+/// A base trait for all core element types
+pub trait AnyElement: DowncastSync + AnyNode {}
+impl_downcast!(sync AnyElement);
 
-macro_rules! impl_raw_elements {
+macro_rules! impl_elements {
     ($((
         $ty: ty,
         storage: $storage: ty,
@@ -58,28 +58,28 @@ macro_rules! impl_raw_elements {
                         construction
                     }
                 }
-                impl AnyRawElement for $ty {}
-                impl AnyRawNode for $ty {
+                impl AnyElement for $ty {}
+                impl AnyNode for $ty {
                     fn get_context(&self) -> Weak<Sandbox> {
                         self.context.clone()
                     }
 
-                    fn clone_node(&self) -> Arc<dyn AnyRawNode> {
+                    fn clone_node(&self) -> Arc<dyn AnyNode> {
                         // TODO this call to clone should really be something
                         // other than the standard clone trait. It is (will be/should be)
                         // our own logic specific to rdom and NOT just a verbatim clone.
                         $ty::new(self.get_context(), self.storage.clone())
                     }
 
-                    fn first_child(&self) -> Option<Arc<dyn AnyRawNode>> {
+                    fn first_child(&self) -> Option<Arc<dyn AnyNode>> {
                         self.node_behavior.first_child()
                     }
 
-                    fn last_child(&self) -> Option<Arc<dyn AnyRawNode>> {
+                    fn last_child(&self) -> Option<Arc<dyn AnyNode>> {
                         self.node_behavior.last_child()
                     }
 
-                    fn append_child(&self, other: Arc<dyn AnyRawNode>) {
+                    fn append_child(&self, other: Arc<dyn AnyNode>) {
                         self.node_behavior.append_child(other)
                     }
 
@@ -88,7 +88,7 @@ macro_rules! impl_raw_elements {
                     }
                 }
 
-                impl PrivateAnyRawNode for $ty {
+                impl PrivateAnyNode for $ty {
                     fn get_node_behavior(&self) -> Arc<NodeBehavior> {
                         self.node_behavior.clone()
                     }
@@ -98,7 +98,7 @@ macro_rules! impl_raw_elements {
     }
 }
 
-impl_raw_elements! {
+impl_elements! {
     (
         HtmlHtmlElement,
         storage: (),

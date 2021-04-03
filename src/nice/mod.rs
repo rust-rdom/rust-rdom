@@ -1,5 +1,23 @@
-//! Wrapped representation of a DOM Node. See [node](../index.html) module for distinction from
-//! raw representation.
+//! This module contains a nicer, public representation of Nodes and Elements. This is
+//! nice in comparison to what rdom calls the "core" representation of Nodes and
+//! Elements, which is a bit more cumbersome to deal with in some cases.
+//!
+//! For most purposes, a nice element is what you want. Nice elements store
+//! an `Arc` of the core element, which ensures that the underlying core element is retained
+//! as long as you maintain that reference to it. (This is how all `Arc`s work.)
+//!
+//! For some DOM operations, ownership of said `Arc` (or nice element) is sufficient
+//! to perform the operation. However, this `Arc` does not ensure that the whole sandbox
+//! is retained, due to the possibility that the sandbox is dropped at an arbitrary time
+//! while you hold this reference.
+//!
+//! As a result, you must be careful to not drop the sandbox until you are totally done
+//! performing DOM operations, else you may find that those operations fail.
+//!
+//! Rdom opts for weak pointers in all but one direction (down), so if the sandbox is
+//! dropped, most of the elements will be dropped with it. This design is
+//! chosen to help with preventing memory leaks, but it has the side effect of causing some
+//! operations (such as getting the parent node of an element) to fail at runtime.
 
 use paste::paste;
 
@@ -11,17 +29,17 @@ use crate::internal_prelude::*;
 
 pub mod element;
 
-/// A base trait for all wrapped node types
-pub trait AnyWrappedNode {
+/// A base trait for all nice node types
+pub trait AnyNiceNode {
     /// Gives a weak reference to the sandbox the node was created in.
     fn get_context(&self) -> Weak<Sandbox>;
 }
 
 #[macro_export]
-/// Provides the trait implementations for all wrapped node types
+/// Provides the trait implementations for all nice node types
 macro_rules! node_base {
     ($ty: ty, impl { $($rest:tt)* }) => {
-        impl AnyWrappedNode for $ty {
+        impl AnyNiceNode for $ty {
             fn get_context(&self) -> Weak<$crate::sandbox::Sandbox> {
                 self.0.clone().get_context()
             }
@@ -33,10 +51,10 @@ macro_rules! node_base {
     }
 }
 
-macro_rules! impl_wrapped_nodes {
+macro_rules! impl_nice_nodes {
     ($((
         $ty: ty,
-        raw: $raw_ty: ty,
+        core: $core_ty: ty,
         blurb: $blurb: literal,
         link: $link: literal,
         impl { $( $rest:tt )* }
@@ -45,18 +63,18 @@ macro_rules! impl_wrapped_nodes {
         $(
             paste! {
                 #[doc =
-                    "A wrapped ["
+                    "A nice version of ["
                     $blurb
                     "](https://developer.mozilla.org/en-US/docs/Web/API/"
                     $link
                     ") node"
                     $(" " $postlude)?
                 ]
-                pub struct $ty(pub Arc<$raw_ty>);
+                pub struct $ty(pub Arc<$core_ty>);
 
                 node_base!($ty, impl {
                     pub(crate) fn new(context: Weak<$crate::sandbox::Sandbox>) -> Self {
-                        Self(<$raw_ty>::new(context, Default::default()))
+                        Self(<$core_ty>::new(context, Default::default()))
                     }
                     $($rest)*
                 });
@@ -72,7 +90,7 @@ macro_rules! impl_wrapped_nodes {
 
                     fn try_from(elem: Node) -> Result<$ty, Node> {
                         elem.0
-                            .downcast_arc::<$raw_ty>()
+                            .downcast_arc::<$core_ty>()
                             .map($ty)
                             .map_err(Node)
                     }
@@ -82,21 +100,21 @@ macro_rules! impl_wrapped_nodes {
     }
 }
 
-impl_wrapped_nodes! {
+impl_nice_nodes! {
     (
         TextNode,
-        raw: raw_node::TextNode,
+        core: node::TextNode,
         blurb: "text",
         link: "Text",
         impl {}
     )
     (
         Document,
-        raw: raw_node::Document,
+        core: node::Document,
         blurb: "document",
         link: "Document",
         impl {
-            fn query_selector(&self, selectors: &str) -> Result<Option<wrapped_element::Element>, DomError> {
+            fn query_selector(&self, selectors: &str) -> Result<Option<nice_element::Element>, DomError> {
                 if self.get_context().upgrade().is_none() {
                     return Err(DomError::SandboxDropped)
                 }
@@ -112,6 +130,6 @@ impl_wrapped_nodes! {
     )
 }
 
-/// Any wrapped Node
-pub struct Node(pub Arc<dyn AnyRawNode>);
+/// Any nice Node
+pub struct Node(pub Arc<dyn AnyNode>);
 node_base!(Node, impl {});

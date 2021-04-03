@@ -17,8 +17,8 @@ use std::sync::Arc;
 
 use rdom::config::ScreenMetrics;
 use rdom::sandbox::Sandbox;
-use rdom::node::raw::element::{HtmlHtmlElement, HtmlBodyElement};
-use rdom::node::raw::AnyRawNode;
+use rdom::node::element::{HtmlHtmlElement, HtmlBodyElement};
+use rdom::node::AnyNode;
 
 fn main() {
     let metrics: ScreenMetrics = Default::default();
