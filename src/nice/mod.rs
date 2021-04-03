@@ -33,7 +33,7 @@ macro_rules! node_base {
     }
 }
 
-macro_rules! impl_wrapped_nodes {
+macro_rules! impl_nice_nodes {
     ($((
         $ty: ty,
         raw: $raw_ty: ty,
@@ -82,7 +82,7 @@ macro_rules! impl_wrapped_nodes {
     }
 }
 
-impl_wrapped_nodes! {
+impl_nice_nodes! {
     (
         TextNode,
         raw: node::TextNode,
@@ -96,7 +96,7 @@ impl_wrapped_nodes! {
         blurb: "document",
         link: "Document",
         impl {
-            fn query_selector(&self, selectors: &str) -> Result<Option<wrapped_element::Element>, DomError> {
+            fn query_selector(&self, selectors: &str) -> Result<Option<nice_element::Element>, DomError> {
                 if self.get_context().upgrade().is_none() {
                     return Err(DomError::SandboxDropped)
                 }

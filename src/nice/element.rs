@@ -23,11 +23,11 @@ macro_rules! element_base {
     }
 }
 
-/// A wrapped Element which could be any concrete type.
+/// A nice Element which could be any concrete type.
 pub struct Element(pub Arc<dyn raw_element::AnyRawElement>);
 element_base!(Element, impl {});
 
-macro_rules! impl_wrapped_elements {
+macro_rules! impl_nice_elements {
     ($((
         $ty: ty,
         $raw_ty: ty,
@@ -79,7 +79,7 @@ macro_rules! impl_wrapped_elements {
     }
 }
 
-impl_wrapped_elements! {
+impl_nice_elements! {
     (
         HtmlHtmlElement,
         raw_element::HtmlHtmlElement,
