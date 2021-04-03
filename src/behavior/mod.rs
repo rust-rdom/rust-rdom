@@ -10,7 +10,7 @@ use crate::node_list::{NodeList, NodeListStorage, Query};
 
 /// Behavior according to the DOM class called Node
 pub struct NodeBehavior {
-    /// Reference back up to the core Node
+    /// Reference back up to the common Node
     node: Weak<dyn AnyNode>,
 
     parent_node: Option<Weak<dyn AnyNode>>,
@@ -61,14 +61,14 @@ impl NodeBehavior {
     }
 
     pub(crate) fn clone_node(&self) -> Result<Arc<dyn AnyNode>, DomError> {
-        let node_core = self.node.upgrade().ok_or(DomError::SandboxDropped)?;
-        Ok((*node_core).clone_node())
+        let node_common = self.node.upgrade().ok_or(DomError::SandboxDropped)?;
+        Ok((*node_common).clone_node())
     }
 }
 
 /// Behavior according to the DOM class called Element
 pub struct ElementBehavior {
-    /// Reference back up to the core Element
+    /// Reference back up to the common Element
     element: Weak<dyn element::AnyElement>,
 }
 
@@ -80,7 +80,7 @@ impl ElementBehavior {
 
 /// Behavior according to the DOM class called ParentNode
 pub struct ParentNodeBehavior {
-    /// Reference back up to the core Node
+    /// Reference back up to the common Node
     node: Weak<dyn AnyNode>,
 }
 

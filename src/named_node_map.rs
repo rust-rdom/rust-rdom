@@ -12,7 +12,7 @@ pub struct NamedNodeMap {
     /// Reference to the sandbox to which this NamedNodeMap belongs
     pub context: Weak<Sandbox>,
 
-    /// Reference back up to the core element
+    /// Reference back up to the common element
     pub element: Weak<dyn element::AnyElement>,
 
     /// The attribute nodes
