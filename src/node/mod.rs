@@ -20,7 +20,4 @@
 //! chosen to help with preventing memory leaks, but it has the side effect of causing some
 //! operations (such as getting the parent node of an element) to fail at runtime.
 
-pub use wrapped::*;
-
 pub mod raw;
-pub mod wrapped;
