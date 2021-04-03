@@ -15,16 +15,16 @@ jobs:
     strategy:
       matrix:
         build:
-        - stable
-        - beta
+#         - stable
+#         - beta
         - nightly-pinned
         include:
-        - build: stable
-          os: ubuntu-latest
-          rust: stable
-        - build: beta
-          os: ubuntu-latest
-          rust: beta
+#         - build: stable
+#           os: ubuntu-latest
+#           rust: stable
+#         - build: beta
+#           os: ubuntu-latest
+#           rust: beta
         - build: nightly-pinned
           os: ubuntu-latest
           rust: nightly-2021-03-23  
