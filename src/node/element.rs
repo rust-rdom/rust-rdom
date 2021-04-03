@@ -1,5 +1,5 @@
-//! Raw representation of a DOM element. See [node](../../index.html) module for distinction from
-//! wrapped representation.
+//! Core representation of a DOM element. See `nice` module for distinction from
+//! nice representation.
 
 use downcast_rs::DowncastSync;
 use paste::paste;

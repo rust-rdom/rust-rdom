@@ -1,4 +1,4 @@
-//! Common representation of a DOM node. See [nice](../nice/index.html) module for distinction from
+//! Common representation of a DOM node. See `nice` module for distinction from
 //! nice representation.
 
 use downcast_rs::DowncastSync;
@@ -18,7 +18,7 @@ pub(crate) mod private;
 /// An input event
 pub struct InputEvent {}
 
-/// A base trait for all common node types
+/// A base trait for all core node types
 pub trait AnyNode: DowncastSync + PrivateAnyNode {
     /// Gives a weak reference to the sandbox the node was created in.
     fn get_context(&self) -> Weak<Sandbox>;

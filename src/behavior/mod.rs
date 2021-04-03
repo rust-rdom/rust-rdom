@@ -10,7 +10,7 @@ use crate::node_list::{NodeList, NodeListStorage, Query};
 
 /// Behavior according to the DOM class called Node
 pub struct NodeBehavior {
-    /// Reference back up to the common Node
+    /// Reference back up to the core Node
     node: Weak<dyn AnyNode>,
 
     parent_node: Option<Weak<dyn AnyNode>>,
@@ -80,7 +80,7 @@ impl ElementBehavior {
 
 /// Behavior according to the DOM class called ParentNode
 pub struct ParentNodeBehavior {
-    /// Reference back up to the common Node
+    /// Reference back up to the core Node
     node: Weak<dyn AnyNode>,
 }
 

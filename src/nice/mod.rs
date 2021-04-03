@@ -29,17 +29,17 @@ use crate::internal_prelude::*;
 
 pub mod element;
 
-/// A base trait for all wrapped node types
-pub trait AnyWrappedNode {
+/// A base trait for all nice node types
+pub trait AnyNiceNode {
     /// Gives a weak reference to the sandbox the node was created in.
     fn get_context(&self) -> Weak<Sandbox>;
 }
 
 #[macro_export]
-/// Provides the trait implementations for all wrapped node types
+/// Provides the trait implementations for all nice node types
 macro_rules! node_base {
     ($ty: ty, impl { $($rest:tt)* }) => {
-        impl AnyWrappedNode for $ty {
+        impl AnyNiceNode for $ty {
             fn get_context(&self) -> Weak<$crate::sandbox::Sandbox> {
                 self.0.clone().get_context()
             }
@@ -130,6 +130,6 @@ impl_nice_nodes! {
     )
 }
 
-/// Any wrapped Node
+/// Any nice Node
 pub struct Node(pub Arc<dyn AnyNode>);
 node_base!(Node, impl {});

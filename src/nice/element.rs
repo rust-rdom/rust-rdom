@@ -1,4 +1,4 @@
-//! Nice representation of a DOM Element. See [nice](../index.html) module for distinction from
+//! Nice representation of a DOM Element. See `nice` module for distinction from
 //! common representation.
 
 use paste::paste;
@@ -7,17 +7,17 @@ use std::convert::TryFrom;
 use std::result::Result;
 use std::sync::{Arc, Weak};
 
-use super::AnyWrappedNode;
+use super::AnyNiceNode;
 use crate::internal_prelude::*;
 use crate::node_base;
 
-/// A base trait for all wrapped element types
-pub trait AnyWrappedElement: AnyWrappedNode {}
+/// A base trait for all nice element types
+pub trait AnyNiceElement: AnyNiceNode {}
 
-/// Provides the trait implementations for all wrapped element types
+/// Provides the trait implementations for all nice element types
 macro_rules! element_base {
     ($ty: ty, impl { $($rest:tt)* }) => {
-        impl AnyWrappedElement for $ty {}
+        impl AnyNiceElement for $ty {}
 
         node_base!($ty, impl { $($rest)* });
     }
@@ -39,7 +39,7 @@ macro_rules! impl_nice_elements {
         $(
             paste! {
                 #[doc =
-                    "A wrapped ["
+                    "A nice ["
                     $blurb
                     "](https://developer.mozilla.org/en-US/docs/Web/API/"
                     $link
@@ -50,7 +50,7 @@ macro_rules! impl_nice_elements {
 
                 element_base!($ty, impl {
                     pub(crate) fn new(context: Weak<$crate::sandbox::Sandbox>) -> Self {
-                        // TODO maybe just don't provide constructors in wrapped elements/nodes?
+                        // TODO maybe just don't provide constructors in nice elements/nodes?
                         // calling default for someone seems a bit disingenuous, and who says
                         // we can just instantiate any type of node?
                         Self(<$common_ty>::new(context, Default::default()))
