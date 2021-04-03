@@ -5,12 +5,11 @@ use downcast_rs::DowncastSync;
 use paste::paste;
 use std::sync::{Arc, Weak};
 
+use crate::behavior::node::{NodeBehaviour, NodeBehaviourStorage};
 use crate::behavior::sandbox_member::{SandboxMemberBehaviour, SandboxMemberBehaviourStorage};
-use crate::behavior::NodeBehavior;
-use crate::impl_sandbox_member;
 use crate::internal_prelude::*;
-use crate::node_list::NodeList;
 use crate::sandbox::Sandbox;
+use crate::{impl_node, impl_sandbox_member};
 
 /// A base trait for all common element types
 pub trait AnyElement: DowncastSync + AnyNode {}
@@ -39,8 +38,8 @@ macro_rules! impl_elements {
                     /// implementation for SandboxMemberBehaviour
                     pub member_storage: SandboxMemberBehaviourStorage,
 
-                    /// Node behavior (fields/methods associated with the DOM class called Node)
-                    pub(crate) node_behavior: Arc<NodeBehavior>,
+                    /// implementation for NodeBehaviour
+                    pub (crate) node_storage: NodeBehaviourStorage,
 
                     pub(crate) storage: $storage,
                 }
@@ -52,7 +51,7 @@ macro_rules! impl_elements {
                         let construction: Arc<$ty> = Arc::new_cyclic(|construction_weak| -> $ty {
                             $ty {
                                 member_storage: SandboxMemberBehaviourStorage::new(context),
-                                node_behavior: Arc::new(NodeBehavior::new(construction_weak.clone())),
+                                node_storage: NodeBehaviourStorage::new(construction_weak.clone()),
                                 storage
                             }
                         });
@@ -62,38 +61,20 @@ macro_rules! impl_elements {
                 }
 
                 impl_sandbox_member!($ty, member_storage);
+                impl_node!($ty, node_storage);
 
-                impl AnyElement for $ty {}
                 impl AnyNode for $ty {
                     fn clone_node(&self) -> Arc<dyn AnyNode> {
-                        // TODO this call to clone should really be something
-                        // other than the standard clone trait. It is (will be/should be)
-                        // our own logic specific to rdom and NOT just a verbatim clone.
-                        $ty::new(self.get_context(), self.storage.clone())
-                    }
+                        let mut construction = $ty::new(self.get_context(), Default::default());
 
-                    fn first_child(&self) -> Option<Arc<dyn AnyNode>> {
-                        self.node_behavior.first_child()
-                    }
+                        let mut cons = Arc::get_mut(&mut construction).expect("Could not construct node");
+                        (*cons).storage = self.storage.clone();
 
-                    fn last_child(&self) -> Option<Arc<dyn AnyNode>> {
-                        self.node_behavior.last_child()
-                    }
-
-                    fn append_child(&self, other: Arc<dyn AnyNode>) {
-                        self.node_behavior.append_child(other)
-                    }
-
-                    fn child_nodes(&self) -> Arc<NodeList> {
-                        self.node_behavior.child_nodes()
+                        construction
                     }
                 }
 
-                impl PrivateAnyNode for $ty {
-                    fn get_node_behavior(&self) -> Arc<NodeBehavior> {
-                        self.node_behavior.clone()
-                    }
-                }
+                impl AnyElement for $ty {}
             }
         )*
     }

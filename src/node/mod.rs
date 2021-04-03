@@ -4,38 +4,28 @@
 use downcast_rs::DowncastSync;
 use paste::paste;
 
-use std::sync::{Arc, Weak};
-
-use crate::behavior::sandbox_member::{SandboxMemberBehaviour, SandboxMemberBehaviourStorage};
-use crate::behavior::NodeBehavior;
-use crate::impl_sandbox_member;
 use crate::internal_prelude::*;
-use crate::node_list::NodeList;
-use crate::sandbox::Sandbox;
+
+use crate::behavior::node::{NodeBehaviour, NodeBehaviourStorage};
+use crate::behavior::sandbox_member::{SandboxMemberBehaviour, SandboxMemberBehaviourStorage};
 use crate::window::Window;
 
+use std::sync::{Arc, Weak};
+
+use crate::{impl_node, impl_sandbox_member};
+
 pub mod element;
-pub(crate) mod private;
+
+// I have to abandon this private interface for now - maksimil
+// pub(crate) mod private;
 
 /// An input event
 pub struct InputEvent {}
 
 /// A base trait for all common node types
-pub trait AnyNode: DowncastSync + PrivateAnyNode + SandboxMemberBehaviour {
-    /// Clones the node
+pub trait AnyNode: DowncastSync + SandboxMemberBehaviour + NodeBehaviour {
+    /// Clones node according to Node.cloneNode()
     fn clone_node(&self) -> Arc<dyn AnyNode>;
-
-    /// Returns the node's first child in the tree
-    fn first_child(&self) -> Option<Arc<dyn AnyNode>>;
-
-    /// Returns the node's last child in the tree
-    fn last_child(&self) -> Option<Arc<dyn AnyNode>>;
-
-    /// Appends a node as a child
-    fn append_child(&self, other: Arc<dyn AnyNode>);
-
-    /// Returns a live NodeList representing the children of the node
-    fn child_nodes(&self) -> Arc<NodeList>;
 }
 impl_downcast!(sync AnyNode);
 
@@ -62,8 +52,8 @@ macro_rules! impl_nodes {
                     /// implementation for SandboxMemberBehaviour
                     pub member_storage: SandboxMemberBehaviourStorage,
 
-                    /// Node behavior (fields/methods associated with the DOM class called Node)
-                    pub(crate) node_behavior: Arc<NodeBehavior>,
+                    /// implementation for NodeBehaviour
+                    pub(crate) node_storage: NodeBehaviourStorage,
 
                     pub(crate) storage: $storage,
                 }
@@ -75,7 +65,7 @@ macro_rules! impl_nodes {
                         let construction: Arc<$ty> = Arc::new_cyclic(|construction_weak| -> $ty {
                             $ty {
                                 storage,
-                                node_behavior: Arc::new(NodeBehavior::new(construction_weak.clone())),
+                                node_storage: NodeBehaviourStorage::new(construction_weak.clone()),
                                 member_storage: SandboxMemberBehaviourStorage::new(context),
                             }
                         });
@@ -87,6 +77,7 @@ macro_rules! impl_nodes {
                 }
 
                 impl_sandbox_member!($ty, member_storage);
+                impl_node!($ty, node_storage);
 
                 impl AnyNode for $ty {
                     fn clone_node(&self) -> Arc<dyn AnyNode> {
@@ -96,28 +87,6 @@ macro_rules! impl_nodes {
                         (*cons).storage = self.storage.clone();
 
                         construction
-                    }
-
-                    fn first_child(&self) -> Option<Arc<dyn AnyNode>> {
-                        self.node_behavior.first_child()
-                    }
-
-                    fn last_child(&self) -> Option<Arc<dyn AnyNode>> {
-                        self.node_behavior.last_child()
-                    }
-
-                    fn append_child(&self, other: Arc<dyn AnyNode>) {
-                        self.node_behavior.append_child(other)
-                    }
-
-                    fn child_nodes(&self) -> Arc<NodeList> {
-                        self.node_behavior.child_nodes()
-                    }
-                }
-
-                impl PrivateAnyNode for $ty {
-                    fn get_node_behavior(&self) -> Arc<NodeBehavior> {
-                        self.node_behavior.clone()
                     }
                 }
             }
