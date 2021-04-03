@@ -61,8 +61,8 @@ impl NodeBehavior {
     }
 
     pub(crate) fn clone_node(&self) -> Result<Arc<dyn AnyRawNode>, DomError> {
-        let raw_node = self.node.upgrade().ok_or(DomError::SandboxDropped)?;
-        Ok((*raw_node).clone_node())
+        let node_core = self.node.upgrade().ok_or(DomError::SandboxDropped)?;
+        Ok((*node_core).clone_node())
     }
 }
 

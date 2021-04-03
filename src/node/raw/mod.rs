@@ -40,7 +40,7 @@ pub trait AnyRawNode: DowncastSync + PrivateAnyRawNode {
 }
 impl_downcast!(sync AnyRawNode);
 
-macro_rules! impl_raw_nodes {
+macro_rules! impl_nodes {
     ($((
         $ty: ty,
         storage: $storage: ty,
@@ -140,7 +140,7 @@ pub(crate) struct TextNodeStorage {
     pub(crate) text: String,
 }
 
-impl_raw_nodes! {
+impl_nodes! {
     (
         AttrNode,
         storage: (),

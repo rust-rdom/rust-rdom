@@ -85,14 +85,14 @@ macro_rules! impl_wrapped_nodes {
 impl_wrapped_nodes! {
     (
         TextNode,
-        raw: raw_node::TextNode,
+        raw: node::TextNode,
         blurb: "text",
         link: "Text",
         impl {}
     )
     (
         Document,
-        raw: raw_node::Document,
+        raw: node::Document,
         blurb: "document",
         link: "Document",
         impl {
