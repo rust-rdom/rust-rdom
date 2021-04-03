@@ -5,7 +5,9 @@ use downcast_rs::DowncastSync;
 use paste::paste;
 use std::sync::{Arc, Weak};
 
+use crate::behavior::sandbox_member::{SandboxMemberBehaviour, SandboxMemberBehaviourStorage};
 use crate::behavior::NodeBehavior;
+use crate::impl_sandbox_member;
 use crate::internal_prelude::*;
 use crate::node_list::NodeList;
 use crate::sandbox::Sandbox;
@@ -34,8 +36,8 @@ macro_rules! impl_elements {
                     $(" " $postlude)?
                 ]
                 pub struct $ty {
-                    /// Reference to the sandbox to which this element belongs
-                    pub context: Weak<Sandbox>,
+                    /// implementation for SandboxMemberBehaviour
+                    pub member_storage: SandboxMemberBehaviourStorage,
 
                     /// Node behavior (fields/methods associated with the DOM class called Node)
                     pub(crate) node_behavior: Arc<NodeBehavior>,
@@ -49,7 +51,7 @@ macro_rules! impl_elements {
                     pub(crate) fn new(context: Weak<Sandbox>, storage: $storage) -> Arc<$ty> {
                         let construction: Arc<$ty> = Arc::new_cyclic(|construction_weak| -> $ty {
                             $ty {
-                                context,
+                                member_storage: SandboxMemberBehaviourStorage::new(context),
                                 node_behavior: Arc::new(NodeBehavior::new(construction_weak.clone())),
                                 storage
                             }
@@ -58,12 +60,11 @@ macro_rules! impl_elements {
                         construction
                     }
                 }
+
+                impl_sandbox_member!($ty, member_storage);
+
                 impl AnyElement for $ty {}
                 impl AnyNode for $ty {
-                    fn get_context(&self) -> Weak<Sandbox> {
-                        self.context.clone()
-                    }
-
                     fn clone_node(&self) -> Arc<dyn AnyNode> {
                         // TODO this call to clone should really be something
                         // other than the standard clone trait. It is (will be/should be)

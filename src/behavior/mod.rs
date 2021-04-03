@@ -12,6 +12,8 @@ use std::sync::{Arc, RwLock, Weak};
 use crate::internal_prelude::*;
 use crate::node_list::{NodeList, NodeListStorage, Query};
 
+pub mod sandbox_member;
+
 /// Behavior according to the DOM class called Node
 pub struct NodeBehavior {
     /// Reference back up to the common Node

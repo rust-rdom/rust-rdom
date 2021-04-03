@@ -6,7 +6,9 @@ use paste::paste;
 
 use std::sync::{Arc, Weak};
 
+use crate::behavior::sandbox_member::{SandboxMemberBehaviour, SandboxMemberBehaviourStorage};
 use crate::behavior::NodeBehavior;
+use crate::impl_sandbox_member;
 use crate::internal_prelude::*;
 use crate::node_list::NodeList;
 use crate::sandbox::Sandbox;
@@ -19,10 +21,7 @@ pub(crate) mod private;
 pub struct InputEvent {}
 
 /// A base trait for all common node types
-pub trait AnyNode: DowncastSync + PrivateAnyNode {
-    /// Gives a weak reference to the sandbox the node was created in.
-    fn get_context(&self) -> Weak<Sandbox>;
-
+pub trait AnyNode: DowncastSync + PrivateAnyNode + SandboxMemberBehaviour {
     /// Clones the node
     fn clone_node(&self) -> Arc<dyn AnyNode>;
 
@@ -60,8 +59,8 @@ macro_rules! impl_nodes {
                     $(" " $postlude)?
                 ]
                 pub struct $ty {
-                    /// Reference to the sandbox to which this node belongs
-                    pub context: Weak<Sandbox>,
+                    /// implementation for SandboxMemberBehaviour
+                    pub member_storage: SandboxMemberBehaviourStorage,
 
                     /// Node behavior (fields/methods associated with the DOM class called Node)
                     pub(crate) node_behavior: Arc<NodeBehavior>,
@@ -75,9 +74,9 @@ macro_rules! impl_nodes {
                     pub(crate) fn new(context: Weak<Sandbox>, storage: $storage) -> Arc<$ty> {
                         let construction: Arc<$ty> = Arc::new_cyclic(|construction_weak| -> $ty {
                             $ty {
-                                context,
-                                node_behavior: Arc::new(NodeBehavior::new(construction_weak.clone())),
                                 storage,
+                                node_behavior: Arc::new(NodeBehavior::new(construction_weak.clone())),
+                                member_storage: SandboxMemberBehaviourStorage::new(context),
                             }
                         });
 
@@ -87,11 +86,9 @@ macro_rules! impl_nodes {
                     $($rest)*
                 }
 
-                impl AnyNode for $ty {
-                    fn get_context(&self) -> Weak<Sandbox> {
-                        self.context.clone()
-                    }
+                impl_sandbox_member!($ty, member_storage);
 
+                impl AnyNode for $ty {
                     fn clone_node(&self) -> Arc<dyn AnyNode> {
                         let mut construction = $ty::new(self.get_context(), Default::default());
 
