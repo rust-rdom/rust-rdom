@@ -33,7 +33,7 @@ impl NodeList {
 
     pub(crate) fn new_static(
         context: Weak<Sandbox>,
-        elements: Vec<Arc<dyn AnyRawNode>>,
+        elements: Vec<Arc<dyn AnyNode>>,
     ) -> Arc<NodeList> {
         let nodelist_storage = NodeListStorage::Static(elements);
         NodeList::new(context, nodelist_storage)
@@ -52,7 +52,7 @@ impl NodeList {
     }
 
     /// NodeList#item
-    pub fn item(&self, index: usize) -> Option<Arc<dyn AnyRawNode>> {
+    pub fn item(&self, index: usize) -> Option<Arc<dyn AnyNode>> {
         match &self.nodelist_storage {
             NodeListStorage::Static(list) => list.get(index).cloned(),
             NodeListStorage::Live(query) => match query {
@@ -66,7 +66,7 @@ impl NodeList {
     }
 
     /// NodeList#get
-    pub fn get(&self, index: usize) -> Option<Arc<dyn AnyRawNode>> {
+    pub fn get(&self, index: usize) -> Option<Arc<dyn AnyNode>> {
         self.item(index)
     }
 }
@@ -74,12 +74,12 @@ impl NodeList {
 /// An encapsulation of how the NodeList will respond to operations.
 pub(crate) enum NodeListStorage {
     /// A static list of nodes (e.g. result of Document.query_selector_all(...))
-    Static(Vec<Arc<dyn AnyRawNode>>),
+    Static(Vec<Arc<dyn AnyNode>>),
 
     /// Some dynamic query (e.g. result of Node.child_nodes())
     Live(Query),
 }
 
 pub(crate) enum Query {
-    ChildNodes { children_of: Arc<dyn AnyRawNode> },
+    ChildNodes { children_of: Arc<dyn AnyNode> },
 }

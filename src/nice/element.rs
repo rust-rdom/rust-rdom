@@ -24,7 +24,7 @@ macro_rules! element_base {
 }
 
 /// A nice Element which could be any concrete type.
-pub struct Element(pub Arc<dyn raw_element::AnyRawElement>);
+pub struct Element(pub Arc<dyn element::AnyElement>);
 element_base!(Element, impl {});
 
 macro_rules! impl_nice_elements {
@@ -82,21 +82,21 @@ macro_rules! impl_nice_elements {
 impl_nice_elements! {
     (
         HtmlHtmlElement,
-        raw_element::HtmlHtmlElement,
+        element::HtmlHtmlElement,
         "html",
         "HTMLHtmlElement",
         impl {}
     )
     (
         HtmlBodyElement,
-        raw_element::HtmlBodyElement,
+        element::HtmlBodyElement,
         "body",
         "HTMLBodyElement",
         impl {}
     )
     (
         HtmlButtonElement,
-        raw_element::HtmlButtonElement,
+        element::HtmlButtonElement,
         "button",
         "HTMLButtonElement",
         impl {}
