@@ -26,3 +26,5 @@ pub mod node_list;
 pub mod sandbox;
 pub mod tests;
 pub mod window;
+
+rdom_macro::declare_node!(struct);

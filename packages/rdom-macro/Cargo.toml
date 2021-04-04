@@ -1,0 +1,19 @@
+[package]
+name = "rdom-macro"
+description = "Macros to support rdom"
+repository = "https://github.com/philip-peterson/rust-rdom/"
+version = "0.1.8"
+authors = ["Philip Peterson <philip.c.peterson@gmail.com>"]
+edition = "2018"
+license = "MIT"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+proc-macro = true
+
+[dependencies]
+proc-macro-hack = "0.5.15"
+proc-macro2 = "1.0.10"
+syn = "1.0.68"
+quote = "1.0.9"
