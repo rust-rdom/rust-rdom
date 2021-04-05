@@ -27,4 +27,11 @@ pub mod sandbox;
 pub mod tests;
 pub mod window;
 
-rdom_macro::declare_node!(struct);
+#[rdom_macro::declare_node]
+#[derive(Element)]
+struct HtmlButtonElement {
+
+}
+
+
+struct Blah(Foobar);
