@@ -20,6 +20,7 @@ macro_rules! impl_elements {
         storage: $storage: ty,
         blurb: $blurb: literal,
         link: $link: literal,
+        tag: $tag: literal,
         impl { $( $rest:tt )* }
         $(, $postlude: literal)?
     ))*) => {
@@ -58,7 +59,9 @@ macro_rules! impl_elements {
                         construction
                     }
                 }
+
                 impl AnyElement for $ty {}
+
                 impl AnyNode for $ty {
                     fn get_context(&self) -> Weak<Sandbox> {
                         self.context.clone()
@@ -86,6 +89,10 @@ macro_rules! impl_elements {
                     fn child_nodes(&self) -> Arc<NodeList> {
                         self.node_behavior.child_nodes()
                     }
+
+                    fn tag_name(&self) -> String {
+                        String::from($tag)
+                    }
                 }
 
                 impl PrivateAnyNode for $ty {
@@ -104,6 +111,7 @@ impl_elements! {
         storage: (),
         blurb: "root document element",
         link: "Document/documentElement",
+        tag: "HTML",
         impl {},
         "(&lt;HTML /&gt;)"
     )
@@ -112,6 +120,7 @@ impl_elements! {
         storage: (),
         blurb: "body",
         link: "Document/body",
+        tag: "BODY",
         impl {},
         "(&lt;BODY /&gt;)"
     )
@@ -120,6 +129,7 @@ impl_elements! {
         storage: (),
         blurb: "button",
         link: "HTMLButtonElement",
+        tag: "BUTTON",
         impl {},
         "(&lt;BUTTON /&gt;)"
     )

@@ -14,6 +14,7 @@ use crate::window::Window;
 
 pub mod element;
 pub(crate) mod private;
+pub mod query_selector;
 
 /// An input event
 pub struct InputEvent {}
@@ -37,6 +38,10 @@ pub trait AnyNode: DowncastSync + PrivateAnyNode {
 
     /// Returns a live NodeList representing the children of the node
     fn child_nodes(&self) -> Arc<NodeList>;
+
+    /// Gets html tag (div for <div> or button for <button>)
+    /// [mdn docs](https://developer.mozilla.org/en-US/docs/Web/API/Element/tagName)
+    fn tag_name(&self) -> String;
 }
 impl_downcast!(sync AnyNode);
 
@@ -115,6 +120,10 @@ macro_rules! impl_nodes {
 
                     fn child_nodes(&self) -> Arc<NodeList> {
                         self.node_behavior.child_nodes()
+                    }
+
+                    fn tag_name(&self) -> String {
+                        String::new()
                     }
                 }
 
