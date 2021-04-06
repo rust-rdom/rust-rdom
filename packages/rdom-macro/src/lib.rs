@@ -17,7 +17,7 @@ use std::convert::{TryFrom, TryInto};
 
 use quote::quote;
 use proc_macro::{TokenStream};
-use syn::{NestedMeta, Meta, parse::{Parse, ParseStream}, DeriveInput, parse_macro_input};
+use syn::{NestedMeta, Meta, Attribute, parse::{Parse, ParseStream}, DeriveInput, parse_macro_input};
 
 #[derive(Debug)]
 enum DerivableClasses {
@@ -56,70 +56,11 @@ impl Parse for NodeDecl {
                 let first_ident = first_seg.ident.to_string();
 
                 if first_ident == "derive" {
-                    // let derive_decl: DeriveDecl = input.parse();
-                    match attr.parse_meta()? {
-                        Meta::List(list) => {
-                            for derived in list.nested.iter() {
-                                if let NestedMeta::Meta(meta) = derived {                                        
-                                    match meta {
-                                        Meta::Path(path) => {
-                                            match path.get_ident() {
-                                                None => {
-                                                    return Err(syn::Error::new_spanned(
-                                                        path,
-                                                        "#[derive(...)] must contain a list of DOM classes (e.g. Node, Element)"
-                                                    ))
-                                                },
-                                                Some(ident_token) => {
-                                                    let ident = ident_token.to_string();
-                                                    let class: Option<DerivableClasses> = ident.clone().try_into().ok();
-                                                    if let Some(class) = class {
-                                                        deriving_classes.push(class);
-                                                    } else {
-                                                        return Err(syn::Error::new_spanned(
-                                                            ident_token,
-                                                            format!("unknown class name in #[derive(...)]: {}", ident)
-                                                        ))
-                                                    }
-                                                }
-                                            }
-                                        },
-                                        _ => {
-                                            return Err(syn::Error::new_spanned(
-                                                meta,
-                                                "#[derive(...)] must contain a list of DOM classes (e.g. Node, Element)"
-                                            ))
-                                        }
-                                    }
-                                } else {
-                                    return Err(syn::Error::new_spanned(
-                                        derived,
-                                        "#[derive(...)] must contain a list of DOM classes, not literals"
-                                    ))
-                                }
-                            }
-                        },
-                        _ => {
-                            return Err(syn::Error::new_spanned(
-                                attr,
-                                "#[derive(...)]: invalid contents"
-                            ))
-                        }
-                    }
-                    // let group: Group = syn::parse2(attr.tokens)?;
-                    // let stream = group.stream();
-                    // let mut first_iteration = true;
-                    // loop {
-                    //     if !first_iteration {
-                    //         syn::parse2::<Token![,]>(stream)?;
-                    //         
-                    //     }
-                    //     first_iteration = false;
-
-                    // }
-                    // let punct: Ident = syn::parse2(group.stream())?;
-                    // println!("XXX {:?}", quote!(#punct));
-                    // panic!();
+                    let derive_decl = NodeDeriveDecl::from(attr)?;
+                    deriving_classes.extend(derive_decl.deriving_classes)
+                } else if first_ident == "core" {
+                    let key_value = TypeRelationDecl::from(attr)?;
+                    // TODO use core = Whatever
                 }
             }
         }
@@ -140,6 +81,66 @@ impl Parse for NodeDecl {
         //     impl {}
         // )
         Ok(NodeDecl())
+    }
+}
+
+struct NodeDeriveDecl {
+    pub(crate) deriving_classes: Vec<DerivableClasses>,
+}
+
+impl NodeDeriveDecl {
+    fn from(attr: Attribute) -> syn::Result<Self> {
+        let mut deriving_classes = Vec::new();
+        match attr.parse_meta()? {
+            Meta::List(list) => {
+                for derived in list.nested.iter() {
+                    if let NestedMeta::Meta(meta) = derived {                                        
+                        match meta {
+                            Meta::Path(path) => {
+                                match path.get_ident() {
+                                    None => {
+                                        return Err(syn::Error::new_spanned(
+                                            path,
+                                            "#[derive(...)] must contain a list of DOM classes (e.g. Node, Element)"
+                                        ))
+                                    },
+                                    Some(ident_token) => {
+                                        let ident = ident_token.to_string();
+                                        let class: Option<DerivableClasses> = ident.clone().try_into().ok();
+                                        if let Some(class) = class {
+                                            deriving_classes.push(class);
+                                        } else {
+                                            return Err(syn::Error::new_spanned(
+                                                ident_token,
+                                                format!("unknown class name in #[derive(...)]: {}", ident)
+                                            ))
+                                        }
+                                    }
+                                }
+                            },
+                            _ => {
+                                return Err(syn::Error::new_spanned(
+                                    meta,
+                                    "#[derive(...)] must contain a list of DOM classes (e.g. Node, Element)"
+                                ))
+                            }
+                        }
+                    } else {
+                        return Err(syn::Error::new_spanned(
+                            derived,
+                            "#[derive(...)] must contain a list of DOM classes, not literals"
+                        ))
+                    }
+                }
+                Ok(NodeDeriveDecl { deriving_classes })
+            },
+            _ => {
+                return Err(syn::Error::new_spanned(
+                    attr,
+                    "#[derive(...)]: invalid contents"
+                ))
+            }
+        }
     }
 }
 

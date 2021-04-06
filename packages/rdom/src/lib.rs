@@ -33,5 +33,9 @@ struct HtmlButtonElement {
 
 }
 
+rdom_macro::implement_node!(impl HtmlButtonElement {
+
+});
+
 
 struct Blah(Foobar);
