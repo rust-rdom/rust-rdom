@@ -9,6 +9,7 @@ use crate::internal_prelude::*;
 use crate::node_list::{NodeList, NodeListStorage, Query};
 
 /// Behavior according to the DOM class called Node
+#[derive(Debug)]
 pub struct NodeBehavior {
     /// Reference back up to the core Node
     node: Weak<dyn AnyNode>,

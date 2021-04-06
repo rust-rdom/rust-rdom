@@ -4,7 +4,10 @@
 use downcast_rs::DowncastSync;
 use paste::paste;
 
-use std::sync::{Arc, Weak};
+use std::{
+    fmt,
+    sync::{Arc, Weak},
+};
 
 use crate::behavior::NodeBehavior;
 use crate::internal_prelude::*;
@@ -50,6 +53,12 @@ pub trait AnyNode: DowncastSync + PrivateAnyNode {
 }
 impl_downcast!(sync AnyNode);
 
+impl fmt::Debug for dyn AnyNode {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "<{} />", self.tag_name())
+    }
+}
+
 macro_rules! impl_nodes {
     ($((
         $ty: ty,
@@ -69,6 +78,7 @@ macro_rules! impl_nodes {
                     ") node type"
                     $(" " $postlude)?
                 ]
+                #[derive(Debug)]
                 pub struct $ty {
                     /// Reference to the sandbox to which this node belongs
                     pub context: Weak<Sandbox>,
@@ -146,13 +156,13 @@ macro_rules! impl_nodes {
     }
 }
 
-#[derive(Default, Clone)]
+#[derive(Default, Clone, Debug)]
 pub(crate) struct DocumentStorage {
     /// Pointer back up to the window
     pub(crate) default_view: Weak<Window>,
 }
 
-#[derive(Default, Clone)]
+#[derive(Default, Clone, Debug)]
 pub(crate) struct TextNodeStorage {
     /// Text in the text node
     pub(crate) text: String,

@@ -7,6 +7,7 @@ use crate::node::{Document, DocumentStorage};
 use crate::sandbox::Sandbox;
 
 /// A simulated window for static rendering
+#[derive(Debug)]
 pub struct Window {
     context: Weak<Sandbox>,
     document: Arc<Document>,

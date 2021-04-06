@@ -36,6 +36,7 @@ macro_rules! impl_elements {
                     ") element type"
                     $(" " $postlude)?
                 ]
+                #[derive(Debug)]
                 pub struct $ty {
                     /// Reference to the sandbox to which this element belongs
                     pub context: Weak<Sandbox>,
