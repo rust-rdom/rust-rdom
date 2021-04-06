@@ -1,10 +1,7 @@
 //! Representation of a [NodeList](https://developer.mozilla.org/en-US/docs/Web/API/NodeList)
 //! and associated metadata.
 
-use std::sync::{Arc, Weak};
-
 use crate::internal_prelude::*;
-use crate::sandbox::Sandbox;
 
 /// Represents a [NodeList](https://developer.mozilla.org/en-US/docs/Web/API/NodeList) structure,
 /// which may be either "live" or "static". Note that these are not strongly retained by the

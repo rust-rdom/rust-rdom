@@ -23,7 +23,6 @@ use paste::paste;
 
 use std::convert::TryFrom;
 use std::result::Result;
-use std::sync::{Arc, Weak};
 
 use crate::internal_prelude::*;
 

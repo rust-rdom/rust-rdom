@@ -1,7 +1,7 @@
 //! A sandbox represents a virtual browser tab. It contains a document and a window,
 //! as well as some configuration information for screen dimensions.
 
-use std::sync::Arc;
+use crate::internal_prelude::*;
 
 use crate::config::ScreenMetrics;
 use crate::window::Window;

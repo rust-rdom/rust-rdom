@@ -5,7 +5,6 @@ use paste::paste;
 
 use std::convert::TryFrom;
 use std::result::Result;
-use std::sync::{Arc, Weak};
 
 use super::AnyNiceNode;
 use crate::internal_prelude::*;

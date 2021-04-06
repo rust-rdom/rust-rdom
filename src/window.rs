@@ -1,10 +1,8 @@
 //! A virtual browser window.
 
-use std::sync::Arc;
-use std::sync::Weak;
+use crate::internal_prelude::*;
 
 use crate::node::{Document, DocumentStorage};
-use crate::sandbox::Sandbox;
 
 /// A simulated window for static rendering
 pub struct Window {
