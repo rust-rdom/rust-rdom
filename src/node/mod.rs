@@ -12,6 +12,8 @@ use crate::node_list::NodeList;
 use crate::sandbox::Sandbox;
 use crate::window::Window;
 
+use query_selector::query_selector;
+
 pub mod element;
 pub(crate) mod private;
 pub mod query_selector;
@@ -42,6 +44,9 @@ pub trait AnyNode: DowncastSync + PrivateAnyNode {
     /// Gets html tag (div for <div> or button for <button>)
     /// [mdn docs](https://developer.mozilla.org/en-US/docs/Web/API/Element/tagName)
     fn tag_name(&self) -> String;
+
+    /// [Document.querySelector](https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector)
+    fn query_selector(&self, selector: &str) -> Result<Option<Arc<dyn AnyNode>>, DomError>;
 }
 impl_downcast!(sync AnyNode);
 
@@ -124,6 +129,10 @@ macro_rules! impl_nodes {
 
                     fn tag_name(&self) -> String {
                         String::new()
+                    }
+
+                    fn query_selector(&self, selector: &str) -> Result<Option<Arc<dyn AnyNode>>, DomError> {
+                        query_selector(self, selector)
                     }
                 }
 
