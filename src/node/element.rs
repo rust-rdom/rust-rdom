@@ -94,7 +94,7 @@ macro_rules! impl_elements {
                     }
 
                     fn tag_name(&self) -> String {
-                        String::from($tag)
+                        $tag.to_string()
                     }
 
                     fn query_selector(&self, selector: &str) -> Result<Option<Arc<dyn AnyNode>>, DomError> {

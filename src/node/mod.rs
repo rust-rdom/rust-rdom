@@ -19,7 +19,7 @@ use query_selector::query_selector;
 
 pub mod element;
 pub(crate) mod private;
-pub mod query_selector;
+pub(crate) mod query_selector;
 
 /// An input event
 pub struct InputEvent {}
