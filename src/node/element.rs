@@ -4,7 +4,7 @@
 use downcast_rs::DowncastSync;
 use paste::paste;
 
-use crate::behavior::{node_prelude::*, sandbox_member_prelude::*};
+crate::use_behaviors!(node, sandbox_member);
 use crate::internal_prelude::*;
 use crate::sandbox::Sandbox;
 

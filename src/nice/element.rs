@@ -7,7 +7,7 @@ use std::convert::TryFrom;
 use std::result::Result;
 
 use super::AnyNiceNode;
-use crate::behavior::sandbox_member_prelude::*;
+crate::use_behaviors!(sandbox_member);
 use crate::internal_prelude::*;
 use crate::node_base;
 

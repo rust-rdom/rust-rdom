@@ -2,7 +2,8 @@
 //! and associated metadata.
 
 use crate::internal_prelude::*;
-use crate::{behavior::sandbox_member_prelude::*, nice::Node};
+
+crate::use_behaviors!(sandbox_member);
 
 /// Represents a [NodeList](https://developer.mozilla.org/en-US/docs/Web/API/NodeList) structure,
 /// which may be either "live" or "static". Note that these are not strongly retained by the

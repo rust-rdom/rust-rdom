@@ -6,7 +6,7 @@ use paste::paste;
 
 use crate::internal_prelude::*;
 
-use crate::behavior::{node_prelude::*, sandbox_member_prelude::*};
+crate::use_behaviors!(node, sandbox_member);
 use crate::window::Window;
 
 use std::sync::{Arc, Weak};

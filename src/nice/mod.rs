@@ -24,7 +24,7 @@ use paste::paste;
 use std::convert::TryFrom;
 use std::result::Result;
 
-use crate::behavior::sandbox_member_prelude::*;
+crate::use_behaviors!(sandbox_member);
 use crate::internal_prelude::*;
 
 pub mod element;

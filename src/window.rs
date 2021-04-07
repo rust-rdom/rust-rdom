@@ -2,7 +2,7 @@
 
 use crate::internal_prelude::*;
 
-use crate::behavior::sandbox_member_prelude::*;
+crate::use_behaviors!(sandbox_member);
 use crate::node::{Document, DocumentStorage};
 
 /// A simulated window for static rendering

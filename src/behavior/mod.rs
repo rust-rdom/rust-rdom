@@ -47,6 +47,18 @@ macro_rules! generate_preludes {
     };
 }
 
+#[macro_export]
+/// Provides use statements for behaviors
+macro_rules! use_behaviors {
+    ($($name:ident),*) => {
+        paste::paste!{
+            $(
+                use crate::behavior::[<$name _prelude>]::*;
+            )*
+        }
+    }
+}
+
 // need to write mod name twice because of
 // macro importing
 pub mod element;
