@@ -1,15 +1,13 @@
 //! Behavior according to the DOM class called Node
 //!
 //! Clone node is too different for different nodes,
-//! so it is not defined in NodeBehaviour
-
-#![macro_use]
+//! so it is not defined in NodeBehavior
 
 use crate::node_list::{NodeList, NodeListStorage};
 use crate::{internal_prelude::*, node_list::Query};
 use std::sync::{Arc, RwLock, Weak};
 
-pub trait NodeBehaviour {
+pub trait NodeBehavior {
     fn first_child(&self) -> Option<Arc<dyn AnyNode>>;
     fn last_child(&self) -> Option<Arc<dyn AnyNode>>;
     fn append_child(&self, other: Arc<dyn AnyNode>);
@@ -17,7 +15,7 @@ pub trait NodeBehaviour {
     fn child_nodes(&self) -> Arc<NodeList>;
 }
 
-pub struct NodeBehaviourStorage {
+pub struct NodeBehaviorStorage {
     /// Reference back up to the common Node
     node: Weak<dyn AnyNode>,
 
@@ -27,9 +25,9 @@ pub struct NodeBehaviourStorage {
     child_nodes: RwLock<Vec<Arc<dyn AnyNode>>>,
 }
 
-impl NodeBehaviourStorage {
-    pub fn new(node: Weak<dyn AnyNode>) -> NodeBehaviourStorage {
-        NodeBehaviourStorage {
+impl NodeBehaviorStorage {
+    pub fn new(node: Weak<dyn AnyNode>) -> NodeBehaviorStorage {
+        NodeBehaviorStorage {
             node,
             parent_node: None,
             left_sibling: None,
@@ -39,7 +37,7 @@ impl NodeBehaviourStorage {
     }
 }
 
-impl NodeBehaviour for NodeBehaviourStorage {
+impl NodeBehavior for NodeBehaviorStorage {
     fn first_child(&self) -> Option<Arc<dyn AnyNode>> {
         let lock = self.child_nodes.read().unwrap();
         (*lock).first().cloned()
@@ -71,12 +69,12 @@ impl NodeBehaviour for NodeBehaviourStorage {
     }
 }
 
-/// Implements NodeBehaviour
+/// Implements NodeBehavior
 #[macro_export]
 macro_rules! impl_node {
     ($structname: ident, $fieldname: ident) => {
         paste! {
-            impl NodeBehaviour for $structname {
+            impl NodeBehavior for $structname {
                 fn first_child(&self) -> Option<Arc<dyn AnyNode>> {
                     self.$fieldname.first_child()
                 }

@@ -6,13 +6,10 @@ use paste::paste;
 
 use crate::internal_prelude::*;
 
-use crate::behavior::node::{NodeBehaviour, NodeBehaviourStorage};
-use crate::behavior::sandbox_member::{SandboxMemberBehaviour, SandboxMemberBehaviourStorage};
+use crate::behavior::{node_prelude::*, sandbox_member_prelude::*};
 use crate::window::Window;
 
 use std::sync::{Arc, Weak};
-
-use crate::{impl_node, impl_sandbox_member};
 
 pub mod element;
 
@@ -23,7 +20,7 @@ pub mod element;
 pub struct InputEvent {}
 
 /// A base trait for all common node types
-pub trait AnyNode: DowncastSync + SandboxMemberBehaviour + NodeBehaviour {
+pub trait AnyNode: DowncastSync + SandboxMemberBehavior + NodeBehavior {
     /// Clones node according to Node.cloneNode()
     fn clone_node(&self) -> Arc<dyn AnyNode>;
 }
@@ -49,11 +46,11 @@ macro_rules! impl_nodes {
                     $(" " $postlude)?
                 ]
                 pub struct $ty {
-                    /// implementation for SandboxMemberBehaviour
-                    pub member_storage: SandboxMemberBehaviourStorage,
+                    /// implementation for SandboxMemberBehavior
+                    pub member_storage: SandboxMemberBehaviorStorage,
 
-                    /// implementation for NodeBehaviour
-                    pub(crate) node_storage: NodeBehaviourStorage,
+                    /// implementation for NodeBehavior
+                    pub(crate) node_storage: NodeBehaviorStorage,
 
                     pub(crate) storage: $storage,
                 }
@@ -65,8 +62,8 @@ macro_rules! impl_nodes {
                         let construction: Arc<$ty> = Arc::new_cyclic(|construction_weak| -> $ty {
                             $ty {
                                 storage,
-                                node_storage: NodeBehaviourStorage::new(construction_weak.clone()),
-                                member_storage: SandboxMemberBehaviourStorage::new(context),
+                                node_storage: NodeBehaviorStorage::new(construction_weak.clone()),
+                                member_storage: SandboxMemberBehaviorStorage::new(context),
                             }
                         });
 

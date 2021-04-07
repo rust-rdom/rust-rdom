@@ -24,18 +24,19 @@ use paste::paste;
 use std::convert::TryFrom;
 use std::result::Result;
 
-use crate::{behavior::sandbox_member::SandboxMemberBehaviour, internal_prelude::*};
+use crate::behavior::sandbox_member_prelude::*;
+use crate::internal_prelude::*;
 
 pub mod element;
 
 /// A base trait for all wrapped node types
-pub trait AnyNiceNode: SandboxMemberBehaviour {}
+pub trait AnyNiceNode: SandboxMemberBehavior {}
 
 #[macro_export]
 /// Provides the trait implementations for all nice node types
 macro_rules! node_base {
     ($ty: ty, impl { $($rest:tt)* }) => {
-        impl SandboxMemberBehaviour for $ty {
+        impl SandboxMemberBehavior for $ty {
             fn get_context(&self) -> Weak<$crate::sandbox::Sandbox> {
                 self.0.clone().get_context()
             }

@@ -4,11 +4,9 @@
 use downcast_rs::DowncastSync;
 use paste::paste;
 
-use crate::behavior::node::{NodeBehaviour, NodeBehaviourStorage};
-use crate::behavior::sandbox_member::{SandboxMemberBehaviour, SandboxMemberBehaviourStorage};
+use crate::behavior::{node_prelude::*, sandbox_member_prelude::*};
 use crate::internal_prelude::*;
 use crate::sandbox::Sandbox;
-use crate::{impl_node, impl_sandbox_member};
 
 /// A base trait for all core element types
 pub trait AnyElement: DowncastSync + AnyNode {}
@@ -34,11 +32,11 @@ macro_rules! impl_elements {
                     $(" " $postlude)?
                 ]
                 pub struct $ty {
-                    /// implementation for SandboxMemberBehaviour
-                    pub member_storage: SandboxMemberBehaviourStorage,
+                    /// implementation for SandboxMemberBehavior
+                    pub member_storage: SandboxMemberBehaviorStorage,
 
-                    /// implementation for NodeBehaviour
-                    pub (crate) node_storage: NodeBehaviourStorage,
+                    /// implementation for NodeBehavior
+                    pub (crate) node_storage: NodeBehaviorStorage,
 
                     pub(crate) storage: $storage,
                 }
@@ -49,8 +47,8 @@ macro_rules! impl_elements {
                     pub(crate) fn new(context: Weak<Sandbox>, storage: $storage) -> Arc<$ty> {
                         let construction: Arc<$ty> = Arc::new_cyclic(|construction_weak| -> $ty {
                             $ty {
-                                member_storage: SandboxMemberBehaviourStorage::new(context),
-                                node_storage: NodeBehaviourStorage::new(construction_weak.clone()),
+                                member_storage: SandboxMemberBehaviorStorage::new(context),
+                                node_storage: NodeBehaviorStorage::new(construction_weak.clone()),
                                 storage
                             }
                         });

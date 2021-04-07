@@ -1,35 +1,33 @@
-#![macro_use]
-
 use std::sync::Weak;
 
 use crate::internal_prelude::*;
 
-pub trait SandboxMemberBehaviour {
+pub trait SandboxMemberBehavior {
     fn get_context(&self) -> Weak<Sandbox>;
 }
 
-pub struct SandboxMemberBehaviourStorage {
+pub struct SandboxMemberBehaviorStorage {
     context: Weak<Sandbox>,
 }
 
-impl SandboxMemberBehaviourStorage {
-    pub fn new(context: Weak<Sandbox>) -> SandboxMemberBehaviourStorage {
-        SandboxMemberBehaviourStorage { context }
+impl SandboxMemberBehaviorStorage {
+    pub fn new(context: Weak<Sandbox>) -> SandboxMemberBehaviorStorage {
+        SandboxMemberBehaviorStorage { context }
     }
 }
 
-impl SandboxMemberBehaviour for SandboxMemberBehaviourStorage {
+impl SandboxMemberBehavior for SandboxMemberBehaviorStorage {
     fn get_context(&self) -> Weak<Sandbox> {
         self.context.clone()
     }
 }
 
 #[macro_export]
-/// Implements SandBoxMemberBehaviour
+/// Implements SandBoxMemberBehavior
 macro_rules! impl_sandbox_member {
     ($structname: ident, $fieldname: ident) => {
         paste! {
-            impl SandboxMemberBehaviour for $structname {
+            impl SandboxMemberBehavior for $structname {
                 fn get_context(&self) -> Weak<Sandbox> {
                     self.$fieldname.get_context()
                 }

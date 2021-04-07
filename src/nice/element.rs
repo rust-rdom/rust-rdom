@@ -7,10 +7,9 @@ use std::convert::TryFrom;
 use std::result::Result;
 
 use super::AnyNiceNode;
+use crate::behavior::sandbox_member_prelude::*;
 use crate::internal_prelude::*;
 use crate::node_base;
-
-use crate::behavior::sandbox_member::SandboxMemberBehaviour;
 
 /// A base trait for all nice element types
 pub trait AnyNiceElement: AnyNiceNode {}
