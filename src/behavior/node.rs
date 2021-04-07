@@ -69,8 +69,8 @@ impl NodeBehavior for NodeBehaviorStorage {
     }
 }
 
-/// Implements NodeBehavior
 #[macro_export]
+/// Implements NodeBehavior
 macro_rules! impl_node {
     ($structname: ident, $fieldname: ident) => {
         paste! {
