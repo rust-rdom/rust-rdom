@@ -1,27 +1,26 @@
-//! Nice representation of a DOM Element. See [nice](../index.html) module for distinction from
-//! common representation.
+//! Nice representation of a DOM Element. See `nice` module for distinction from
+//! core representation.
 
 use paste::paste;
 
 use std::convert::TryFrom;
 use std::result::Result;
-use std::sync::{Arc, Weak};
 
-use super::AnyWrappedNode;
+use super::AnyNiceNode;
 use crate::internal_prelude::*;
 use crate::node_base;
 
 use crate::behavior::sandbox_member::SandboxMemberBehaviour;
 
-/// A base trait for all wrapped element types
-pub trait AnyWrappedElement: AnyWrappedNode {}
+/// A base trait for all nice element types
+pub trait AnyNiceElement: AnyNiceNode {}
 
-/// Provides the trait implementations for all wrapped element types
+/// Provides the trait implementations for all nice element types
 macro_rules! element_base {
     ($ty: ty, impl { $($rest:tt)* }) => {
-        node_base!($ty, impl { $($rest)* });
+        impl AnyNiceElement for $ty {}
 
-        impl AnyWrappedElement for $ty {}
+        node_base!($ty, impl { $($rest)* });
     }
 }
 
@@ -32,7 +31,7 @@ element_base!(Element, impl {});
 macro_rules! impl_nice_elements {
     ($((
         $ty: ty,
-        $common_ty: ty,
+        $core_ty: ty,
         $blurb: literal,
         $link: literal,
         impl { $( $rest:tt )* }
@@ -41,21 +40,21 @@ macro_rules! impl_nice_elements {
         $(
             paste! {
                 #[doc =
-                    "A wrapped ["
+                    "A nice ["
                     $blurb
                     "](https://developer.mozilla.org/en-US/docs/Web/API/"
                     $link
                     ") element"
                     $(" " $postlude)?
                 ]
-                pub struct $ty(pub Arc<$common_ty>);
+                pub struct $ty(pub Arc<$core_ty>);
 
                 element_base!($ty, impl {
                     pub(crate) fn new(context: Weak<$crate::sandbox::Sandbox>) -> Self {
-                        // TODO maybe just don't provide constructors in wrapped elements/nodes?
+                        // TODO maybe just don't provide constructors in nice elements/nodes?
                         // calling default for someone seems a bit disingenuous, and who says
                         // we can just instantiate any type of node?
-                        Self(<$common_ty>::new(context, Default::default()))
+                        Self(<$core_ty>::new(context, Default::default()))
                     }
                     $($rest)*
                 });
@@ -71,7 +70,7 @@ macro_rules! impl_nice_elements {
 
                     fn try_from(elem: Element) -> Result<$ty, Element> {
                         elem.0
-                            .downcast_arc::<$common_ty>()
+                            .downcast_arc::<$core_ty>()
                             .map($ty)
                             .map_err(Element)
                     }

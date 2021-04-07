@@ -1,9 +1,8 @@
-//! Raw representation of a DOM element. See [node](../../index.html) module for distinction from
-//! wrapped representation.
+//! Core representation of a DOM element. See `nice` module for distinction from
+//! nice representation.
 
 use downcast_rs::DowncastSync;
 use paste::paste;
-use std::sync::{Arc, Weak};
 
 use crate::behavior::node::{NodeBehaviour, NodeBehaviourStorage};
 use crate::behavior::sandbox_member::{SandboxMemberBehaviour, SandboxMemberBehaviourStorage};
@@ -11,7 +10,7 @@ use crate::internal_prelude::*;
 use crate::sandbox::Sandbox;
 use crate::{impl_node, impl_sandbox_member};
 
-/// A base trait for all common element types
+/// A base trait for all core element types
 pub trait AnyElement: DowncastSync + AnyNode {}
 impl_downcast!(sync AnyElement);
 
