@@ -3,7 +3,7 @@
 //! this module provides several structures that provide the same behavior but in a Rust-
 //! friendly way (using composition instead of inheritance).
 
-use std::sync::{Arc, RwLock, Weak};
+use std::sync::RwLock;
 
 use crate::internal_prelude::*;
 use crate::node_list::{NodeList, NodeListStorage, Query};

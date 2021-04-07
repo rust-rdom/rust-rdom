@@ -1,11 +1,8 @@
 //! Representation of a [NamedNodeMap](https://developer.mozilla.org/en-US/docs/Web/API/NamedNodeMap)
 //! and associated metadata.
 
-use std::sync::{Arc, Weak};
-
 use crate::internal_prelude::*;
 use crate::node::AttrNode;
-use crate::sandbox::Sandbox;
 
 /// A [NamedNodeMap](https://developer.mozilla.org/en-US/docs/Web/API/NamedNodeMap) structure
 pub struct NamedNodeMap {
@@ -20,10 +17,7 @@ pub struct NamedNodeMap {
 }
 
 impl NamedNodeMap {
-    fn new(
-        context: Weak<Sandbox>,
-        element: Weak<dyn element::AnyElement>,
-    ) -> Arc<NamedNodeMap> {
+    fn new(context: Weak<Sandbox>, element: Weak<dyn element::AnyElement>) -> Arc<NamedNodeMap> {
         Arc::new(NamedNodeMap {
             context,
             element,
