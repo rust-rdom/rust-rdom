@@ -26,7 +26,7 @@ impl SandboxMemberBehavior for SandboxMemberBehaviorStorage {
 /// Implements SandBoxMemberBehavior
 macro_rules! impl_sandbox_member {
     ($structname: ident, $fieldname: ident) => {
-        paste! {
+        paste::paste! {
             impl SandboxMemberBehavior for $structname {
                 fn get_context(&self) -> Weak<Sandbox> {
                     self.$fieldname.get_context()

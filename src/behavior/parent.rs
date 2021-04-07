@@ -7,7 +7,7 @@ pub struct ParentBehaviorStorage;
 /// Implements ParentBehavior
 macro_rules! impl_parent {
     ($structname: ident, $fieldname: ident) => {
-        paste! {
+        paste::paste! {
             impl ParentBehavior for $structname {}
         }
     };

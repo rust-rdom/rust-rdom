@@ -73,7 +73,7 @@ impl NodeBehavior for NodeBehaviorStorage {
 /// Implements NodeBehavior
 macro_rules! impl_node {
     ($structname: ident, $fieldname: ident) => {
-        paste! {
+        paste::paste! {
             impl NodeBehavior for $structname {
                 fn first_child(&self) -> Option<Arc<dyn AnyNode>> {
                     self.$fieldname.first_child()

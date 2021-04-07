@@ -21,7 +21,7 @@
 //         "/// Implements $2Behavior",
 //         "macro_rules! impl_$1 {",
 //         "    (\\$structname: ident, \\$fieldname: ident) => {",
-//         "        paste! {",
+//         "        paste::paste! {",
 //         "            impl $2Behavior for \\$structname {}",
 //         "        }",
 //         "    };",

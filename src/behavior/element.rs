@@ -7,7 +7,7 @@ pub struct ElementBehaviorStorage;
 /// Implements ElementBehavior
 macro_rules! impl_element {
     ($structname: ident, $fieldname: ident) => {
-        paste! {
+        paste::paste! {
             impl ElementBehavior for $structname {}
         }
     };
