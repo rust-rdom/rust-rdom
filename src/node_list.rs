@@ -2,6 +2,7 @@
 //! and associated metadata.
 
 use crate::internal_prelude::*;
+use crate::{behavior::sandbox_member_prelude::*, nice::Node};
 
 /// Represents a [NodeList](https://developer.mozilla.org/en-US/docs/Web/API/NodeList) structure,
 /// which may be either "live" or "static". Note that these are not strongly retained by the
@@ -14,7 +15,7 @@ use crate::internal_prelude::*;
 /// retained.
 pub struct NodeList {
     /// Reference to the sandbox to which this NodeList belongs
-    pub context: Weak<Sandbox>,
+    pub context: SandboxMemberBehaviorStorage,
 
     /// The underlying storage
     pub(crate) nodelist_storage: NodeListStorage,
@@ -23,7 +24,7 @@ pub struct NodeList {
 impl NodeList {
     pub(crate) fn new(context: Weak<Sandbox>, nodelist_storage: NodeListStorage) -> Arc<NodeList> {
         Arc::new(NodeList {
-            context,
+            context: SandboxMemberBehaviorStorage::new(context),
             nodelist_storage,
         })
     }
@@ -63,6 +64,8 @@ impl NodeList {
         self.item(index)
     }
 }
+
+impl_sandbox_member!(NodeList, context);
 
 /// An encapsulation of how the NodeList will respond to operations.
 pub(crate) enum NodeListStorage {
