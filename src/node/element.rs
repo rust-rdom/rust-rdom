@@ -69,6 +69,10 @@ macro_rules! impl_elements {
 
                         construction
                     }
+
+                    fn get_node_type(&self) -> isize {
+                        1 // Element node type is 1
+                    }
                 }
 
                 impl AnyElement for $ty {}
