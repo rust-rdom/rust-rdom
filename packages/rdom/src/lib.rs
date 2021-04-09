@@ -29,13 +29,14 @@ pub mod window;
 
 #[rdom_macro::declare_node]
 #[derive(Element)]
-struct HtmlButtonElement {
+const _: () = {
+    struct HtmlButtonElement {
 
-}
+    }
 
-rdom_macro::implement_node!(impl HtmlButtonElement {
+    impl HtmlButtonElement {
 
-});
-
+    }
+};
 
 struct Blah(Foobar);

@@ -17,7 +17,7 @@ use std::convert::{TryFrom, TryInto};
 
 use quote::quote;
 use proc_macro::{TokenStream};
-use syn::{NestedMeta, Meta, Attribute, parse::{Parse, ParseStream}, DeriveInput, parse_macro_input};
+use syn::{Attribute, DeriveInput, Expr, Item, ItemConst, ItemImpl, ItemStruct, Meta, NestedMeta, Stmt, parse::{Parse, ParseStream}, parse_macro_input, token::Struct};
 
 #[derive(Debug)]
 enum DerivableClasses {
@@ -43,9 +43,9 @@ impl TryFrom<String> for DerivableClasses {
 }
 
 
-struct NodeDecl();
+struct NodeImplDecl();
 
-impl Parse for NodeDecl {
+impl Parse for NodeImplDecl {
     fn parse(input: ParseStream) -> syn::Result<Self> {
         let mut deriving_classes = Vec::new();
         let decl: DeriveInput = input.parse()?;
@@ -58,10 +58,10 @@ impl Parse for NodeDecl {
                 if first_ident == "derive" {
                     let derive_decl = NodeDeriveDecl::from(attr)?;
                     deriving_classes.extend(derive_decl.deriving_classes)
-                } else if first_ident == "core" {
-                    let key_value = TypeRelationDecl::from(attr)?;
-                    // TODO use core = Whatever
-                }
+                }// else if first_ident == "core" {
+                //    let key_value = TypeRelationDecl::from(attr)?;
+                //    // TODO use core = Whatever
+                //}
             }
         }
         // input.parse::<Token![(]>()?;
@@ -80,7 +80,71 @@ impl Parse for NodeDecl {
         //     link: "Text",
         //     impl {}
         // )
-        Ok(NodeDecl())
+        Ok(NodeImplDecl())
+    }
+}
+
+struct NodeDecl {
+
+};
+
+impl NodeDecl {
+    fn visit_struct(&mut self, block: &ItemStruct) {
+//        attrs: Vec<Attribute>
+//vis: Visibility
+//struct_token: Struct
+//ident: Ident
+//generics: Generics
+//fields: Fields
+//semi_token: Option<Semi>`
+        if let Visibility::Public(_) = block.vis {
+            if block.attrs {
+
+            }
+        } else {
+
+        }
+    }
+
+    fn visit_impl(&mut self, block: &ItemImpl) {
+
+    }
+}
+
+impl Parse for NodeDecl {
+    fn parse(input: ParseStream) -> syn::Result<Self> {
+        let mut result = NodeDecl {};
+        let decl: ItemConst = input.parse()?;
+        if let Expr::Block(block) = *decl.expr {
+            let block = block.block;
+            if block.stmts.len() != 2 {
+                return Err(syn::Error::new_spanned(
+                    block,
+                    "A #[derive_node] block must contain at least two items"
+                ))
+            }
+            let struct_stmt = block.stmts.get(0);;
+            let impl_stmt = block.stmts.get(1);
+
+            if let Some(Stmt::Item(Item::Struct(struct_block))) = struct_stmt {
+                result.visit_struct(struct_block);
+            } else {
+                return Err(syn::Error::new_spanned(
+                    struct_stmt,
+                    "A #[derive_node] block must have a first item that is a struct"
+                ))
+            }
+
+            if let Some(Stmt::Item(Item::Impl(impl_block))) = impl_stmt {
+                result.visit_impl(impl_block);
+            } else {
+                return Err(syn::Error::new_spanned(
+                    impl_stmt,
+                    "A #[derive_node] block must have a second item that is an impl"
+                ))
+            }
+        }
+        Ok(result)
     }
 }
 
@@ -225,4 +289,10 @@ pub fn declare_node(_attribute: TokenStream, input: TokenStream) -> TokenStream 
     //         self.node_behavior.clone()
     //     }
     // }
+}
+
+#[proc_macro_attribute]
+/// Foo
+pub fn impl_node(_attribute: TokenStream, input: TokenStream) -> TokenStream {
+    "".parse().unwrap()
 }
