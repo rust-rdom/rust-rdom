@@ -109,7 +109,7 @@ impl_nice_nodes! {
     )
     (
         Document,
-        core: node::Document,
+        core: node::DocumentNode,
         blurb: "document",
         link: "Document",
         impl {
