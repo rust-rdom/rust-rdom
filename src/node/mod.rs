@@ -92,7 +92,7 @@ macro_rules! impl_nodes {
 }
 
 #[derive(Default, Clone)]
-pub(crate) struct DocumentStorage {
+pub(crate) struct DocumentNodeStorage {
     /// Pointer back up to the window
     pub(crate) default_view: Weak<Window>,
 }
@@ -119,8 +119,8 @@ impl_nodes! {
         impl {}
     )
     (
-        Document,
-        storage: DocumentStorage,
+        DocumentNode,
+        storage: DocumentNodeStorage,
         blurb: "document",
         link: "Document",
         impl {
