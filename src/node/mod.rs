@@ -19,14 +19,28 @@ pub mod element;
 /// An input event
 pub struct InputEvent {}
 
+#[derive(Copy, Clone)]
+enum NodeType {
+    Element = 1,
+    Attribute = 2,
+    Text = 3,
+    CDataSection = 4,
+    ProcessingInstruction = 7,
+    Comment = 8,
+    Document = 9,
+    DocumentType = 10,
+    DocumentFragment = 11,
+}
+
 /// A base trait for all common node types
 pub trait AnyNode: DowncastSync + SandboxMemberBehavior + NodeBehavior {
     /// Clones node according to Node.cloneNode()
     fn clone_node(&self) -> Arc<dyn AnyNode>;
 
-    /// Returns the node type, as defuned in https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType
+    /// Returns the node type, as defined in https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType
     fn get_node_type(&self) -> isize;
 }
+
 impl_downcast!(sync AnyNode);
 
 macro_rules! impl_nodes {
@@ -58,7 +72,7 @@ macro_rules! impl_nodes {
 
                     pub(crate) storage: $storage,
 
-                    node_type: isize,
+                    node_type: NodeType,
                 }
             }
 
@@ -94,7 +108,7 @@ macro_rules! impl_nodes {
                     }
 
                     fn get_node_type(&self) -> isize {
-                        self.node_type
+                        self.node_type as isize
                     }
                 }
             }
@@ -120,7 +134,7 @@ impl_nodes! {
         storage: (),
         blurb: "Element",
         link: "Element",
-        node_type: 1,
+        node_type: NodeType::Element,
         impl {}
     )
     (
@@ -128,7 +142,7 @@ impl_nodes! {
         storage: (),
         blurb: "attr (attribute)",
         link: "Attr",
-        node_type: 2,
+        node_type: NodeType::Attribute,
         impl {}
     )
     (
@@ -136,7 +150,7 @@ impl_nodes! {
         storage: TextNodeStorage,
         blurb: "text",
         link: "Text",
-        node_type: 3,
+        node_type: NodeType::Text,
         impl {}
     )
     (
@@ -144,7 +158,7 @@ impl_nodes! {
         storage: (),
         blurb: "CDATASection",
         link: "CDATASection",
-        node_type: 4,
+        node_type: NodeType::CDataSection,
         impl {}
     )
     (
@@ -152,7 +166,7 @@ impl_nodes! {
         storage: () /* or ProcessingInstructiNodeStorage */,
         blurb: "ProcessingInstruction",
         link: "ProcessingInstruction",
-        node_type: 7,
+        node_type: NodeType::ProcessingInstruction,
         impl {}
     )
     (
@@ -160,7 +174,7 @@ impl_nodes! {
         storage: () /* or CommentNodeStorage */,
         blurb: "Comment",
         link: "Comment",
-        node_type: 8,
+        node_type: NodeType::Comment,
         impl {}
     )
     (
@@ -168,7 +182,7 @@ impl_nodes! {
         storage: DocumentStorage,
         blurb: "document",
         link: "Document",
-        node_type: 9,
+        node_type: NodeType::Document,
         impl {
             /// Creates a text node.
             pub fn create_text_node(&self, text: String) -> Arc<TextNode> {
@@ -181,7 +195,7 @@ impl_nodes! {
         storage: () /* or DocumentTypeNodeStorage */,
         blurb: "DocumentType",
         link: "DocumentType",
-        node_type: 10,
+        node_type: NodeType::DocumentType,
         impl {}
     )
     (
@@ -189,7 +203,7 @@ impl_nodes! {
         storage: () /* or DocumentFragmentNodeStorage */,
         blurb: "DocumentFragment",
         link: "DocumentFragment",
-        node_type: 11,
+        node_type: NodeType::DocumentFragment,
         impl {}
     )
 }
