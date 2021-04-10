@@ -3,6 +3,7 @@
 
 use downcast_rs::DowncastSync;
 use paste::paste;
+use std::any::Any;
 
 use crate::internal_prelude::*;
 
@@ -20,15 +21,25 @@ pub mod element;
 pub struct InputEvent {}
 
 #[derive(Copy, Clone)]
-enum NodeType {
+/// Node type, as defined in https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType
+pub enum NodeType {
+    /// Element node
     Element = 1,
+    ///  node
     Attribute = 2,
+    ///  node
     Text = 3,
+    ///  node
     CDataSection = 4,
+    ///  node
     ProcessingInstruction = 7,
+    ///  node
     Comment = 8,
+    ///  node
     Document = 9,
+    ///  node
     DocumentType = 10,
+    ///  node
     DocumentFragment = 11,
 }
 
@@ -36,6 +47,9 @@ enum NodeType {
 pub trait AnyNode: DowncastSync + SandboxMemberBehavior + NodeBehavior {
     /// Clones node according to Node.cloneNode()
     fn clone_node(&self) -> Arc<dyn AnyNode>;
+
+    /// Allows downcasting to concreate node type
+    fn as_any(&self) -> &dyn Any;
 
     /// Returns the node type, as defined in https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType
     fn get_node_type(&self) -> isize;
@@ -107,6 +121,10 @@ macro_rules! impl_nodes {
                         construction
                     }
 
+                    fn as_any(&self) -> &dyn Any {
+                        self
+                    }
+                
                     fn get_node_type(&self) -> isize {
                         self.node_type as isize
                     }
@@ -151,10 +169,15 @@ impl_nodes! {
         blurb: "text",
         link: "Text",
         node_type: NodeType::Text,
-        impl {}
+        impl {
+            /// Creates a text node.
+            pub fn get_text(&self) -> Option<String> {
+                Some(self.storage.text.clone())
+            }            
+        }
     )
     (
-        CDATASectionNode,
+        CDataSectionNode,
         storage: (),
         blurb: "CDATASection",
         link: "CDATASection",
@@ -171,7 +194,7 @@ impl_nodes! {
     )
     (
         CommentNode,
-        storage: () /* or CommentNodeStorage */,
+        storage: TextNodeStorage,
         blurb: "Comment",
         link: "Comment",
         node_type: NodeType::Comment,

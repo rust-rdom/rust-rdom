@@ -3,6 +3,7 @@
 
 use downcast_rs::DowncastSync;
 use paste::paste;
+use std::any::Any;
 
 crate::use_behaviors!(node, sandbox_member);
 use crate::internal_prelude::*;
@@ -70,6 +71,10 @@ macro_rules! impl_elements {
                         construction
                     }
 
+                    fn as_any(&self) -> &dyn Any {
+                        self
+                    }
+                
                     fn get_node_type(&self) -> isize {
                         1 // Element node type is 1
                     }
