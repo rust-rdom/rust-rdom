@@ -16,36 +16,42 @@ pub(crate) struct Builder<T: AnyNode> {
 
 impl Builder<node::AttrNode> {
     pub fn build(&self) -> Arc<node::AttrNode> {
+        #[allow(clippy::unit_arg)]
         node::AttrNode::new(self.sandbox.clone(), Default::default())
     }
 }
 
 impl Builder<node::TextNode> {
     pub fn build(&self) -> Arc<node::TextNode> {
+        #[allow(clippy::unit_arg)]
         node::TextNode::new(self.sandbox.clone(), Default::default())
     }
 }
 
 impl Builder<node::DocumentNode> {
     pub fn build(&self) -> Arc<node::DocumentNode> {
+        #[allow(clippy::unit_arg)]
         node::DocumentNode::new(self.sandbox.clone(), Default::default())
     }
 }
 
 impl Builder<element::HtmlBodyElement> {
     pub fn build(&self) -> Arc<element::HtmlBodyElement> {
+        #[allow(clippy::unit_arg)]
         element::HtmlBodyElement::new(self.sandbox.clone(), Default::default())
     }
 }
 
 impl Builder<element::HtmlButtonElement> {
     pub fn build(&self) -> Arc<element::HtmlButtonElement> {
+        #[allow(clippy::unit_arg)]
         element::HtmlButtonElement::new(self.sandbox.clone(), Default::default())
     }
 }
 
 impl Builder<element::HtmlHtmlElement> {
     pub fn build(&self) -> Arc<element::HtmlHtmlElement> {
+        #[allow(clippy::unit_arg)]
         element::HtmlHtmlElement::new(self.sandbox.clone(), Default::default())
     }
 }
