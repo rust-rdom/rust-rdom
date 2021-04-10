@@ -1,6 +1,5 @@
 //! A Rust-based simulated DOM (browser-independent replacement for web_sys)
 
-#![feature(const_generics)]
 #![feature(arc_new_cyclic)]
 #![deny(
     missing_docs,

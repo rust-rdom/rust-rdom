@@ -1,20 +1,53 @@
 //! A sandbox represents a virtual browser tab. It contains a document and a window,
 //! as well as some configuration information for screen dimensions.
 
+use std::marker::PhantomData;
+
 use crate::internal_prelude::*;
 
 use crate::config::ScreenMetrics;
 use crate::node::{self, element};
 use crate::window::Window;
 
-#[derive(PartialEq, Eq)]
-pub(crate) enum BuildableNode {
-    AttrNode,
-    TextNode,
-    DocumentNode,
-    HtmlHtmlElement,
-    HtmlBodyElement,
-    HtmlButtonElement,
+pub(crate) struct Builder<T: AnyNode> {
+    sandbox: Weak<Sandbox>,
+    _phantom: PhantomData<T>,
+}
+
+impl Builder<node::AttrNode> {
+    pub fn build(&self) -> Arc<node::AttrNode> {
+        node::AttrNode::new(self.sandbox.clone(), Default::default())
+    }
+}
+
+impl Builder<node::TextNode> {
+    pub fn build(&self) -> Arc<node::TextNode> {
+        node::TextNode::new(self.sandbox.clone(), Default::default())
+    }
+}
+
+impl Builder<node::DocumentNode> {
+    pub fn build(&self) -> Arc<node::DocumentNode> {
+        node::DocumentNode::new(self.sandbox.clone(), Default::default())
+    }
+}
+
+impl Builder<element::HtmlBodyElement> {
+    pub fn build(&self) -> Arc<element::HtmlBodyElement> {
+        element::HtmlBodyElement::new(self.sandbox.clone(), Default::default())
+    }
+}
+
+impl Builder<element::HtmlButtonElement> {
+    pub fn build(&self) -> Arc<element::HtmlButtonElement> {
+        element::HtmlButtonElement::new(self.sandbox.clone(), Default::default())
+    }
+}
+
+impl Builder<element::HtmlHtmlElement> {
+    pub fn build(&self) -> Arc<element::HtmlHtmlElement> {
+        element::HtmlHtmlElement::new(self.sandbox.clone(), Default::default())
+    }
 }
 
 /// A sandbox represents a virtual browser tab. It contains a document and a window,
@@ -44,22 +77,10 @@ impl Sandbox {
         self.window.clone()
     }
 
-    pub(crate) fn build_node<const N: BuildableNode>(self: Arc<Self>) -> Arc<dyn AnyNode> {
-        let sbox = Arc::downgrade(&self);
-
-        match N {
-            BuildableNode::AttrNode => node::AttrNode::new(sbox, Default::default()),
-            BuildableNode::TextNode => node::TextNode::new(sbox, Default::default()),
-            BuildableNode::DocumentNode => node::DocumentNode::new(sbox, Default::default()),
-            BuildableNode::HtmlHtmlElement => {
-                element::HtmlHtmlElement::new(sbox, Default::default())
-            }
-            BuildableNode::HtmlBodyElement => {
-                element::HtmlBodyElement::new(sbox, Default::default())
-            }
-            BuildableNode::HtmlButtonElement => {
-                element::HtmlButtonElement::new(sbox, Default::default())
-            }
+    pub(crate) fn builder<T: AnyNode>(self: &Arc<Self>) -> Builder<T> {
+        Builder {
+            sandbox: Arc::downgrade(self),
+            _phantom: PhantomData,
         }
     }
 }
