@@ -7,6 +7,7 @@ use paste::paste;
 use crate::internal_prelude::*;
 
 crate::use_behaviors!(node, sandbox_member);
+use crate::sandbox::Builder;
 use crate::window::Window;
 
 use std::sync::{Arc, Weak};
@@ -25,6 +26,19 @@ pub trait AnyNode: DowncastSync + SandboxMemberBehavior + NodeBehavior {
     fn clone_node(&self) -> Arc<dyn AnyNode>;
 }
 impl_downcast!(sync AnyNode);
+
+#[macro_export]
+/// implements builder for type
+macro_rules! impl_builder {
+    ($ty: ident) => {
+        impl Builder<$ty> {
+            pub fn build(&self) -> Arc<$ty> {
+                #[allow(clippy::unit_arg)]
+                $ty::new(self.sandbox.clone(), Default::default())
+            }
+        }
+    };
+}
 
 macro_rules! impl_nodes {
     ($((
@@ -72,6 +86,8 @@ macro_rules! impl_nodes {
 
                     $($rest)*
                 }
+
+                impl_builder!($ty);
 
                 impl_sandbox_member!($ty, member_storage);
                 impl_node!($ty, node_storage);
