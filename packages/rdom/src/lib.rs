@@ -28,17 +28,20 @@ pub mod tests;
 pub mod window;
 
 #[rdom_macro::declare_node]
+// this const is just required to group the syntaxes of struct and impl together
 const _: () = {
     #[derive(Node)]
-    #[core = "Biff"]
+    #[core = "Button"]
     pub struct HtmlButtonElement {
         foo: i32
     }
 
+    // Change this to Foobar to make it compile; it should compile without doing that,
+    // once everything about the declare_node macro works
     impl HtmlButtonElement {
-        fn foo() {
+        fn do_something() {
         }
     }
 };
 
-struct Blah(HtmlButtonElement);
+// struct Blah(HtmlButtonElement);
