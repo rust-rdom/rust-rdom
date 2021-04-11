@@ -15,11 +15,12 @@ extern crate proc_macro;
 
 use std::convert::{TryFrom, TryInto};
 
-use quote::quote;
+use core::iter::Extend;
+use quote::{quote, ToTokens};
 use proc_macro::{TokenStream};
-use syn::{Attribute, DeriveInput, Expr, Item, ItemConst, ItemImpl, ItemStruct, Meta, NestedMeta, Stmt, parse::{Parse, ParseStream}, parse_macro_input, token::Struct};
+use syn::{Attribute, DeriveInput, Expr, ImplItem, Lit, Item, ItemConst, ItemImpl, ItemStruct, Meta, NestedMeta, Stmt, Visibility, parse::{Parse, ParseStream}, parse_macro_input, token::Struct};
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 enum DerivableClasses {
     Node,
     Element,
@@ -49,8 +50,16 @@ impl Parse for NodeImplDecl {
     fn parse(input: ParseStream) -> syn::Result<Self> {
         let mut deriving_classes = Vec::new();
         let decl: DeriveInput = input.parse()?;
-        for attr in decl.attrs {
-            let path = attr.clone().path;
+        
+        if decl.attrs.is_empty() {
+            return Err(syn::Error::new_spanned(
+                decl,
+                "A #[derive_node] struct block must have at least a #[derive(Node)] attribute"
+            ))
+        }
+
+        for attr in &decl.attrs {
+            let path = &attr.path;
             if path.segments.len() == 1 {
                 let first_seg = path.segments.first().unwrap().clone();
                 let first_ident = first_seg.ident.to_string();
@@ -58,12 +67,20 @@ impl Parse for NodeImplDecl {
                 if first_ident == "derive" {
                     let derive_decl = NodeDeriveDecl::from(attr)?;
                     deriving_classes.extend(derive_decl.deriving_classes)
-                }// else if first_ident == "core" {
-                //    let key_value = TypeRelationDecl::from(attr)?;
-                //    // TODO use core = Whatever
-                //}
+                } else if first_ident == "core" {
+                    // let key_value = TypeRelationDecl::from(attr)?;
+                    // TODO use core = Whatever
+                }
             }
         }
+
+        if !deriving_classes.contains(&DerivableClasses::Node) {
+            return Err(syn::Error::new_spanned(
+                decl,
+                "A #[derive_node] struct block must have at least a #[derive(Node)] attribute"
+            ))
+        }
+
         // input.parse::<Token![(]>()?;
         // let declared_type: Type = input.parse()?;
         // {
@@ -85,11 +102,21 @@ impl Parse for NodeImplDecl {
 }
 
 struct NodeDecl {
-
-};
+    core_decl: Option<CoreDecl>,
+    item_struct: Option<ItemStruct>,
+    item_impl: Option<ItemImpl>
+}
 
 impl NodeDecl {
-    fn visit_struct(&mut self, block: &ItemStruct) {
+    fn new() -> NodeDecl {
+        NodeDecl {
+            item_struct: None,
+            item_impl: None,
+            core_decl: None
+        }
+    }
+
+    fn visit_struct(&mut self, block: &ItemStruct) -> syn::Result<()> {
 //        attrs: Vec<Attribute>
 //vis: Visibility
 //struct_token: Struct
@@ -98,22 +125,69 @@ impl NodeDecl {
 //fields: Fields
 //semi_token: Option<Semi>`
         if let Visibility::Public(_) = block.vis {
-            if block.attrs {
+            let mut deriving_classes = Vec::new();
+            let mut core_decl = None;
+            
+            if block.attrs.is_empty() {
+                return Err(syn::Error::new_spanned(
+                    block,
+                    "A #[derive_node] struct block must have at least a #[derive(Node)] attribute"
+                ))
+            }
 
+            for attr in &block.attrs {
+                let path = attr.clone().path;
+                if path.segments.len() == 1 {
+                    let first_seg = path.segments.first().unwrap().clone();
+                    let first_ident = first_seg.ident.to_string();
+
+                    if first_ident == "derive" {
+                        let derive_decl = NodeDeriveDecl::from(attr)?;
+                        deriving_classes.extend(derive_decl.deriving_classes)
+                    } else if first_ident == "core" {
+                        core_decl = Some(CoreDecl::from(attr)?);
+                    }
+                }
+            }
+
+            if !deriving_classes.contains(&DerivableClasses::Node) {
+                return Err(syn::Error::new_spanned(
+                    block,
+                    "A #[derive_node] struct block must have at least a #[derive(Node)] attribute"
+                ))
+            }
+
+            match core_decl {
+                Some(_) => {
+                    self.core_decl = core_decl;
+                    self.item_struct = Some(block.clone());
+                },
+                None => {
+                    return Err(syn::Error::new_spanned(
+                        block,
+                        "A #[derive_node] struct block must have at least a #[core = \"SomeType\"] attribute"
+                    ))
+                }
             }
         } else {
-
+            return Err(syn::Error::new_spanned(
+                block,
+                "A #[derive_node] struct block must have `pub` visibility"
+            ))
         }
+
+        Ok(())
     }
 
-    fn visit_impl(&mut self, block: &ItemImpl) {
-
+    fn visit_impl(&mut self, block: &ItemImpl) -> syn::Result<()> {
+        self.item_impl = Some(block.clone());
+        Ok(())
     }
 }
 
 impl Parse for NodeDecl {
     fn parse(input: ParseStream) -> syn::Result<Self> {
-        let mut result = NodeDecl {};
+        let mut result = NodeDecl::new();
         let decl: ItemConst = input.parse()?;
         if let Expr::Block(block) = *decl.expr {
             let block = block.block;
@@ -127,7 +201,7 @@ impl Parse for NodeDecl {
             let impl_stmt = block.stmts.get(1);
 
             if let Some(Stmt::Item(Item::Struct(struct_block))) = struct_stmt {
-                result.visit_struct(struct_block);
+                result.visit_struct(struct_block)?;
             } else {
                 return Err(syn::Error::new_spanned(
                     struct_stmt,
@@ -153,7 +227,7 @@ struct NodeDeriveDecl {
 }
 
 impl NodeDeriveDecl {
-    fn from(attr: Attribute) -> syn::Result<Self> {
+    fn from(attr: &Attribute) -> syn::Result<Self> {
         let mut deriving_classes = Vec::new();
         match attr.parse_meta()? {
             Meta::List(list) => {
@@ -208,10 +282,126 @@ impl NodeDeriveDecl {
     }
 }
 
+struct CoreDecl {
+    pub(crate) core_struct: String
+}
+
+impl CoreDecl {
+    fn from(attr: &Attribute) -> syn::Result<Self> {
+        match attr.parse_meta()? {
+            Meta::NameValue(nv) => {
+                let path = nv.path;
+                assert_eq!(quote!(#path).to_string(), "core");
+
+                match nv.lit {
+                    Lit::Str(s) => {
+                        return Ok(CoreDecl {
+                            core_struct: s.value()
+                        })
+                    },
+                    _ => {}
+                }
+            },
+            _ => {}
+        }
+        return Err(syn::Error::new_spanned(
+            attr,
+            "#[core = ...]: invalid contents"
+        ))
+    }
+}
+
+struct BlurbDecl {
+    pub(crate) blurb: String
+}
+
+impl BlurbDecl {
+    fn from(attr: &Attribute) -> syn::Result<Self> {
+        match attr.parse_meta()? {
+            Meta::NameValue(nv) => {
+                let path = nv.path;
+                assert_eq!(quote!(#path).to_string(), "blurb");
+
+                match nv.lit {
+                    Lit::Str(s) => {
+                        return Ok(BlurbDecl {
+                            blurb: s.value()
+                        })
+                    },
+                    _ => {}
+                }
+            },
+            _ => {}
+        }
+        return Err(syn::Error::new_spanned(
+            attr,
+            "#[blurb = ...]: invalid contents"
+        ))
+    }
+}
+
+struct LinkDecl {
+    pub(crate) blurb: String
+}
+
+impl LinkDecl {
+    fn from(attr: &Attribute) -> syn::Result<Self> {
+        match attr.parse_meta()? {
+            Meta::NameValue(nv) => {
+                let path = nv.path;
+                assert_eq!(quote!(#path).to_string(), "link");
+
+                match nv.lit {
+                    Lit::Str(s) => {
+                        return Ok(LinkDecl {
+                            blurb: s.value()
+                        })
+                    },
+                    _ => {}
+                }
+            },
+            _ => {}
+        }
+        return Err(syn::Error::new_spanned(
+            attr,
+            "#[link = ...]: invalid contents"
+        ))
+    }
+}
+
+struct PostludeDecl {
+    pub(crate) blurb: String
+}
+
+impl PostludeDecl {
+    fn from(attr: &Attribute) -> syn::Result<Self> {
+        match attr.parse_meta()? {
+            Meta::NameValue(nv) => {
+                let path = nv.path;
+                assert_eq!(quote!(#path).to_string(), "postlude");
+
+                match nv.lit {
+                    Lit::Str(s) => {
+                        return Ok(PostludeDecl {
+                            blurb: s.value()
+                        })
+                    },
+                    _ => {}
+                }
+            },
+            _ => {}
+        }
+        return Err(syn::Error::new_spanned(
+            attr,
+            "#[postlude = ...]: invalid contents"
+        ))
+    }
+}
+
 #[proc_macro_attribute]
-/// DOes a thing
+/// Allows the declaration of a type which is meant to inherit from the DOM "Node" class
 pub fn declare_node(_attribute: TokenStream, input: TokenStream) -> TokenStream {
-    parse_macro_input!(input as NodeDecl);
+    let node_decl = parse_macro_input!(input as NodeDecl);
 
     let postlude = Some("");
     let mut blurb = "The [{}](https://developer.mozilla.org/en-US/docs/Web/API/{}) node type".to_string();
@@ -222,18 +412,35 @@ pub fn declare_node(_attribute: TokenStream, input: TokenStream) -> TokenStream 
 
     let struct_name = "Foobar";
 
-    let decl = format!(r#"
-        #[doc = {blurb}]
-        pub struct {struct_name} {{
-            // /// Reference to the sandbox to which this node belongs
-            // pub context: Weak<Sandbox>,
+    let mut decl: TokenStream = format!(
+        r#"
+            #[doc = {blurb}]
+            pub struct {struct_name} {{
+                // /// Reference to the sandbox to which this node belongs
+                // pub context: Weak<Sandbox>,
 
-            // /// Node behavior (fields/methods associated with the DOM class called Node)
-            // pub(crate) node_behavior: Arc<NodeBehavior>,
+                // /// Node behavior (fields/methods associated with the DOM class called Node)
+                // pub(crate) node_behavior: Arc<NodeBehavior>,
 
-            // pub(crate) storage: $storage,
-        }}
-    "#, blurb=quote!(#blurb).to_string(), struct_name=struct_name).parse().unwrap();
+                // pub(crate) storage: $storage,
+            }}
+        "#,
+        blurb=quote!(#blurb).to_string(),
+        struct_name=struct_name,
+    ).parse().unwrap();
+
+
+    match node_decl.item_impl {
+        Some(closing) => {
+            let mut closing = closing.clone();
+            let foo = syn::parse_str("fn fibbar() {}").expect("Invalid");
+            closing.items.push(foo);
+
+            let z: TokenStream = closing.into_token_stream().into();
+            decl.extend(z);
+        },
+        None => {}
+    }
 
     decl
 

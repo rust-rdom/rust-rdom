@@ -28,15 +28,17 @@ pub mod tests;
 pub mod window;
 
 #[rdom_macro::declare_node]
-#[derive(Element)]
 const _: () = {
-    struct HtmlButtonElement {
-
+    #[derive(Node)]
+    #[core = "Biff"]
+    pub struct HtmlButtonElement {
+        foo: i32
     }
 
     impl HtmlButtonElement {
-
+        fn foo() {
+        }
     }
 };
 
-struct Blah(Foobar);
+struct Blah(HtmlButtonElement);
