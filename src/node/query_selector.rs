@@ -30,17 +30,29 @@ impl FromStr for Selector {
     }
 }
 
-/// Trait for checking if an object is selected
-pub trait Selectable {
-    fn is_selected(&self, selector: &Selector) -> bool;
+fn is_selected(node: &dyn AnyNode, selector: &Selector) -> bool {
+    match node.as_element() {
+        Some(element) => element.tag_name() == selector.0,
+        None => false,
+    }
 }
 
-/// Trait for every node that implements query_selector
-pub trait QuerySearcher {
-    fn query_selector(&self, selector: &str) -> Result<Option<Arc<dyn AnyNode>>, DomError> {
-        let selector = selector.parse()?;
-        Ok(self.query_selector_rec(&selector))
-    }
+/// Query selector function, does not check root node.
+/// Does not return element, returns node.
+pub fn query_selector(
+    root: &dyn AnyNode,
+    selector: &str,
+) -> Result<Option<Arc<dyn AnyNode>>, DomError> {
+    let selector = selector.parse::<Selector>()?;
+    Ok(query_selector_rec(root, &selector))
+}
 
-    fn query_selector_rec(&self, selector: &Selector) -> Option<Arc<dyn AnyNode>>;
+fn query_selector_rec(root: &dyn AnyNode, selector: &Selector) -> Option<Arc<dyn AnyNode>> {
+    root.static_child_nodes().into_iter().find_map(|node| {
+        if is_selected(&*node, selector) {
+            Some(node)
+        } else {
+            query_selector_rec(&*node, selector)
+        }
+    })
 }

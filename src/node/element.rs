@@ -8,6 +8,8 @@ crate::use_behaviors!(node, sandbox_member);
 use crate::internal_prelude::*;
 use crate::sandbox::Sandbox;
 
+use super::query_selector::query_selector;
+
 /// A base trait for all core element types
 pub trait AnyElement: DowncastSync + AnyNode {
     /// Gets html tag (DIV for <div> or BUTTON for <button>)
@@ -78,6 +80,10 @@ macro_rules! impl_elements {
 
                     fn as_element(&self) -> Option<&dyn AnyElement> {
                         Some(self)
+                    }
+
+                    fn query_selector(&self, selector: &str) -> Result<Option<Arc<dyn AnyNode>>, DomError> {
+                        query_selector(self, selector)
                     }
                 }
 

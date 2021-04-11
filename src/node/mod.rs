@@ -18,6 +18,8 @@ use std::{
 pub mod element;
 mod query_selector;
 
+use query_selector::query_selector;
+
 // I have to abandon this private interface for now - maksimil
 // pub(crate) mod private;
 
@@ -31,6 +33,9 @@ pub trait AnyNode: DowncastSync + SandboxMemberBehavior + NodeBehavior {
 
     /// Tries to cast node into element
     fn as_element(&self) -> Option<&dyn AnyElement>;
+
+    /// [Document.querySelector](https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector)
+    fn query_selector(&self, selector: &str) -> Result<Option<Arc<dyn AnyNode>>, DomError>;
 }
 impl_downcast!(sync AnyNode);
 
@@ -107,6 +112,10 @@ macro_rules! impl_nodes {
 
                     fn as_element(&self) -> Option<&dyn AnyElement> {
                         None
+                    }
+
+                    fn query_selector(&self, selector: &str) -> Result<Option<Arc<dyn AnyNode>>, DomError> {
+                        query_selector(self, selector)
                     }
                 }
             }
