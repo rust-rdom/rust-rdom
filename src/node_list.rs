@@ -1,10 +1,9 @@
 //! Representation of a [NodeList](https://developer.mozilla.org/en-US/docs/Web/API/NodeList)
 //! and associated metadata.
 
-use std::sync::{Arc, Weak};
-
 use crate::internal_prelude::*;
-use crate::sandbox::Sandbox;
+
+crate::use_behaviors!(sandbox_member);
 
 /// Represents a [NodeList](https://developer.mozilla.org/en-US/docs/Web/API/NodeList) structure,
 /// which may be either "live" or "static". Note that these are not strongly retained by the
@@ -17,7 +16,7 @@ use crate::sandbox::Sandbox;
 /// retained.
 pub struct NodeList {
     /// Reference to the sandbox to which this NodeList belongs
-    pub context: Weak<Sandbox>,
+    pub context: SandboxMemberBehaviorStorage,
 
     /// The underlying storage
     pub(crate) nodelist_storage: NodeListStorage,
@@ -26,7 +25,7 @@ pub struct NodeList {
 impl NodeList {
     pub(crate) fn new(context: Weak<Sandbox>, nodelist_storage: NodeListStorage) -> Arc<NodeList> {
         Arc::new(NodeList {
-            context,
+            context: SandboxMemberBehaviorStorage::new(context),
             nodelist_storage,
         })
     }
@@ -44,9 +43,7 @@ impl NodeList {
         match &self.nodelist_storage {
             NodeListStorage::Static(list) => list.len(),
             NodeListStorage::Live(query) => match query {
-                Query::ChildNodes { children_of } => {
-                    children_of.get_node_behavior().static_child_nodes().len()
-                }
+                Query::ChildNodes { children_of } => children_of.static_child_nodes().len(),
             },
         }
     }
@@ -56,11 +53,9 @@ impl NodeList {
         match &self.nodelist_storage {
             NodeListStorage::Static(list) => list.get(index).cloned(),
             NodeListStorage::Live(query) => match query {
-                Query::ChildNodes { children_of } => children_of
-                    .get_node_behavior()
-                    .static_child_nodes()
-                    .get(index)
-                    .cloned(),
+                Query::ChildNodes { children_of } => {
+                    children_of.static_child_nodes().get(index).cloned()
+                }
             },
         }
     }
@@ -70,6 +65,8 @@ impl NodeList {
         self.item(index)
     }
 }
+
+impl_sandbox_member!(NodeList, context);
 
 /// An encapsulation of how the NodeList will respond to operations.
 pub(crate) enum NodeListStorage {

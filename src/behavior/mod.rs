@@ -2,91 +2,73 @@
 //! refer extensively to classes and mixins, and because Rust does not support either one,
 //! this module provides several structures that provide the same behavior but in a Rust-
 //! friendly way (using composition instead of inheritance).
+//!
+//! Every behavior is implemented using traits, which can be dependent on one another.
+//! Every behavior has a **BehaviorName**Behavior and **BehaviorName**BehaviorStorage and
+//! implementing macro.
 
-use std::sync::{Arc, RwLock, Weak};
+// vscode snippet for behavior files
+// "add_behavior": {
+//     "prefix": "add_behavior",
+//     "description": "adds template code to behavior file",
+//     "body": [
+//         "#![macro_use]",
+//         "",
+//         "pub trait $2Behavior {}",
+//         "pub struct $2BehaviorStorage;",
+//         "",
+//         "#[macro_export]",
+//         "/// Implements $2Behavior",
+//         "macro_rules! impl_$1 {",
+//         "    (\\$structname: ident, \\$fieldname: ident) => {",
+//         "        paste::paste! {",
+//         "            impl $2Behavior for \\$structname {}",
+//         "        }",
+//         "    };",
+//         "}"
+//     ]
+// }
 
-use crate::internal_prelude::*;
-use crate::node_list::{NodeList, NodeListStorage, Query};
+/// Macro for generating preludes and enforcing mod names
+macro_rules! generate_preludes {
+    ($($modname: ident $traitname: ident),*) => {
+        paste::paste! {
+            $(
+                pub mod [<$modname _prelude>] {
+                    pub use super::$modname::{
+                        [<$traitname Behavior>],
+                        [<$traitname BehaviorStorage>]
+                    };
 
-/// Behavior according to the DOM class called Node
-#[derive(Debug)]
-pub struct NodeBehavior {
-    /// Reference back up to the core Node
-    node: Weak<dyn AnyNode>,
-
-    parent_node: Option<Weak<dyn AnyNode>>,
-    left_sibling: Option<Weak<dyn AnyNode>>,
-    right_sibling: Option<Weak<dyn AnyNode>>,
-    child_nodes: RwLock<Vec<Arc<dyn AnyNode>>>,
+                    pub use crate::[<impl_ $modname>];
+                }
+            )*
+        }
+    };
 }
 
-impl NodeBehavior {
-    pub(crate) fn new(node: Weak<dyn AnyNode>) -> NodeBehavior {
-        NodeBehavior {
-            node,
-            parent_node: None,
-            left_sibling: None,
-            right_sibling: None,
-            child_nodes: RwLock::new(Vec::new()),
+#[macro_export]
+/// Provides use statements for behaviors
+macro_rules! use_behaviors {
+    ($($name:ident),*) => {
+        paste::paste!{
+            $(
+                use crate::behavior::[<$name _prelude>]::*;
+            )*
         }
     }
-
-    pub(crate) fn first_child(&self) -> Option<Arc<dyn AnyNode>> {
-        let lock = self.child_nodes.read().unwrap();
-        (*lock).first().cloned()
-    }
-
-    pub(crate) fn last_child(&self) -> Option<Arc<dyn AnyNode>> {
-        let lock = self.child_nodes.read().unwrap();
-        (*lock).last().cloned()
-    }
-
-    pub(crate) fn append_child(&self, other: Arc<dyn AnyNode>) {
-        let mut lock = self.child_nodes.write().unwrap();
-        (*lock).push(other);
-    }
-
-    pub(crate) fn static_child_nodes(&self) -> Vec<Arc<dyn AnyNode>> {
-        self.child_nodes.read().unwrap().clone()
-    }
-
-    pub(crate) fn child_nodes(&self) -> Arc<NodeList> {
-        let strong_ref = self.node.upgrade().expect("Sandbox dropped");
-
-        NodeList::new(
-            strong_ref.get_context(),
-            NodeListStorage::Live(Query::ChildNodes {
-                children_of: strong_ref,
-            }),
-        )
-    }
-
-    pub(crate) fn clone_node(&self) -> Result<Arc<dyn AnyNode>, DomError> {
-        let node_core = self.node.upgrade().ok_or(DomError::SandboxDropped)?;
-        Ok((*node_core).clone_node())
-    }
 }
 
-/// Behavior according to the DOM class called Element
-pub struct ElementBehavior {
-    /// Reference back up to the core Element
-    element: Weak<dyn element::AnyElement>,
-}
+// need to write mod name twice because of
+// macro importing
+pub mod element;
+pub mod node;
+pub mod parent;
+pub mod sandbox_member;
 
-impl ElementBehavior {
-    pub(crate) fn new(element: Weak<dyn element::AnyElement>) -> ElementBehavior {
-        ElementBehavior { element }
-    }
-}
-
-/// Behavior according to the DOM class called ParentNode
-pub struct ParentNodeBehavior {
-    /// Reference back up to the core Node
-    node: Weak<dyn AnyNode>,
-}
-
-impl ParentNodeBehavior {
-    pub(crate) fn new(node: Weak<dyn AnyNode>) -> ParentNodeBehavior {
-        ParentNodeBehavior { node }
-    }
+generate_preludes! {
+    node Node,
+    sandbox_member SandboxMember,
+    parent Parent,
+    element Element
 }

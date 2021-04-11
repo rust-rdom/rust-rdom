@@ -2,6 +2,7 @@
 
 use std::sync::Arc;
 
+use crate::behavior::node::NodeBehavior;
 use crate::config::ScreenMetrics;
 use crate::node::element::{HtmlBodyElement, HtmlButtonElement, HtmlHtmlElement};
 use crate::sandbox::Sandbox;

@@ -46,14 +46,11 @@ pub fn query_selector(
 }
 
 fn query_selector_rec(root: &dyn AnyNode, selector: &Selector) -> Option<Arc<dyn AnyNode>> {
-    root.get_node_behavior()
-        .static_child_nodes()
-        .into_iter()
-        .find_map(|node| {
-            if node.tag_name() == selector.0 {
-                Some(node)
-            } else {
-                query_selector_rec(&*node, selector)
-            }
-        })
+    root.static_child_nodes().into_iter().find_map(|node| {
+        if node.tag_name() == selector.0 {
+            Some(node)
+        } else {
+            query_selector_rec(&*node, selector)
+        }
+    })
 }

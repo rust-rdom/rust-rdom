@@ -1,16 +1,14 @@
 //! Representation of a [NamedNodeMap](https://developer.mozilla.org/en-US/docs/Web/API/NamedNodeMap)
 //! and associated metadata.
 
-use std::sync::{Arc, Weak};
-
+crate::use_behaviors!(sandbox_member);
 use crate::internal_prelude::*;
 use crate::node::AttrNode;
-use crate::sandbox::Sandbox;
 
 /// A [NamedNodeMap](https://developer.mozilla.org/en-US/docs/Web/API/NamedNodeMap) structure
 pub struct NamedNodeMap {
-    /// Reference to the sandbox to which this NamedNodeMap belongs
-    pub context: Weak<Sandbox>,
+    /// SandboxMember implementation
+    pub context: SandboxMemberBehaviorStorage,
 
     /// Reference back up to the core element
     pub element: Weak<dyn element::AnyElement>,
@@ -20,12 +18,9 @@ pub struct NamedNodeMap {
 }
 
 impl NamedNodeMap {
-    fn new(
-        context: Weak<Sandbox>,
-        element: Weak<dyn element::AnyElement>,
-    ) -> Arc<NamedNodeMap> {
+    fn new(context: Weak<Sandbox>, element: Weak<dyn element::AnyElement>) -> Arc<NamedNodeMap> {
         Arc::new(NamedNodeMap {
-            context,
+            context: SandboxMemberBehaviorStorage::new(context),
             element,
             attribute_list: Vec::new(),
         })
@@ -39,3 +34,5 @@ impl NamedNodeMap {
         self.attribute_list.get(index).cloned()
     }
 }
+
+impl_sandbox_member!(NamedNodeMap, context);

@@ -23,27 +23,26 @@ use paste::paste;
 
 use std::convert::TryFrom;
 use std::result::Result;
-use std::sync::{Arc, Weak};
 
+crate::use_behaviors!(sandbox_member);
 use crate::internal_prelude::*;
 
 pub mod element;
 
-/// A base trait for all nice node types
-pub trait AnyNiceNode {
-    /// Gives a weak reference to the sandbox the node was created in.
-    fn get_context(&self) -> Weak<Sandbox>;
-}
+/// A base trait for all wrapped node types
+pub trait AnyNiceNode: SandboxMemberBehavior {}
 
 #[macro_export]
 /// Provides the trait implementations for all nice node types
 macro_rules! node_base {
     ($ty: ty, impl { $($rest:tt)* }) => {
-        impl AnyNiceNode for $ty {
+        impl SandboxMemberBehavior for $ty {
             fn get_context(&self) -> Weak<$crate::sandbox::Sandbox> {
                 self.0.clone().get_context()
             }
         }
+
+        impl AnyNiceNode for $ty {}
 
         impl $ty {
             $($rest)*
