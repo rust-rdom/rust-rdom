@@ -71,10 +71,6 @@ macro_rules! impl_elements {
                         construction
                     }
 
-                    fn as_any(&self) -> &dyn Any {
-                        self
-                    }
-                
                     fn get_node_type(&self) -> isize {
                         1 // Element node type is 1
                     }

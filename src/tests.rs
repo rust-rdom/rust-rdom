@@ -59,7 +59,7 @@ fn test_text_node() {
     let _doc = test_node_creation!(TextNode, NodeType::Text, TextNodeStorage {text: "test".to_owned()});
 
     let node = _doc.first_child().unwrap();
-    let node = AnyNode::as_any(node.as_ref()).downcast_ref::<TextNode>().unwrap();
+    let node = node.downcast_ref::<TextNode>().unwrap();
 
     assert_eq!(node.get_text().unwrap(), "test".to_owned());
 }
