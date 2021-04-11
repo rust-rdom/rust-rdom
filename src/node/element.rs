@@ -8,8 +8,6 @@ crate::use_behaviors!(node, sandbox_member);
 use crate::internal_prelude::*;
 use crate::sandbox::Sandbox;
 
-use super::query_selector::query_selector;
-
 /// A base trait for all core element types
 pub trait AnyElement: DowncastSync + AnyNode {}
 impl_downcast!(sync AnyElement);
@@ -76,10 +74,6 @@ macro_rules! impl_elements {
 
                     fn tag_name(&self) -> String {
                         $tag.to_string()
-                    }
-
-                    fn query_selector(&self, selector: &str) -> Result<Option<Arc<dyn AnyNode>>, DomError> {
-                        query_selector(self, selector)
                     }
                  }
 
