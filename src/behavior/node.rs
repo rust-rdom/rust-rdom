@@ -11,7 +11,11 @@ pub trait NodeBehavior {
     fn first_child(&self) -> Option<Arc<dyn AnyNode>>;
     fn last_child(&self) -> Option<Arc<dyn AnyNode>>;
     fn append_child(&self, other: Arc<dyn AnyNode>);
+
+    #[doc(hidden)]
+    /// RDOM-private: gives a clone of the backing children Vec
     fn static_child_nodes(&self) -> Vec<Arc<dyn AnyNode>>;
+
     fn child_nodes(&self) -> Arc<NodeList>;
 }
 

@@ -6,8 +6,9 @@ use paste::paste;
 use std::any::Any;
 
 crate::use_behaviors!(node, sandbox_member);
+use crate::impl_builder;
 use crate::internal_prelude::*;
-use crate::sandbox::Sandbox;
+use crate::sandbox::{Builder, Sandbox};
 
 /// A base trait for all core element types
 pub trait AnyElement: DowncastSync + AnyNode {}
@@ -57,6 +58,8 @@ macro_rules! impl_elements {
                         construction
                     }
                 }
+
+                impl_builder!($ty);
 
                 impl_sandbox_member!($ty, member_storage);
                 impl_node!($ty, node_storage);

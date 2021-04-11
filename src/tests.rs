@@ -4,7 +4,8 @@ use std::sync::Arc;
 
 use crate::behavior::node::NodeBehavior;
 use crate::config::ScreenMetrics;
-use crate::node::element::HtmlHtmlElement;
+
+use crate::node::{self, element::HtmlHtmlElement};
 use crate::node::{ AnyNode,
     AttrNode, CDataSectionNode, CommentNode, Document, DocumentFragmentNode, DocumentTypeNode,
     ElementNode, NodeType, ProcessingInstructionNode, TextNode,
@@ -89,3 +90,15 @@ fn test_document_fragment_node() {
     let _doc = test_node_creation!(DocumentFragmentNode, NodeType::DocumentFragment, ());
 }
 
+#[test]
+fn can_build_node() {
+    use crate::behavior::sandbox_member::SandboxMemberBehavior;
+    use std::sync::Weak;
+
+    let metrics: ScreenMetrics = Default::default();
+    let sbox = Sandbox::new(metrics);
+    let node = sbox.builder::<node::AttrNode>().build();
+    let _: Arc<node::AttrNode> = node; // assert that we got an AttrNode
+
+    assert!(Weak::ptr_eq(&node.get_context(), &Arc::downgrade(&sbox)));
+}

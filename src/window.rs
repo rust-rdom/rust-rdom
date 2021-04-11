@@ -3,20 +3,20 @@
 use crate::internal_prelude::*;
 
 crate::use_behaviors!(sandbox_member);
-use crate::node::{Document, DocumentStorage};
+use crate::node::{DocumentNode, DocumentNodeStorage};
 
 /// A simulated window for static rendering
 pub struct Window {
     context: SandboxMemberBehaviorStorage,
-    document: Arc<Document>,
+    document: Arc<DocumentNode>,
 }
 
 impl Window {
     pub(crate) fn new(context: Weak<Sandbox>) -> Arc<Window> {
         Arc::new_cyclic(|win_weak| -> Window {
-            let document: Arc<Document> = Document::new(
+            let document: Arc<DocumentNode> = DocumentNode::new(
                 context.clone(),
-                DocumentStorage {
+                DocumentNodeStorage {
                     default_view: win_weak.clone(),
                 },
             );
@@ -28,7 +28,7 @@ impl Window {
     }
 
     /// Gets the window's document
-    pub fn document(&self) -> Arc<Document> {
+    pub fn document(&self) -> Arc<DocumentNode> {
         self.document.clone()
     }
 }

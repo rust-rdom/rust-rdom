@@ -7,6 +7,7 @@ use paste::paste;
 use crate::internal_prelude::*;
 
 crate::use_behaviors!(node, sandbox_member);
+use crate::sandbox::Builder;
 use crate::window::Window;
 
 use std::sync::{Arc, Weak};
@@ -43,6 +44,19 @@ pub trait AnyNode: DowncastSync + SandboxMemberBehavior + NodeBehavior {
 }
 
 impl_downcast!(sync AnyNode);
+
+#[macro_export]
+/// implements builder for type
+macro_rules! impl_builder {
+    ($ty: ident) => {
+        impl Builder<$ty> {
+            pub fn build(&self) -> Arc<$ty> {
+                #[allow(clippy::unit_arg)]
+                $ty::new(self.sandbox.clone(), Default::default())
+            }
+        }
+    };
+}
 
 macro_rules! impl_nodes {
     ($((
@@ -95,6 +109,8 @@ macro_rules! impl_nodes {
                     $($rest)*
                 }
 
+                impl_builder!($ty);
+
                 impl_sandbox_member!($ty, member_storage);
                 impl_node!($ty, node_storage);
 
@@ -118,7 +134,7 @@ macro_rules! impl_nodes {
 }
 
 #[derive(Default, Clone)]
-pub(crate) struct DocumentStorage {
+pub(crate) struct DocumentNodeStorage {
     /// Pointer back up to the window
     pub(crate) default_view: Weak<Window>,
 }
@@ -184,8 +200,8 @@ impl_nodes! {
         impl {}
     )
     (
-        Document,
-        storage: DocumentStorage,
+        DocumentNode,
+        storage: DocumentNodeStorage,
         blurb: "document",
         link: "Document",
         node_type: NodeType::Document,

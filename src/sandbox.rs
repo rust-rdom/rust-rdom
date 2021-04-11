@@ -1,11 +1,18 @@
 //! A sandbox represents a virtual browser tab. It contains a document and a window,
 //! as well as some configuration information for screen dimensions.
 
+use std::marker::PhantomData;
+
 use crate::internal_prelude::*;
 
 use crate::config::ScreenMetrics;
+use crate::node::{self, element};
 use crate::window::Window;
 
+pub(crate) struct Builder<T: AnyNode> {
+    pub(crate) sandbox: Weak<Sandbox>,
+    _phantom: PhantomData<T>,
+}
 /// A sandbox represents a virtual browser tab. It contains a document and a window,
 /// as well as some configuration information for screen dimensions.
 #[derive(Clone)]
@@ -31,5 +38,12 @@ impl Sandbox {
         // Window is safe to unwrap, as it's only None during initialization.
         // This will be fixable when arc_new_cyclic is stable.
         self.window.clone()
+    }
+
+    pub(crate) fn builder<T: AnyNode>(self: &Arc<Self>) -> Builder<T> {
+        Builder {
+            sandbox: Arc::downgrade(self),
+            _phantom: PhantomData,
+        }
     }
 }
