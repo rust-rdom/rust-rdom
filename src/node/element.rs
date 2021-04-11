@@ -3,6 +3,7 @@
 
 use downcast_rs::DowncastSync;
 use paste::paste;
+use std::any::Any;
 
 crate::use_behaviors!(node, sandbox_member);
 use crate::impl_builder;
@@ -71,6 +72,10 @@ macro_rules! impl_elements {
                         (*cons).storage = self.storage.clone();
 
                         construction
+                    }
+
+                    fn get_node_type(&self) -> isize {
+                        1 // Element node type is 1
                     }
                 }
 

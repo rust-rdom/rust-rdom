@@ -20,11 +20,29 @@ pub mod element;
 /// An input event
 pub struct InputEvent {}
 
+#[derive(Copy, Clone)]
+/// Node type, as defined in https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType
+pub(crate) enum NodeType {
+    Element = 1,
+    Attribute = 2,
+    Text = 3,
+    CDataSection = 4,
+    ProcessingInstruction = 7,
+    Comment = 8,
+    Document = 9,
+    DocumentType = 10,
+    DocumentFragment = 11,
+}
+
 /// A base trait for all common node types
 pub trait AnyNode: DowncastSync + SandboxMemberBehavior + NodeBehavior {
     /// Clones node according to Node.cloneNode()
     fn clone_node(&self) -> Arc<dyn AnyNode>;
+
+    /// Returns the node type, as defined in https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType
+    fn get_node_type(&self) -> isize;
 }
+
 impl_downcast!(sync AnyNode);
 
 #[macro_export]
@@ -46,6 +64,7 @@ macro_rules! impl_nodes {
         storage: $storage: ty,
         blurb: $blurb: literal,
         link: $link: literal,
+        node_type: $node_type: expr,
         impl { $( $rest:tt )* }
         $(, $postlude: literal)?
     ))*) => {
@@ -67,6 +86,8 @@ macro_rules! impl_nodes {
                     pub(crate) node_storage: NodeBehaviorStorage,
 
                     pub(crate) storage: $storage,
+
+                    node_type: NodeType,
                 }
             }
 
@@ -78,6 +99,7 @@ macro_rules! impl_nodes {
                                 storage,
                                 node_storage: NodeBehaviorStorage::new(construction_weak.clone()),
                                 member_storage: SandboxMemberBehaviorStorage::new(context),
+                                node_type: $node_type,
                             }
                         });
 
@@ -101,6 +123,10 @@ macro_rules! impl_nodes {
 
                         construction
                     }
+
+                    fn get_node_type(&self) -> isize {
+                        self.node_type as isize
+                    }
                 }
             }
         )*
@@ -121,10 +147,19 @@ pub(crate) struct TextNodeStorage {
 
 impl_nodes! {
     (
+        ElementNode,
+        storage: (),
+        blurb: "Element",
+        link: "Element",
+        node_type: NodeType::Element,
+        impl {}
+    )
+    (
         AttrNode,
         storage: (),
         blurb: "attr (attribute)",
         link: "Attr",
+        node_type: NodeType::Attribute,
         impl {}
     )
     (
@@ -132,6 +167,36 @@ impl_nodes! {
         storage: TextNodeStorage,
         blurb: "text",
         link: "Text",
+        node_type: NodeType::Text,
+        impl {
+            /// Creates a text node.
+            pub fn get_text(&self) -> Option<String> {
+                Some(self.storage.text.clone())
+            }            
+        }
+    )
+    (
+        CDataSectionNode,
+        storage: (),
+        blurb: "CDATASection",
+        link: "CDATASection",
+        node_type: NodeType::CDataSection,
+        impl {}
+    )
+    (
+        ProcessingInstructionNode,
+        storage: () /* or ProcessingInstructiNodeStorage */,
+        blurb: "ProcessingInstruction",
+        link: "ProcessingInstruction",
+        node_type: NodeType::ProcessingInstruction,
+        impl {}
+    )
+    (
+        CommentNode,
+        storage: TextNodeStorage,
+        blurb: "Comment",
+        link: "Comment",
+        node_type: NodeType::Comment,
         impl {}
     )
     (
@@ -139,11 +204,28 @@ impl_nodes! {
         storage: DocumentNodeStorage,
         blurb: "document",
         link: "Document",
+        node_type: NodeType::Document,
         impl {
             /// Creates a text node.
             pub fn create_text_node(&self, text: String) -> Arc<TextNode> {
                 TextNode::new(self.get_context(), TextNodeStorage { text })
             }
         }
+    )
+    (
+        DocumentTypeNode,
+        storage: () /* or DocumentTypeNodeStorage */,
+        blurb: "DocumentType",
+        link: "DocumentType",
+        node_type: NodeType::DocumentType,
+        impl {}
+    )
+    (
+        DocumentFragmentNode,
+        storage: () /* or DocumentFragmentNodeStorage */,
+        blurb: "DocumentFragment",
+        link: "DocumentFragment",
+        node_type: NodeType::DocumentFragment,
+        impl {}
     )
 }
