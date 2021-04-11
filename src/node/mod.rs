@@ -2,6 +2,7 @@
 //! nice representation.
 
 use downcast_rs::DowncastSync;
+use node::element::AnyElement;
 use paste::paste;
 
 use crate::internal_prelude::*;
@@ -28,15 +29,18 @@ pub trait AnyNode: DowncastSync + SandboxMemberBehavior + NodeBehavior {
     /// Clones node according to Node.cloneNode()
     fn clone_node(&self) -> Arc<dyn AnyNode>;
 
-    /// Gets html tag (div for <div> or button for <button>)
-    /// [mdn docs](https://developer.mozilla.org/en-US/docs/Web/API/Element/tagName)
-    fn tag_name(&self) -> String;
+    /// Tries to cast node into element
+    fn as_element(&self) -> Option<&dyn AnyElement>;
 }
 impl_downcast!(sync AnyNode);
 
 impl fmt::Debug for dyn AnyNode {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "<{} />", self.tag_name())
+        match self.as_element() {
+            Some(element) => write!(f, "<{} />", element.tag_name()),
+            // TODO: add a better implementation when #20 gets merged
+            None => write!(f, "< />"),
+        }
     }
 }
 
@@ -101,8 +105,8 @@ macro_rules! impl_nodes {
                         construction
                     }
 
-                    fn tag_name(&self) -> String {
-                        String::new()
+                    fn as_element(&self) -> Option<&dyn AnyElement> {
+                        None
                     }
                 }
             }

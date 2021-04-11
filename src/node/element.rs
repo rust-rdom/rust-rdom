@@ -9,7 +9,11 @@ use crate::internal_prelude::*;
 use crate::sandbox::Sandbox;
 
 /// A base trait for all core element types
-pub trait AnyElement: DowncastSync + AnyNode {}
+pub trait AnyElement: DowncastSync + AnyNode {
+    /// Gets html tag (DIV for <div> or BUTTON for <button>)
+    /// [mdn docs](https://developer.mozilla.org/en-US/docs/Web/API/Element/tagName)
+    fn tag_name(&self) -> String;
+}
 impl_downcast!(sync AnyElement);
 
 macro_rules! impl_elements {
@@ -72,12 +76,16 @@ macro_rules! impl_elements {
                         construction
                     }
 
+                    fn as_element(&self) -> Option<&dyn AnyElement> {
+                        Some(self)
+                    }
+                }
+
+                impl AnyElement for $ty {
                     fn tag_name(&self) -> String {
                         $tag.to_string()
                     }
-                 }
-
-                impl AnyElement for $ty {}
+                }
             }
         )*
     }

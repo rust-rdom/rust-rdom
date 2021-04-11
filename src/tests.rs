@@ -4,7 +4,7 @@ use std::sync::Arc;
 
 use crate::behavior::node::NodeBehavior;
 use crate::config::ScreenMetrics;
-use crate::node::element::{HtmlBodyElement, HtmlButtonElement, HtmlHtmlElement};
+use crate::node::element::{AnyElement, HtmlBodyElement, HtmlButtonElement, HtmlHtmlElement};
 use crate::sandbox::Sandbox;
 
 use crate::node::AnyNode;
@@ -21,23 +21,40 @@ fn it_works() {
 }
 
 #[test]
-fn query_selector() {
+fn casting_test() {
     let sbox = Sandbox::new(Default::default());
     let doc = sbox.clone().window().document();
+    let document_element = HtmlHtmlElement::new(Arc::downgrade(&sbox), ());
+    let text = doc.create_text_node("Hello, world!".to_string());
+    doc.append_child(document_element);
+    doc.append_child(text);
 
-    let html = HtmlHtmlElement::new(Arc::downgrade(&sbox), ());
-    let body = HtmlBodyElement::new(Arc::downgrade(&sbox), ());
+    let mut children = doc.static_child_nodes().into_iter();
+    let html = children.next().unwrap();
+    let atext = children.next().unwrap();
 
-    doc.append_child(html.clone());
-    html.append_child(body.clone());
-
-    let qbody = doc
-        .query_selector("body")
-        .unwrap()
-        .unwrap()
-        .downcast_arc()
-        .unwrap();
-
-    // query selector on nodes
-    assert!(Arc::ptr_eq(&qbody, &body));
+    assert!(html.as_element().is_some());
+    assert!(atext.as_element().is_none());
 }
+
+// #[test]
+// fn query_selector() {
+//     let sbox = Sandbox::new(Default::default());
+//     let doc = sbox.clone().window().document();
+
+//     let html = HtmlHtmlElement::new(Arc::downgrade(&sbox), ());
+//     let body = HtmlBodyElement::new(Arc::downgrade(&sbox), ());
+
+//     doc.append_child(html.clone());
+//     html.append_child(body.clone());
+
+//     let qbody = doc
+//         .query_selector("body")
+//         .unwrap()
+//         .unwrap()
+//         .downcast_arc()
+//         .unwrap();
+
+//     // query selector on nodes
+//     assert!(Arc::ptr_eq(&qbody, &body));
+// }
