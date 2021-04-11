@@ -7,7 +7,7 @@ use crate::config::ScreenMetrics;
 
 use crate::node::{self, element::HtmlHtmlElement};
 use crate::node::{ AnyNode,
-    AttrNode, CDataSectionNode, CommentNode, Document, DocumentFragmentNode, DocumentTypeNode,
+    AttrNode, CDataSectionNode, CommentNode,  DocumentFragmentNode, DocumentTypeNode,
     ElementNode, NodeType, ProcessingInstructionNode, TextNode,
 };
 use crate::node::TextNodeStorage;
@@ -97,8 +97,8 @@ fn can_build_node() {
 
     let metrics: ScreenMetrics = Default::default();
     let sbox = Sandbox::new(metrics);
-    let node = sbox.builder::<node::AttrNode>().build();
-    let _: Arc<node::AttrNode> = node; // assert that we got an AttrNode
+    let node = sbox.builder::<AttrNode>().build();
+    let _: Arc<AttrNode> = node; // assert that we got an AttrNode
 
     assert!(Weak::ptr_eq(&node.get_context(), &Arc::downgrade(&sbox)));
 }
