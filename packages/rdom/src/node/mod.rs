@@ -42,6 +42,23 @@ pub(crate) enum NodeType {
     DocumentFragment = 11,
 }
 
+impl ToString for NodeType {
+    fn to_string(&self) -> String {
+        match self {
+            NodeType::Element => "element",
+            NodeType::Attribute => "attribute",
+            NodeType::Text => "text",
+            NodeType::CDataSection => "CData section",
+            NodeType::ProcessingInstruction => "processing instruction",
+            NodeType::Comment => "comment",
+            NodeType::Document => "document",
+            NodeType::DocumentType => "document type",
+            NodeType::DocumentFragment => "document fragment",
+        }
+        .to_string()
+    }
+}
+
 /// A base trait for all common node types
 pub trait AnyNode: DowncastSync + SandboxMemberBehavior + NodeBehavior {
     /// Clones node according to Node.cloneNode()
@@ -75,8 +92,7 @@ impl fmt::Debug for dyn AnyNode {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self.as_element() {
             Some(element) => write!(f, "<{} />", element.tag_name()),
-            // TODO: add a better implementation when #20 gets merged
-            None => write!(f, "< />"),
+            None => write!(f, "Node of type {}", self.get_node_type()),
         }
     }
 }
