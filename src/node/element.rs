@@ -5,8 +5,9 @@ use downcast_rs::DowncastSync;
 use paste::paste;
 
 crate::use_behaviors!(node, sandbox_member);
+use crate::impl_builder;
 use crate::internal_prelude::*;
-use crate::sandbox::Sandbox;
+use crate::sandbox::{Builder, Sandbox};
 
 use super::query_selector::query_selector;
 
@@ -65,6 +66,8 @@ macro_rules! impl_elements {
                     }
                 }
 
+                impl_builder!($ty);
+
                 impl_sandbox_member!($ty, member_storage);
                 impl_node!($ty, node_storage);
 
@@ -84,6 +87,10 @@ macro_rules! impl_elements {
 
                     fn query_selector(&self, selector: &str) -> Result<Option<Arc<dyn AnyNode>>, DomError> {
                         query_selector(self, selector)
+                    }
+
+                    fn get_node_type(&self) -> isize {
+                        1 // Element node type is 1
                     }
                 }
 
