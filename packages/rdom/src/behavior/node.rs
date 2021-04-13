@@ -7,19 +7,8 @@ use crate::node_list::{NodeList, NodeListStorage};
 use crate::{internal_prelude::*, node_list::Query};
 use std::sync::{Arc, RwLock, Weak};
 
-pub trait NodeBehavior {
-    fn first_child(&self) -> Option<Arc<dyn AnyNode>>;
-    fn last_child(&self) -> Option<Arc<dyn AnyNode>>;
-    fn append_child(&self, other: Arc<dyn AnyNode>);
 
-    #[doc(hidden)]
-    /// RDOM-private: gives a clone of the backing children Vec
-    fn static_child_nodes(&self) -> Vec<Arc<dyn AnyNode>>;
-
-    fn child_nodes(&self) -> Arc<NodeList>;
-}
-
-pub struct NodeBehaviorStorage {
+pub struct NodeBehavior {
     /// Reference back up to the common Node
     node: Weak<dyn AnyNode>,
 
@@ -29,9 +18,9 @@ pub struct NodeBehaviorStorage {
     child_nodes: RwLock<Vec<Arc<dyn AnyNode>>>,
 }
 
-impl NodeBehaviorStorage {
-    pub fn new(node: Weak<dyn AnyNode>) -> NodeBehaviorStorage {
-        NodeBehaviorStorage {
+impl NodeBehavior {
+    pub fn new(node: Weak<dyn AnyNode>) -> NodeBehavior {
+        NodeBehavior {
             node,
             parent_node: None,
             left_sibling: None,
@@ -39,9 +28,7 @@ impl NodeBehaviorStorage {
             child_nodes: RwLock::new(Vec::new()),
         }
     }
-}
 
-impl NodeBehavior for NodeBehaviorStorage {
     fn first_child(&self) -> Option<Arc<dyn AnyNode>> {
         let lock = self.child_nodes.read().unwrap();
         (*lock).first().cloned()
@@ -78,27 +65,6 @@ impl NodeBehavior for NodeBehaviorStorage {
 macro_rules! impl_node {
     ($structname: ident, $fieldname: ident) => {
         paste::paste! {
-            impl NodeBehavior for $structname {
-                fn first_child(&self) -> Option<Arc<dyn AnyNode>> {
-                    self.$fieldname.first_child()
-                }
-
-                fn last_child(&self) -> Option<Arc<dyn AnyNode>> {
-                    self.$fieldname.last_child()
-                }
-
-                fn append_child(&self, other: Arc<dyn AnyNode>) {
-                    self.$fieldname.append_child(other)
-                }
-
-                fn static_child_nodes(&self) -> Vec<Arc<dyn AnyNode>> {
-                    self.$fieldname.static_child_nodes()
-                }
-
-                fn child_nodes(&self) -> Arc<$crate::node_list::NodeList> {
-                    self.$fieldname.child_nodes()
-                }
-            }
         }
     };
 }
