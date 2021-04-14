@@ -3,10 +3,13 @@
 
 use crate::internal_prelude::*;
 use crate::sandbox::{Sandbox};
+use crate::window::Window;
 
 #[derive(Clone)]
 pub enum ConcreteElement {
-    HtmlHtmlElement,
+    HtmlHtmlElement {
+        default_view: Weak<Window>
+    },
     HtmlBodyElement,
     HtmlButtonElement
 }
