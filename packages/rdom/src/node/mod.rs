@@ -4,21 +4,22 @@
 use downcast_rs::DowncastSync;
 use paste::paste;
 
-use crate::internal_prelude::*;
+use crate::{internal_prelude::*, node_list::Query};
+use crate::node_list::{NodeList, NodeListStorage};
+use std::sync::{Arc, RwLock, Weak};
 
-crate::use_behaviors!(node, sandbox_member);
-use crate::sandbox::Builder;
+crate::use_behaviors!(sandbox_member);
 use crate::window::Window;
 
-use std::sync::{Arc, Weak};
+use element::ConcreteElement;
 
 pub mod element;
 
 /// An input event
 pub struct InputEvent {}
 
-#[derive(Copy, Clone)]
 /// Node type, as defined in https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType
+#[derive(Clone)]
 pub(crate) enum NodeContents {
     Element(ConcreteElement),
     Attribute,
@@ -35,11 +36,10 @@ pub struct Node {
     /// specifics on what type of node this is
     pub contents: NodeContents,
 
+    pub node_storage: NodeBehavior,
+
     /// implementation for SandboxMemberBehavior
     pub member_storage: SandboxMemberBehaviorStorage,
-
-    /// implementation for NodeBehavior
-    pub(crate) node_storage: NodeBehaviorStorage,
 }
 
 impl Node {
@@ -47,7 +47,7 @@ impl Node {
         let construction: Arc<Node> = Arc::new_cyclic(|construction_weak| -> Node {
             Node {
                 contents,
-                node_storage: NodeBehaviorStorage::new(construction_weak.clone()),
+                node_storage: NodeBehavior::new(construction_weak.clone()),
                 member_storage: SandboxMemberBehaviorStorage::new(context),
             }
         });
@@ -55,27 +55,27 @@ impl Node {
         construction
     }
 
-    fn first_child(&self) -> Option<Arc<dyn AnyNode>> {
-        self.node_behavior.first_child()
+    fn first_child(&self) -> Option<Arc<Node>> {
+        self.node_storage.first_child()
     }
 
-    fn last_child(&self) -> Option<Arc<dyn AnyNode>> {
-        self.node_behavior.last_child()
+    fn last_child(&self) -> Option<Arc<Node>> {
+        self.node_storage.last_child()
     }
 
-    fn append_child(&self, other: Arc<dyn AnyNode>) {
-        self.node_behavior.append_child(other)
+    fn append_child(&self, other: Arc<Node>) {
+        self.node_storage.append_child(other)
     }
 
-    fn static_child_nodes(&self) -> Vec<Arc<dyn AnyNode>> {
-        self.node_behavior.static_child_nodes()
+    pub(crate) fn static_child_nodes(&self) -> Vec<Arc<Node>> {
+        self.node_storage.static_child_nodes()
     }
 
-    fn child_nodes(&self) -> Arc<crate::node_list::NodeList> {
-        self.node_behavior.child_nodes()
+    fn child_nodes(&self) -> Arc<NodeList> {
+        self.node_storage.child_nodes()
     }
 
-    fn clone_node(&self) -> Arc<dyn AnyNode> {
+    fn clone_node(&self) -> Arc<Node> {
         let contents = self.contents.clone();
         let mut construction = Node::new(self.get_context(), contents);
 
@@ -84,18 +84,20 @@ impl Node {
 
     fn get_node_type(&self) -> isize {
         match self.contents {
-            Element(_) => 1,
-            Attribute => 2,
-            Text => 3,
-            CDataSection => 4,
-            ProcessingInstruction => 7,
-            Comment => 8,
-            Document => 9,
-            DocumentType => 10,
-            DocumentFragment => 11,
+            NodeContents::Element(_) => 1,
+            NodeContents::Attribute => 2,
+            NodeContents::Text => 3,
+            NodeContents::CDataSection => 4,
+            NodeContents::ProcessingInstruction => 7,
+            NodeContents::Comment => 8,
+            NodeContents::Document => 9,
+            NodeContents::DocumentType => 10,
+            NodeContents::DocumentFragment => 11,
         }
     }
 }
+
+impl_sandbox_member!(Node, member_storage);
 
 #[derive(Default, Clone)]
 pub(crate) struct DocumentNodeStorage {
@@ -124,3 +126,55 @@ pub fn create_text_node(&self, text: String) -> Arc<TextNode> {
 }
 
 */
+
+pub struct NodeBehavior {
+    /// Reference back up to the common Node
+    node: Weak<Node>,
+
+    parent_node: Option<Weak<Node>>,
+    left_sibling: Option<Weak<Node>>,
+    right_sibling: Option<Weak<Node>>,
+    child_nodes: RwLock<Vec<Arc<Node>>>,
+}
+
+impl NodeBehavior {
+    pub fn new(node: Weak<Node>) -> NodeBehavior {
+        NodeBehavior {
+            node,
+            parent_node: None,
+            left_sibling: None,
+            right_sibling: None,
+            child_nodes: RwLock::new(Vec::new()),
+        }
+    }
+
+    fn first_child(&self) -> Option<Arc<Node>> {
+        let lock = self.child_nodes.read().unwrap();
+        (*lock).first().cloned()
+    }
+
+    fn last_child(&self) -> Option<Arc<Node>> {
+        let lock = self.child_nodes.read().unwrap();
+        (*lock).last().cloned()
+    }
+
+    fn append_child(&self, other: Arc<Node>) {
+        let mut lock = self.child_nodes.write().unwrap();
+        (*lock).push(other);
+    }
+
+    fn static_child_nodes(&self) -> Vec<Arc<Node>> {
+        self.child_nodes.read().unwrap().clone()
+    }
+
+    fn child_nodes(&self) -> Arc<NodeList> {
+        let strong_ref = self.node.upgrade().expect("Sandbox dropped");
+
+        NodeList::new(
+            (*strong_ref).get_context(),
+            NodeListStorage::Live(Query::ChildNodes {
+                children_of: strong_ref,
+            }),
+        )
+    }
+}

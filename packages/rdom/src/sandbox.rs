@@ -9,10 +9,10 @@ use crate::config::ScreenMetrics;
 use crate::node::{self, element};
 use crate::window::Window;
 
-pub(crate) struct Builder<T: AnyNode> {
-    pub(crate) sandbox: Weak<Sandbox>,
-    _phantom: PhantomData<T>,
-}
+// pub(crate) struct Builder<T: AnyNode> {
+//     pub(crate) sandbox: Weak<Sandbox>,
+//     _phantom: PhantomData<T>,
+// }
 /// A sandbox represents a virtual browser tab. It contains a document and a window,
 /// as well as some configuration information for screen dimensions.
 #[derive(Clone)]
@@ -40,10 +40,10 @@ impl Sandbox {
         self.window.clone()
     }
 
-    pub(crate) fn builder<T: AnyNode>(self: &Arc<Self>) -> Builder<T> {
-        Builder {
-            sandbox: Arc::downgrade(self),
-            _phantom: PhantomData,
-        }
-    }
+    // pub(crate) fn builder<T: AnyNode>(self: &Arc<Self>) -> Builder<T> {
+    //     Builder {
+    //         sandbox: Arc::downgrade(self),
+    //         _phantom: PhantomData,
+    //     }
+    // }
 }

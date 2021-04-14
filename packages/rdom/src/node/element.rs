@@ -2,9 +2,10 @@
 //! nice representation.
 
 use crate::internal_prelude::*;
-use crate::sandbox::{Builder, Sandbox};
+use crate::sandbox::{Sandbox};
 
-enum ConcreteElement {
+#[derive(Clone)]
+pub enum ConcreteElement {
     HtmlHtmlElement,
     HtmlBodyElement,
     HtmlButtonElement
