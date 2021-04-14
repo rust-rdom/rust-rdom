@@ -107,6 +107,7 @@ pub struct NodeCommon {
     pub(crate) node_graph: NodeGraphStorage,
 
     // just a context without behaviour wrapper for now
+    /// Context, pointing to the Sandbox
     pub context: Weak<Sandbox>,
 }
 
@@ -118,12 +119,14 @@ pub struct NodeCommon {
 // are in Arcs, AnyNodeRef and ConcreteNodeRef are just wrappers
 // With this we would actually probably not even need nice
 #[derive(Clone)]
+/// Strong pair of refernces to common and concrete node storages
 pub struct AnyNodeArc {
     pub(crate) contents: NodeContentsArc,
     pub(crate) common: Arc<NodeCommon>,
 }
 
 #[derive(Clone)]
+/// Weak version of AnyNodeArc
 pub struct AnyNodeWeak {
     pub(crate) contents: NodeContentsWeak,
     pub(crate) common: Weak<NodeCommon>,
@@ -135,13 +138,21 @@ pub struct AnyNodeWeak {
 // }
 
 // NodeBehaviour trait will be here for now
+/// Trait for main functions connected to node behaviour
 pub trait NodeBehaviour {
+    /// Returns first child
     fn first_child(&self) -> Option<AnyNodeArc>;
+    /// Returns last child
     fn last_child(&self) -> Option<AnyNodeArc>;
+    /// Adds child to child list
     fn append_child(&self, other: AnyNodeArc);
+    /// Gets static list of all child nodes
     fn static_child_nodes(&self) -> Vec<AnyNodeArc>;
+    /// Gets live list of all child nodes
     fn child_nodes(&self) -> Arc<NodeList>;
+    /// Clones node
     fn clone_node(&self) -> AnyNodeArc;
+    /// [Node.getType](https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType)
     fn get_node_type(&self) -> isize;
 }
 
@@ -206,7 +217,7 @@ impl NodeBehaviour for AnyNodeArc {
 
     fn clone_node(&self) -> AnyNodeArc {
         let contents = self.contents.clone();
-        let mut construction = AnyNodeArc::new(self.get_context(), contents);
+        let construction = AnyNodeArc::new(self.get_context(), contents);
 
         construction
     }
@@ -244,8 +255,8 @@ pub fn create_text_node(&self, text: String) -> Arc<TextNode> {
 
 */
 
-// NodeGraphStorage contains all the data connected
-// to graph of the nodes
+/// NodeGraphStorage contains all the data connected
+/// to graph of the nodes
 pub struct NodeGraphStorage {
     /// Reference back up to the common Node
     node: AnyNodeWeak,
@@ -257,6 +268,7 @@ pub struct NodeGraphStorage {
 }
 
 impl NodeGraphStorage {
+    /// Constructs a new NodeGraphStorage
     pub fn new(node: AnyNodeWeak) -> NodeGraphStorage {
         NodeGraphStorage {
             node,

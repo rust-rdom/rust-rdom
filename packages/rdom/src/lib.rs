@@ -27,5 +27,6 @@ pub mod named_node_map;
 pub mod node;
 pub mod node_list;
 pub mod sandbox;
-pub mod tests;
+// tests don't exist for now
+// pub mod tests;
 pub mod window;

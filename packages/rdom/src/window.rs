@@ -1,7 +1,6 @@
 //! A virtual browser window.
 
-use crate::internal_prelude::*;
-use crate::node::NodeContents;
+use crate::{internal_prelude::*, node::NodeContentsArc};
 
 crate::use_behaviors!(sandbox_member);
 
@@ -9,19 +8,17 @@ crate::use_behaviors!(sandbox_member);
 pub struct Window {
     context: SandboxMemberBehaviorStorage,
     // would be nice to have DocumentNode
-    document: Arc<Node>,
+    document: AnyNodeArc,
 }
 
 impl Window {
     pub(crate) fn new(context: Weak<Sandbox>) -> Arc<Window> {
         Arc::new_cyclic(|win_weak| -> Window {
-            let document: Arc<Node> = Node::new(
+            let document = AnyNodeArc::new(
                 context.clone(),
-                NodeContents::Element(
-                    ConcreteElement::HtmlHtmlElement {
-                        default_view: win_weak.clone(),
-                    }
-                ),
+                NodeContentsArc::Element(Arc::new(ConcreteElement::HtmlHtmlElement {
+                    default_view: win_weak.clone(),
+                })),
             );
             Window {
                 context: SandboxMemberBehaviorStorage::new(context),
@@ -32,7 +29,7 @@ impl Window {
 
     /// Gets the window's document
     // would be nice to have DocumentNode
-    pub fn document(&self) -> Arc<Node> {
+    pub fn document(&self) -> AnyNodeArc {
         self.document.clone()
     }
 }

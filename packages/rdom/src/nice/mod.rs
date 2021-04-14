@@ -29,4 +29,4 @@ use crate::internal_prelude::*;
 
 pub mod element;
 
-pub struct Document(Arc<Node>);
+pub struct Document(AnyNodeArc);

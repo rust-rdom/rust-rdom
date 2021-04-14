@@ -2,14 +2,18 @@
 //! nice representation.
 
 use crate::internal_prelude::*;
-use crate::sandbox::{Sandbox};
 use crate::window::Window;
 
 #[derive(Clone)]
+/// Enum of all concrete elements
 pub enum ConcreteElement {
+    /// [html](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/html)
     HtmlHtmlElement {
-        default_view: Weak<Window>
+        /// reference to window
+        default_view: Weak<Window>,
     },
+    /// [body](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/body)
     HtmlBodyElement,
-    HtmlButtonElement
+    /// [button](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button)
+    HtmlButtonElement,
 }
