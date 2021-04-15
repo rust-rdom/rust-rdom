@@ -148,8 +148,8 @@ pub struct ConcreteNodeWeak<T> {
     pub(crate) common: Weak<NodeCommon>,
 }
 
-macro_rules! impl_cast {
-    ($var:ident($ty:ident)) => {
+macro_rules! impl_concrete {
+    ($var:ident($ty:ident) => $node_type: expr) => {
         impl TryFrom<AnyNodeArc> for ConcreteNodeArc<$ty> {
             type Error = DomError;
 
@@ -177,7 +177,7 @@ macro_rules! impl_cast {
 
                 Ok(ConcreteNodeWeak {
                     contents,
-                    common: value.common,
+                    common: value.common
                 })
             }
         }
@@ -199,19 +199,49 @@ macro_rules! impl_cast {
                 }
             }
         }
+
+        impl NodeBehaviour for ConcreteNodeArc<$ty> {
+            fn first_child(&self) -> Option<AnyNodeArc> {
+                self.common.node_graph.first_child()
+            }
+
+            fn last_child(&self) -> Option<AnyNodeArc> {
+                self.common.node_graph.last_child()
+            }
+
+            fn append_child(&self, other: AnyNodeArc) {
+                self.common.node_graph.append_child(other)
+            }
+
+            fn static_child_nodes(&self) -> Vec<AnyNodeArc> {
+                self.common.node_graph.static_child_nodes()
+            }
+
+            fn child_nodes(&self) -> Arc<NodeList> {
+                self.common.node_graph.child_nodes()
+            }
+
+            fn clone_node(&self) -> AnyNodeArc {
+                AnyNodeArc::from(self.clone()).clone_node()
+            }
+
+            fn get_node_type(&self) -> isize {
+                $node_type
+            }
+        }
     };
 
-    ($($var:ident($ty:ident)),*) => {
+    ($($var:ident($ty:ident)=>$node_type:expr),*) => {
         $(
-            impl_cast!($var($ty));
+            impl_concrete!($var($ty)=>$node_type);
         )*
     }
 }
 
-impl_cast! {
-    Element(ConcreteElement),
-    Document(DocumentNodeStorage),
-    Text(TextNodeStorage)
+impl_concrete! {
+    Element(ConcreteElement) => 1,
+    Document(DocumentNodeStorage) => 7,
+    Text(TextNodeStorage) => 3
 }
 
 // NodeBehaviour trait will be here for now
@@ -266,6 +296,12 @@ impl AnyNodeArc {
 }
 
 impl SandboxMemberBehavior for AnyNodeArc {
+    fn get_context(&self) -> Weak<Sandbox> {
+        self.common.context.clone()
+    }
+}
+
+impl<T> SandboxMemberBehavior for ConcreteNodeArc<T> {
     fn get_context(&self) -> Weak<Sandbox> {
         self.common.context.clone()
     }
