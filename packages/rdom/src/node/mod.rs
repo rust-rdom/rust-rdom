@@ -3,7 +3,7 @@
 
 use crate::node_list::{NodeList, NodeListStorage};
 use crate::{internal_prelude::*, node_list::Query};
-use std::sync::RwLock;
+use std::{convert::TryFrom, sync::RwLock};
 
 crate::use_behaviors!(sandbox_member);
 use crate::window::Window;
@@ -20,11 +20,11 @@ pub struct InputEvent {}
 pub(crate) enum NodeContentsArc {
     Element(Arc<ConcreteElement>),
     Attribute,
-    Text,
+    Text(Arc<TextNodeStorage>),
     CDataSection,
     ProcessingInstruction,
     Comment,
-    Document,
+    Document(Arc<DocumentNodeStorage>),
     DocumentType,
     DocumentFragment,
 }
@@ -33,11 +33,11 @@ pub(crate) enum NodeContentsArc {
 pub(crate) enum NodeContentsWeak {
     Element(Weak<ConcreteElement>),
     Attribute,
-    Text,
+    Text(Weak<TextNodeStorage>),
     CDataSection,
     ProcessingInstruction,
     Comment,
-    Document,
+    Document(Weak<DocumentNodeStorage>),
     DocumentType,
     DocumentFragment,
 }
@@ -47,11 +47,11 @@ impl NodeContentsArc {
         match self {
             NodeContentsArc::Element(_) => 1,
             NodeContentsArc::Attribute => 2,
-            NodeContentsArc::Text => 3,
+            NodeContentsArc::Text(_) => 3,
             NodeContentsArc::CDataSection => 4,
             NodeContentsArc::ProcessingInstruction => 5,
             NodeContentsArc::Comment => 6,
-            NodeContentsArc::Document => 7,
+            NodeContentsArc::Document(_) => 7,
             NodeContentsArc::DocumentType => 8,
             NodeContentsArc::DocumentFragment => 9,
         }
@@ -61,11 +61,13 @@ impl NodeContentsArc {
         match self {
             NodeContentsArc::Element(strong) => NodeContentsWeak::Element(Arc::downgrade(&strong)),
             NodeContentsArc::Attribute => NodeContentsWeak::Attribute,
-            NodeContentsArc::Text => NodeContentsWeak::Text,
+            NodeContentsArc::Text(strong) => NodeContentsWeak::Text(Arc::downgrade(&strong)),
             NodeContentsArc::CDataSection => NodeContentsWeak::CDataSection,
             NodeContentsArc::ProcessingInstruction => NodeContentsWeak::ProcessingInstruction,
             NodeContentsArc::Comment => NodeContentsWeak::Comment,
-            NodeContentsArc::Document => NodeContentsWeak::Document,
+            NodeContentsArc::Document(strong) => {
+                NodeContentsWeak::Document(Arc::downgrade(&strong))
+            }
             NodeContentsArc::DocumentType => NodeContentsWeak::DocumentType,
             NodeContentsArc::DocumentFragment => NodeContentsWeak::DocumentFragment,
         }
@@ -77,11 +79,11 @@ impl NodeContentsWeak {
         match self {
             NodeContentsWeak::Element(_) => 1,
             NodeContentsWeak::Attribute => 2,
-            NodeContentsWeak::Text => 3,
+            NodeContentsWeak::Text(_) => 3,
             NodeContentsWeak::CDataSection => 4,
             NodeContentsWeak::ProcessingInstruction => 5,
             NodeContentsWeak::Comment => 6,
-            NodeContentsWeak::Document => 7,
+            NodeContentsWeak::Document(_) => 7,
             NodeContentsWeak::DocumentType => 8,
             NodeContentsWeak::DocumentFragment => 9,
         }
@@ -91,11 +93,11 @@ impl NodeContentsWeak {
         Some(match self {
             NodeContentsWeak::Element(weak) => NodeContentsArc::Element(weak.upgrade()?),
             NodeContentsWeak::Attribute => NodeContentsArc::Attribute,
-            NodeContentsWeak::Text => NodeContentsArc::Text,
+            NodeContentsWeak::Text(weak) => NodeContentsArc::Text(weak.upgrade()?),
             NodeContentsWeak::CDataSection => NodeContentsArc::CDataSection,
             NodeContentsWeak::ProcessingInstruction => NodeContentsArc::ProcessingInstruction,
             NodeContentsWeak::Comment => NodeContentsArc::Comment,
-            NodeContentsWeak::Document => NodeContentsArc::Document,
+            NodeContentsWeak::Document(weak) => NodeContentsArc::Document(weak.upgrade()?),
             NodeContentsWeak::DocumentType => NodeContentsArc::DocumentType,
             NodeContentsWeak::DocumentFragment => NodeContentsArc::DocumentFragment,
         })
@@ -131,11 +133,86 @@ pub struct AnyNodeWeak {
     pub(crate) contents: NodeContentsWeak,
     pub(crate) common: Weak<NodeCommon>,
 }
-// #[derive(Clone)]
-// pub struct ConcreteNodeRef<T> {
-//     pub(crate) contents: Arc<T>,
-//     pub(crate) common: Arc<NodeCommon>,
-// }
+
+#[derive(Clone)]
+/// Concrete variant of AnyNodeArc
+pub struct ConcreteNodeArc<T> {
+    pub(crate) contents: Arc<T>,
+    pub(crate) common: Arc<NodeCommon>,
+}
+
+#[derive(Clone)]
+/// Concrete variant of AnyNodeWeak
+pub struct ConcreteNodeWeak<T> {
+    pub(crate) contents: Weak<T>,
+    pub(crate) common: Weak<NodeCommon>,
+}
+
+macro_rules! impl_cast {
+    ($var:ident($ty:ident)) => {
+        impl TryFrom<AnyNodeArc> for ConcreteNodeArc<$ty> {
+            type Error = DomError;
+
+            fn try_from(value: AnyNodeArc) -> Result<Self, Self::Error> {
+                let contents = match value.contents {
+                    NodeContentsArc::$var(element) => Ok(element),
+                    _ => Err(DomError::NodeCastFail),
+                }?;
+
+                Ok(ConcreteNodeArc {
+                    contents,
+                    common: value.common,
+                })
+            }
+        }
+
+        impl TryFrom<AnyNodeWeak> for ConcreteNodeWeak<$ty> {
+            type Error = DomError;
+
+            fn try_from(value: AnyNodeWeak) -> Result<Self, Self::Error> {
+                let contents = match value.contents {
+                    NodeContentsWeak::$var(element) => Ok(element),
+                    _ => Err(DomError::NodeCastFail),
+                }?;
+
+                Ok(ConcreteNodeWeak {
+                    contents,
+                    common: value.common,
+                })
+            }
+        }
+
+        impl From<ConcreteNodeArc<$ty>> for AnyNodeArc {
+            fn from(concrete: ConcreteNodeArc<$ty>) -> Self {
+                AnyNodeArc {
+                    common: concrete.common,
+                    contents: NodeContentsArc::$var(concrete.contents),
+                }
+            }
+        }
+
+        impl From<ConcreteNodeWeak<$ty>> for AnyNodeWeak {
+            fn from(concrete: ConcreteNodeWeak<$ty>) -> Self {
+                AnyNodeWeak {
+                    common: concrete.common,
+                    contents: NodeContentsWeak::$var(concrete.contents),
+                }
+            }
+        }
+    };
+
+    ($($var:ident($ty:ident)),*) => {
+        $(
+            impl_cast!($var($ty));
+        )*
+    }
+}
+
+impl_cast! {
+    Element(ConcreteElement),
+    Document(DocumentNodeStorage),
+    Text(TextNodeStorage)
+}
 
 // NodeBehaviour trait will be here for now
 /// Trait for main functions connected to node behaviour

@@ -19,4 +19,8 @@ pub enum DomError {
     /// sandbox as a whole is out of memory.
     #[error("object out of memory")]
     ObjectOutOfMemory,
+
+    /// Node cast failure. The types don't match
+    #[error("node cast fail")]
+    NodeCastFail,
 }
