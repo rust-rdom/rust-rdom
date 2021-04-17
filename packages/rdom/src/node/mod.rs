@@ -8,11 +8,11 @@ use std::{convert::TryFrom, sync::RwLock};
 crate::use_behaviors!(sandbox_member);
 use crate::window::Window;
 
-use element::ConcreteElement;
 use contents::{NodeContentsArc, NodeContentsWeak};
+use element::ConcreteElement;
 
-pub mod element;
 pub(crate) mod contents;
+pub mod element;
 
 /// An input event
 pub struct InputEvent {}
@@ -126,10 +126,6 @@ macro_rules! impl_concrete {
                 self.common.node_graph.append_child(other)
             }
 
-            fn static_child_nodes(&self) -> Vec<AnyNodeArc> {
-                self.common.node_graph.static_child_nodes()
-            }
-
             fn child_nodes(&self) -> Arc<NodeList> {
                 self.common.node_graph.child_nodes()
             }
@@ -166,8 +162,6 @@ pub trait NodeBehaviour {
     fn last_child(&self) -> Option<AnyNodeArc>;
     /// Adds child to child list
     fn append_child(&self, other: AnyNodeArc);
-    /// Gets static list of all child nodes
-    fn static_child_nodes(&self) -> Vec<AnyNodeArc>;
     /// Gets live list of all child nodes
     fn child_nodes(&self) -> Arc<NodeList>;
     /// Clones node
@@ -231,10 +225,6 @@ impl NodeBehaviour for AnyNodeArc {
 
     fn append_child(&self, other: AnyNodeArc) {
         self.common.node_graph.append_child(other)
-    }
-
-    fn static_child_nodes(&self) -> Vec<AnyNodeArc> {
-        self.common.node_graph.static_child_nodes()
     }
 
     fn child_nodes(&self) -> Arc<NodeList> {
@@ -322,7 +312,7 @@ impl NodeGraphStorage {
         (*lock).push(other);
     }
 
-    fn static_child_nodes(&self) -> Vec<AnyNodeArc> {
+    pub(crate) fn static_child_nodes(&self) -> Vec<AnyNodeArc> {
         self.child_nodes.read().unwrap().clone()
     }
 

@@ -1,4 +1,4 @@
-use super::{TextNodeStorage, DocumentNodeStorage};
+use super::{DocumentNodeStorage, TextNodeStorage};
 use crate::internal_prelude::*;
 
 /// Node type, as defined in https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType

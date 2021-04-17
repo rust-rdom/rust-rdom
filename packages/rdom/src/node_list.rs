@@ -40,7 +40,9 @@ impl NodeList {
         match &self.nodelist_storage {
             NodeListStorage::Static(list) => list.len(),
             NodeListStorage::Live(query) => match query {
-                Query::ChildNodes { children_of } => children_of.static_child_nodes().len(),
+                Query::ChildNodes { children_of } => {
+                    children_of.common.node_graph.static_child_nodes().len()
+                }
             },
         }
     }
@@ -50,9 +52,12 @@ impl NodeList {
         match &self.nodelist_storage {
             NodeListStorage::Static(list) => list.get(index).cloned(),
             NodeListStorage::Live(query) => match query {
-                Query::ChildNodes { children_of } => {
-                    children_of.static_child_nodes().get(index).cloned()
-                }
+                Query::ChildNodes { children_of } => children_of
+                    .common
+                    .node_graph
+                    .static_child_nodes()
+                    .get(index)
+                    .cloned(),
             },
         }
     }

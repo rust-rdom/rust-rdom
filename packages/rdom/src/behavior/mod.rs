@@ -16,7 +16,6 @@ macro_rules! generate_preludes {
     };
 }
 
-
 #[macro_export]
 /// Provides use statements for behaviors
 macro_rules! use_behaviors {
