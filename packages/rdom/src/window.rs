@@ -1,6 +1,6 @@
 //! A virtual browser window.
 
-use crate::{internal_prelude::*, node::NodeContentsArc};
+use crate::{internal_prelude::*, node::contents::NodeContentsArc};
 
 crate::use_behaviors!(sandbox_member);
 
