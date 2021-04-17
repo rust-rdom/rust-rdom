@@ -29,7 +29,7 @@ pub(crate) enum NodeContentsWeak {
 }
 
 impl NodeContentsArc {
-    pub(crate) fn to_isize(&self) -> isize {
+    pub(crate) fn to_node_type(&self) -> isize {
         match self {
             NodeContentsArc::Element(_) => 1,
             NodeContentsArc::Attribute => 2,
@@ -61,7 +61,7 @@ impl NodeContentsArc {
 }
 
 impl NodeContentsWeak {
-    pub(crate) fn to_isize(&self) -> isize {
+    pub(crate) fn to_node_type(&self) -> isize {
         match self {
             NodeContentsWeak::Element(_) => 1,
             NodeContentsWeak::Attribute => 2,

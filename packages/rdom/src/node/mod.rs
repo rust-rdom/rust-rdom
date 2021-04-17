@@ -249,7 +249,7 @@ impl NodeBehaviour for AnyNodeArc {
     }
 
     fn get_node_type(&self) -> isize {
-        self.contents.to_isize()
+        self.contents.to_node_type()
     }
 }
 
