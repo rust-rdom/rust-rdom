@@ -8,10 +8,12 @@ use std::{convert::TryFrom, sync::RwLock};
 crate::use_behaviors!(sandbox_member);
 use crate::window::Window;
 
-use contents::{NodeContentsArc, NodeContentsWeak};
+use contents::{NodeType, NodeContentsArc, NodeContentsWeak};
 use element::ConcreteElement;
+use graph_storage::NodeGraphStorage;
 
 pub(crate) mod contents;
+pub(crate) mod graph_storage;
 pub mod element;
 
 /// An input event
@@ -62,7 +64,7 @@ pub struct ConcreteNodeWeak<T> {
 }
 
 macro_rules! impl_concrete {
-    ($var:ident($ty:ident) => $node_type: expr) => {
+    ($var:ident($ty:ident)) => {
         impl TryFrom<AnyNodeArc> for ConcreteNodeArc<$ty> {
             type Error = DomError;
 
@@ -135,22 +137,22 @@ macro_rules! impl_concrete {
             }
 
             fn get_node_type(&self) -> isize {
-                $node_type
+                (NodeType::$var).get_node_number()
             }
         }
     };
 
-    ($($var:ident($ty:ident)=>$node_type:expr),*) => {
+    ($($var:ident($ty:ident)),*) => {
         $(
-            impl_concrete!($var($ty)=>$node_type);
+            impl_concrete!($var($ty));
         )*
     }
 }
 
 impl_concrete! {
-    Element(ConcreteElement) => 1,
-    Document(DocumentNodeStorage) => 7,
-    Text(TextNodeStorage) => 3
+    Element(ConcreteElement),
+    Document(DocumentNodeStorage),
+    Text(TextNodeStorage)
 }
 
 // NodeBehaviour trait will be here for now
@@ -239,7 +241,7 @@ impl NodeBehaviour for AnyNodeArc {
     }
 
     fn get_node_type(&self) -> isize {
-        self.contents.to_node_type()
+        self.contents.to_node_type().get_node_number()
     }
 }
 
@@ -271,59 +273,3 @@ pub fn create_text_node(&self, text: String) -> Arc<TextNode> {
 
 */
 
-/// NodeGraphStorage contains all the data connected
-/// to graph of the nodes
-pub struct NodeGraphStorage {
-    /// Reference back up to the common Node
-    node: AnyNodeWeak,
-
-    parent_node: Option<AnyNodeWeak>,
-    left_sibling: Option<AnyNodeWeak>,
-    right_sibling: Option<AnyNodeWeak>,
-    child_nodes: RwLock<Vec<AnyNodeArc>>,
-}
-
-impl NodeGraphStorage {
-    /// Constructs a new NodeGraphStorage
-    pub fn new(node: AnyNodeWeak) -> NodeGraphStorage {
-        NodeGraphStorage {
-            node,
-            parent_node: None,
-            left_sibling: None,
-            right_sibling: None,
-            child_nodes: RwLock::new(Vec::new()),
-        }
-    }
-}
-
-impl NodeGraphStorage {
-    fn first_child(&self) -> Option<AnyNodeArc> {
-        let lock = self.child_nodes.read().unwrap();
-        (*lock).first().cloned()
-    }
-
-    fn last_child(&self) -> Option<AnyNodeArc> {
-        let lock = self.child_nodes.read().unwrap();
-        (*lock).last().cloned()
-    }
-
-    fn append_child(&self, other: AnyNodeArc) {
-        let mut lock = self.child_nodes.write().unwrap();
-        (*lock).push(other);
-    }
-
-    pub(crate) fn static_child_nodes(&self) -> Vec<AnyNodeArc> {
-        self.child_nodes.read().unwrap().clone()
-    }
-
-    fn child_nodes(&self) -> Arc<NodeList> {
-        let strong_ref = self.node.upgrade().expect("Sandbox dropped");
-
-        NodeList::new(
-            strong_ref.get_context(),
-            NodeListStorage::Live(Query::ChildNodes {
-                children_of: strong_ref,
-            }),
-        )
-    }
-}

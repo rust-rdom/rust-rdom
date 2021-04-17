@@ -1,6 +1,34 @@
 use super::{DocumentNodeStorage, TextNodeStorage};
 use crate::internal_prelude::*;
 
+pub(crate) enum NodeType {
+    Element,
+    Attribute,
+    Text,
+    CDataSection,
+    ProcessingInstruction,
+    Comment,
+    Document,
+    DocumentType,
+    DocumentFragment,
+}
+
+impl NodeType {
+    pub(crate) fn get_node_number(&self) -> isize {
+        match self {
+            NodeType::Element => 1,
+            NodeType::Attribute => 2,
+            NodeType::Text => 3,
+            NodeType::CDataSection => 4,
+            NodeType::ProcessingInstruction => 5,
+            NodeType::Comment => 6,
+            NodeType::Document => 7,
+            NodeType::DocumentType => 8,
+            NodeType::DocumentFragment => 9,
+        }
+    }
+}
+
 /// Node type, as defined in https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType
 #[derive(Clone)]
 pub(crate) enum NodeContentsArc {
@@ -29,17 +57,17 @@ pub(crate) enum NodeContentsWeak {
 }
 
 impl NodeContentsArc {
-    pub(crate) fn to_node_type(&self) -> isize {
+    pub(crate) fn to_node_type(&self) -> NodeType {
         match self {
-            NodeContentsArc::Element(_) => 1,
-            NodeContentsArc::Attribute => 2,
-            NodeContentsArc::Text(_) => 3,
-            NodeContentsArc::CDataSection => 4,
-            NodeContentsArc::ProcessingInstruction => 5,
-            NodeContentsArc::Comment => 6,
-            NodeContentsArc::Document(_) => 7,
-            NodeContentsArc::DocumentType => 8,
-            NodeContentsArc::DocumentFragment => 9,
+            NodeContentsArc::Element(_) => NodeType::Element,
+            NodeContentsArc::Attribute => NodeType::Attribute,
+            NodeContentsArc::Text(_) => NodeType::Text,
+            NodeContentsArc::CDataSection => NodeType::CDataSection,
+            NodeContentsArc::ProcessingInstruction => NodeType::ProcessingInstruction,
+            NodeContentsArc::Comment => NodeType::Comment,
+            NodeContentsArc::Document(_) => NodeType::Document,
+            NodeContentsArc::DocumentType => NodeType::DocumentType,
+            NodeContentsArc::DocumentFragment => NodeType::DocumentFragment,
         }
     }
 
@@ -61,17 +89,17 @@ impl NodeContentsArc {
 }
 
 impl NodeContentsWeak {
-    pub(crate) fn to_node_type(&self) -> isize {
+    pub(crate) fn to_node_type(&self) -> NodeType {
         match self {
-            NodeContentsWeak::Element(_) => 1,
-            NodeContentsWeak::Attribute => 2,
-            NodeContentsWeak::Text(_) => 3,
-            NodeContentsWeak::CDataSection => 4,
-            NodeContentsWeak::ProcessingInstruction => 5,
-            NodeContentsWeak::Comment => 6,
-            NodeContentsWeak::Document(_) => 7,
-            NodeContentsWeak::DocumentType => 8,
-            NodeContentsWeak::DocumentFragment => 9,
+            NodeContentsWeak::Element(_) => NodeType::Element,
+            NodeContentsWeak::Attribute => NodeType::Attribute,
+            NodeContentsWeak::Text(_) => NodeType::Text,
+            NodeContentsWeak::CDataSection => NodeType::CDataSection,
+            NodeContentsWeak::ProcessingInstruction => NodeType::ProcessingInstruction,
+            NodeContentsWeak::Comment => NodeType::Comment,
+            NodeContentsWeak::Document(_) => NodeType::Document,
+            NodeContentsWeak::DocumentType => NodeType::DocumentType,
+            NodeContentsWeak::DocumentFragment => NodeType::DocumentFragment,
         }
     }
 
