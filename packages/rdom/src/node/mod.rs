@@ -8,13 +8,13 @@ use std::{convert::TryFrom, sync::RwLock};
 crate::use_behaviors!(sandbox_member);
 use crate::window::Window;
 
-use contents::{NodeType, NodeContentsArc, NodeContentsWeak};
-use element::ConcreteElement;
+use contents::{NodeContentsArc, NodeContentsWeak, NodeType};
+use element::ElementNodeStorage;
 use graph_storage::NodeGraphStorage;
 
 pub(crate) mod contents;
-pub(crate) mod graph_storage;
 pub mod element;
+pub(crate) mod graph_storage;
 
 /// An input event
 pub struct InputEvent {}
@@ -150,7 +150,7 @@ macro_rules! impl_concrete {
 }
 
 impl_concrete! {
-    Element(ConcreteElement),
+    Element(ElementNodeStorage),
     Document(DocumentNodeStorage),
     Text(TextNodeStorage)
 }
@@ -272,4 +272,3 @@ pub fn create_text_node(&self, text: String) -> Arc<TextNode> {
 }
 
 */
-

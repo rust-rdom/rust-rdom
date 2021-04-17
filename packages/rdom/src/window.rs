@@ -16,7 +16,7 @@ impl Window {
         Arc::new_cyclic(|win_weak| -> Window {
             let document = AnyNodeArc::new(
                 context.clone(),
-                NodeContentsArc::Element(Arc::new(ConcreteElement::HtmlHtmlElement {
+                NodeContentsArc::Element(Arc::new(ElementNodeStorage::HtmlHtmlElement {
                     default_view: win_weak.clone(),
                 })),
             );

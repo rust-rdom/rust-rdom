@@ -6,7 +6,7 @@ use crate::window::Window;
 
 #[derive(Clone)]
 /// Enum of all concrete elements
-pub enum ConcreteElement {
+pub enum ElementNodeStorage {
     /// [html](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/html)
     HtmlHtmlElement {
         /// reference to window
