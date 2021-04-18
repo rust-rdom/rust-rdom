@@ -253,9 +253,7 @@ impl NodeBehaviour for AnyNodeArc {
 
     fn clone_node(&self) -> AnyNodeArc {
         let contents = self.contents.clone();
-        let construction = AnyNodeArc::new(self.get_context(), contents);
-
-        construction
+        AnyNodeArc::new(self.get_context(), contents)
     }
 
     fn get_node_type(&self) -> isize {
