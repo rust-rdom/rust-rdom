@@ -1,6 +1,7 @@
 use super::{DocumentNodeStorage, TextNodeStorage};
 use crate::internal_prelude::*;
 
+
 macro_rules! declare_contents {
     ($($ti:expr => $name:ident),*) => {
         paste::paste! {
@@ -70,6 +71,14 @@ macro_rules! declare_contents {
                 }
             }
         }
+
+        $(
+            impl From<&Arc<[<$name NodeStorage>]>> for NodeContentsWeak {
+                fn from(source: &Arc<[<$name NodeStorage>]>) -> NodeContentsWeak {
+                    NodeContentsWeak::$name(Arc::downgrade(source))
+                }
+            }
+        )*
     }
 };
 }

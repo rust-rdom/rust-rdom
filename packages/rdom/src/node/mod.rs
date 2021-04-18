@@ -13,6 +13,7 @@ use element::ElementNodeStorage;
 use graph_storage::NodeGraphStorage;
 
 pub(crate) mod contents;
+pub(crate) mod typed_arc;
 pub mod element;
 pub(crate) mod graph_storage;
 
@@ -20,13 +21,15 @@ pub(crate) mod graph_storage;
 pub struct InputEvent {}
 
 /// The DOM [node](https://developer.mozilla.org/en-US/docs/Web/API/Node)
-pub struct NodeCommon {
+pub(crate) struct NodeCommon {
     pub(crate) node_graph: NodeGraphStorage,
 
     // just a context without behaviour wrapper for now
     /// Context, pointing to the Sandbox
     pub context: Weak<Sandbox>,
 }
+
+pub(crate) trait AnyStorage {}
 
 // The tree structure is that you have common
 // and concrete storage for each node
@@ -65,6 +68,28 @@ pub struct ConcreteNodeWeak<T> {
 
 macro_rules! impl_concrete {
     ($var:ident($ty:ident)) => {
+        impl AnyStorage for $ty {}
+
+        impl ConcreteNodeArc<$ty> {
+            pub(crate) fn new(context: Weak<Sandbox>, contents: Arc<$ty>) -> ConcreteNodeArc<$ty> {
+                let common = Arc::new_cyclic(|construction_weak| NodeCommon {
+                    node_graph: NodeGraphStorage::new(AnyNodeWeak {
+                        contents: (&contents).into(),
+                        common: construction_weak.clone(),
+                    }),
+                    context,
+                });
+
+                ConcreteNodeArc { contents, common }
+            }
+        }
+
+        impl SandboxMemberBehavior for ConcreteNodeArc<$ty> {
+            fn get_context(&self) -> Weak<Sandbox> {
+                self.common.context.clone()
+            }
+        }
+
         impl TryFrom<AnyNodeArc> for ConcreteNodeArc<$ty> {
             type Error = DomError;
 
@@ -205,12 +230,6 @@ impl AnyNodeArc {
 }
 
 impl SandboxMemberBehavior for AnyNodeArc {
-    fn get_context(&self) -> Weak<Sandbox> {
-        self.common.context.clone()
-    }
-}
-
-impl<T> SandboxMemberBehavior for ConcreteNodeArc<T> {
     fn get_context(&self) -> Weak<Sandbox> {
         self.common.context.clone()
     }
