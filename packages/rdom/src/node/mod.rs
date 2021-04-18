@@ -15,7 +15,6 @@ use graph_storage::NodeGraphStorage;
 pub(crate) mod contents;
 pub mod element;
 pub(crate) mod graph_storage;
-pub(crate) mod typed_arc;
 
 /// An input event
 pub struct InputEvent {}
@@ -29,8 +28,6 @@ pub(crate) struct NodeCommon {
     pub context: Weak<Sandbox>,
 }
 
-pub(crate) trait AnyStorage {}
-
 // The tree structure is that you have common
 // and concrete storage for each node
 // AnyNode and ConcreteNode are nodes for acessing
@@ -39,28 +36,32 @@ pub(crate) trait AnyStorage {}
 // are in Arcs, AnyNodeRef and ConcreteNodeRef are just wrappers
 // With this we would actually probably not even need nice
 #[derive(Clone)]
-/// Strong pair of refernces to common and concrete node storages
+/// A strong reference to any node (nonspecific type).
 pub struct AnyNodeArc {
     pub(crate) contents: NodeContentsArc,
     pub(crate) common: Arc<NodeCommon>,
 }
 
 #[derive(Clone)]
-/// Weak version of AnyNodeArc
+/// A weak reference to any node (nonspecific type).
 pub struct AnyNodeWeak {
     pub(crate) contents: NodeContentsWeak,
     pub(crate) common: Weak<NodeCommon>,
 }
 
 #[derive(Clone)]
-/// Concrete variant of AnyNodeArc
+/// A strongly-typed handle to a node with a strong reference.
+/// `T` may be the underlying storage
+/// type of any node.
 pub struct ConcreteNodeArc<T> {
     pub(crate) contents: Arc<T>,
     pub(crate) common: Arc<NodeCommon>,
 }
 
 #[derive(Clone)]
-/// Concrete variant of AnyNodeWeak
+/// A strongly-typed handle to a node with a weak reference.
+/// `T` may be the underlying storage
+/// type of any node.
 pub struct ConcreteNodeWeak<T> {
     pub(crate) contents: Weak<T>,
     pub(crate) common: Weak<NodeCommon>,
@@ -68,8 +69,6 @@ pub struct ConcreteNodeWeak<T> {
 
 macro_rules! impl_concrete {
     ($var:ident($ty:ident)) => {
-        impl AnyStorage for $ty {}
-
         impl ConcreteNodeArc<$ty> {
             pub(crate) fn new(context: Weak<Sandbox>, contents: Arc<$ty>) -> ConcreteNodeArc<$ty> {
                 let common = Arc::new_cyclic(|construction_weak| NodeCommon {
