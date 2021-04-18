@@ -8,10 +8,10 @@ use std::{convert::TryFrom, sync::RwLock};
 crate::use_behaviors!(sandbox_member);
 use crate::window::Window;
 
-use contents::{NodeContentsArc, NodeContentsWeak, NodeType};
-use element::ElementNodeStorage;
+use contents::{NodeContentsArc, NodeContentsWeak};
 use graph_storage::NodeGraphStorage;
 
+pub(crate) mod concrete;
 pub(crate) mod contents;
 pub mod element;
 pub(crate) mod graph_storage;
@@ -47,136 +47,6 @@ pub struct AnyNodeArc {
 pub struct AnyNodeWeak {
     pub(crate) contents: NodeContentsWeak,
     pub(crate) common: Weak<NodeCommon>,
-}
-
-#[derive(Clone)]
-/// A strongly-typed handle to a node with a strong reference.
-/// `T` may be the underlying storage
-/// type of any node.
-pub struct ConcreteNodeArc<T> {
-    pub(crate) contents: Arc<T>,
-    pub(crate) common: Arc<NodeCommon>,
-}
-
-#[derive(Clone)]
-/// A strongly-typed handle to a node with a weak reference.
-/// `T` may be the underlying storage
-/// type of any node.
-pub struct ConcreteNodeWeak<T> {
-    pub(crate) contents: Weak<T>,
-    pub(crate) common: Weak<NodeCommon>,
-}
-
-macro_rules! impl_concrete {
-    ($var:ident($ty:ident)) => {
-        impl ConcreteNodeArc<$ty> {
-            pub(crate) fn new(context: Weak<Sandbox>, contents: Arc<$ty>) -> ConcreteNodeArc<$ty> {
-                let common = Arc::new_cyclic(|construction_weak| NodeCommon {
-                    node_graph: NodeGraphStorage::new(AnyNodeWeak {
-                        contents: (&contents).into(),
-                        common: construction_weak.clone(),
-                    }),
-                    context,
-                });
-
-                ConcreteNodeArc { contents, common }
-            }
-        }
-
-        impl SandboxMemberBehavior for ConcreteNodeArc<$ty> {
-            fn get_context(&self) -> Weak<Sandbox> {
-                self.common.context.clone()
-            }
-        }
-
-        impl TryFrom<AnyNodeArc> for ConcreteNodeArc<$ty> {
-            type Error = DomError;
-
-            fn try_from(value: AnyNodeArc) -> Result<Self, Self::Error> {
-                let contents = match value.contents {
-                    NodeContentsArc::$var(element) => Ok(element),
-                    _ => Err(DomError::NodeCastFail),
-                }?;
-
-                Ok(ConcreteNodeArc {
-                    contents,
-                    common: value.common,
-                })
-            }
-        }
-
-        impl TryFrom<AnyNodeWeak> for ConcreteNodeWeak<$ty> {
-            type Error = DomError;
-
-            fn try_from(value: AnyNodeWeak) -> Result<Self, Self::Error> {
-                let contents = match value.contents {
-                    NodeContentsWeak::$var(element) => Ok(element),
-                    _ => Err(DomError::NodeCastFail),
-                }?;
-
-                Ok(ConcreteNodeWeak {
-                    contents,
-                    common: value.common
-                })
-            }
-        }
-
-        impl From<ConcreteNodeArc<$ty>> for AnyNodeArc {
-            fn from(concrete: ConcreteNodeArc<$ty>) -> Self {
-                AnyNodeArc {
-                    common: concrete.common,
-                    contents: NodeContentsArc::$var(concrete.contents),
-                }
-            }
-        }
-
-        impl From<ConcreteNodeWeak<$ty>> for AnyNodeWeak {
-            fn from(concrete: ConcreteNodeWeak<$ty>) -> Self {
-                AnyNodeWeak {
-                    common: concrete.common,
-                    contents: NodeContentsWeak::$var(concrete.contents),
-                }
-            }
-        }
-
-        impl NodeBehaviour for ConcreteNodeArc<$ty> {
-            fn first_child(&self) -> Option<AnyNodeArc> {
-                self.common.node_graph.first_child()
-            }
-
-            fn last_child(&self) -> Option<AnyNodeArc> {
-                self.common.node_graph.last_child()
-            }
-
-            fn append_child(&self, other: AnyNodeArc) {
-                self.common.node_graph.append_child(other)
-            }
-
-            fn child_nodes(&self) -> Arc<NodeList> {
-                self.common.node_graph.child_nodes()
-            }
-
-            fn clone_node(&self) -> AnyNodeArc {
-                AnyNodeArc::from(self.clone()).clone_node()
-            }
-
-            fn get_node_type(&self) -> isize {
-                (NodeType::$var).get_node_number()
-            }
-        }
-    };
-
-    ($($var:ident($ty:ident)),*) => {
-        $(
-            impl_concrete!($var($ty));
-        )*
-    }
-}
-
-impl_concrete! {
-    Element(ElementNodeStorage),
-    Document(DocumentNodeStorage),
-    Text(TextNodeStorage)
 }
 
 // NodeBehaviour trait will be here for now
