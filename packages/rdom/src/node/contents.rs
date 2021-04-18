@@ -1,7 +1,6 @@
 use super::{DocumentNodeStorage, TextNodeStorage};
 use crate::internal_prelude::*;
 
-
 macro_rules! declare_contents {
     ($($ti:expr => $name:ident),*) => {
         paste::paste! {

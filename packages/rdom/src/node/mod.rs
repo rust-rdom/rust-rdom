@@ -13,9 +13,9 @@ use element::ElementNodeStorage;
 use graph_storage::NodeGraphStorage;
 
 pub(crate) mod contents;
-pub(crate) mod typed_arc;
 pub mod element;
 pub(crate) mod graph_storage;
+pub(crate) mod typed_arc;
 
 /// An input event
 pub struct InputEvent {}
