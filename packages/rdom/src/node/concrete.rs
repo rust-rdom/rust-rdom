@@ -34,6 +34,8 @@ macro_rules! impl_concrete {
     ($($ti:expr => $name:ident),*) => {
         paste::paste! {
         $(
+        pub(crate) type [<$name Node>] = ConcreteNodeArc<[<$name NodeStorage>]>;
+
         impl ConcreteNodeArc<[<$name NodeStorage>]> {
             pub(crate) fn new(context: Weak<Sandbox>, contents: Arc<[<$name NodeStorage>]>) ->
             ConcreteNodeArc<[<$name NodeStorage>]> {
@@ -145,4 +147,10 @@ impl_concrete! {
     7 => Document,
     8 => DocumentType,
     9 => DocumentFragment
+}
+
+impl DocumentNode {
+    pub fn create_text_node(&self, text: String) -> TextNode {
+        TextNode::new(self.get_context(), Arc::new(TextNodeStorage { text }))
+    }
 }

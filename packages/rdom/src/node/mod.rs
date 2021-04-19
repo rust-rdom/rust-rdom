@@ -1,9 +1,8 @@
 //! Core representation of a DOM node. See `nice` module for distinction from
 //! nice representation.
 
-use crate::node_list::{NodeList, NodeListStorage};
-use crate::{internal_prelude::*, node_list::Query};
-use std::{convert::TryFrom, sync::RwLock};
+use crate::internal_prelude::*;
+use crate::node_list::NodeList;
 
 crate::use_behaviors!(sandbox_member);
 use crate::window::Window;

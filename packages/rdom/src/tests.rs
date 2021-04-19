@@ -2,25 +2,26 @@
 
 use std::sync::Arc;
 
-use crate::behavior::node::NodeBehavior;
 use crate::config::ScreenMetrics;
+use crate::node::concrete::{DocumentNode, ElementNode};
+use crate::node::element::ElementNodeStorage;
 
-use crate::node::{self, element::HtmlHtmlElement};
-use crate::node::{ AnyNode,
-    AttrNode, CDataSectionNode, CommentNode,  DocumentFragmentNode, DocumentTypeNode,
-    ElementNode, NodeType, ProcessingInstructionNode, TextNode,
-};
-use crate::node::TextNodeStorage;
-
+use crate::node::NodeBehaviour;
 use crate::sandbox::Sandbox;
-use paste::paste;
+use std::convert::TryInto;
 
 #[test]
 fn it_works() {
     let metrics: ScreenMetrics = Default::default();
     let sbox = Sandbox::new(metrics);
-    let doc = sbox.clone().window().document();
-    let document_element = HtmlHtmlElement::new(Arc::downgrade(&sbox), ());
+    let doc: DocumentNode = sbox.clone().window().document().try_into().unwrap();
+    let document_element = ElementNode::new(
+        Arc::downgrade(&sbox),
+        Arc::new(ElementNodeStorage::HtmlHtmlElement {
+            default_view: Arc::downgrade(&sbox.window()),
+        }),
+    )
+    .into();
     let _text = doc.create_text_node("Hello, world!".to_string());
     doc.append_child(document_element);
     assert_eq!(doc.child_nodes().length(), 1);
