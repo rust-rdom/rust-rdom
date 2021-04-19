@@ -1,14 +1,14 @@
 #![cfg(test)]
 
-use std::sync::Arc;
 use std::convert::TryInto;
+use std::sync::Arc;
 
 use crate::config::ScreenMetrics;
 use crate::node::concrete::*;
 use crate::node::contents::{
-    AttributeNodeStorage, CommentNodeStorage, DocumentNodeStorage, TextNodeStorage, NodeType
+    AttributeNodeStorage, CommentNodeStorage, DocumentNodeStorage, NodeType, TextNodeStorage,
 };
-use crate::node::element::ElementNodeStorage;
+use crate::node::element::{ElementNodeStorage, HtmlButtonElementStorage, HtmlHtmlElementStorage};
 use crate::node::NodeBehaviour;
 use crate::sandbox::Sandbox;
 
@@ -19,9 +19,9 @@ fn it_works() {
     let doc: DocumentNode = sbox.clone().window().document().try_into().unwrap();
     let document_element = ElementNode::new(
         Arc::downgrade(&sbox),
-        Arc::new(ElementNodeStorage::HtmlHtmlElement {
+        Arc::new(ElementNodeStorage::HtmlHtml(HtmlHtmlElementStorage {
             default_view: Arc::downgrade(&sbox.window()),
-        }),
+        })),
     )
     .into();
     let _text = doc.create_text_node("Hello, world!".to_string());
@@ -53,7 +53,7 @@ fn test_element_node_m() {
     let _elem = test_node_creation!(
         ElementNode,
         NodeType::Element,
-        Arc::new(ElementNodeStorage::HtmlButtonElement)
+        Arc::new(ElementNodeStorage::HtmlButton(HtmlButtonElementStorage))
     );
 }
 

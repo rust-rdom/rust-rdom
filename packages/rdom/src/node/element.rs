@@ -4,16 +4,36 @@
 use crate::internal_prelude::*;
 use crate::window::Window;
 
-#[derive(Clone)]
-/// Enum of all concrete elements
-pub enum ElementNodeStorage {
-    /// [html](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/html)
-    HtmlHtmlElement {
-        /// reference to window
-        default_view: Weak<Window>,
-    },
-    /// [body](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/body)
-    HtmlBodyElement,
-    /// [button](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button)
-    HtmlButtonElement,
+macro_rules! declare_elements {
+    ($($tag:literal => $name:ident),*) => {
+        paste::paste! {
+        /// Enum of all concrete elements
+        #[derive(Clone)]
+        pub enum ElementNodeStorage {
+            $(
+                #[doc = "[" $tag "](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/" $tag ")"]
+                $name([<$name ElementStorage>]),
+            )*
+        }
+    }
+    };
 }
+
+declare_elements! {
+    "HTML" => HtmlHtml,
+    "BODY" => HtmlBody,
+    "BUTTON" => HtmlButton
+}
+
+/// html element storage
+#[derive(Clone)]
+pub struct HtmlHtmlElementStorage {
+    /// pointer up to the window
+    pub default_view: Weak<Window>,
+}
+/// body element storage
+#[derive(Clone)]
+pub struct HtmlBodyElementStorage;
+/// button element storage
+#[derive(Clone)]
+pub struct HtmlButtonElementStorage;
