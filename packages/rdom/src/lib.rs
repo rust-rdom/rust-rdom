@@ -12,15 +12,15 @@
     unused_qualifications
 )]
 
-#[macro_use]
-extern crate downcast_rs;
-
 pub(crate) mod behavior;
 pub mod config;
 pub mod error;
 pub(crate) mod internal_prelude;
 pub mod named_node_map;
-pub mod nice;
+
+// Had to get rid of `nice` for now.
+// pub mod nice;
+
 pub mod node;
 pub mod node_list;
 pub mod sandbox;
