@@ -15,7 +15,7 @@ pub(crate) mod contents;
 pub mod element;
 pub(crate) mod graph_storage;
 
-pub(crate) trait AnyNodeStorage {}
+pub(crate) trait AnyNS {}
 
 /// An input event
 pub struct InputEvent {}
@@ -137,7 +137,7 @@ impl NodeBehaviour for AnyNodeArc {
 // TODO for DocumentNode; this will require a "nice" instantiation
 /// Creates a text node.
 pub fn create_text_node(&self, text: String) -> Arc<TextNode> {
-    TextNode::new(self.get_context(), TextNodeStorage { text })
+    TextNode::new(self.get_context(), TextNS { text })
 }
 
 */

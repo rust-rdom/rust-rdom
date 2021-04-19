@@ -9,10 +9,10 @@ macro_rules! declare_elements {
         paste::paste! {
         /// Enum of all concrete elements
         #[derive(Clone)]
-        pub enum ElementNodeStorage {
+        pub enum ElementNS {
             $(
                 #[doc = "[" $tag "](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/" $tag ")"]
-                $name([<$name ElementStorage>]),
+                $name([<$name ES>]),
             )*
         }
     }
@@ -27,13 +27,13 @@ declare_elements! {
 
 /// html element storage
 #[derive(Clone)]
-pub struct HtmlHtmlElementStorage {
+pub struct HtmlHtmlES {
     /// pointer up to the window
     pub default_view: Weak<Window>,
 }
 /// body element storage
 #[derive(Clone)]
-pub struct HtmlBodyElementStorage;
+pub struct HtmlBodyES;
 /// button element storage
 #[derive(Clone)]
-pub struct HtmlButtonElementStorage;
+pub struct HtmlButtonES;

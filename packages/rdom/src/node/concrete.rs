@@ -1,11 +1,10 @@
 use crate::internal_prelude::*;
 
 use super::contents::{
-    AttributeNodeStorage, CDataSectionNodeStorage, CommentNodeStorage, DocumentFragmentNodeStorage,
-    DocumentNodeStorage, DocumentTypeNodeStorage, ProcessingInstructionNodeStorage,
-    TextNodeStorage,
+    AttributeNS, CDataSectionNS, CommentNS, DocumentFragmentNS, DocumentNS, DocumentTypeNS,
+    ProcessingInstructionNS, TextNS,
 };
-use super::{AnyNodeStorage, NodeCommon, NodeContentsArc, NodeContentsWeak, NodeGraphStorage};
+use super::{AnyNS, NodeCommon, NodeContentsArc, NodeContentsWeak, NodeGraphStorage};
 use crate::node_list::NodeList;
 use crate::sandbox::Builder;
 use std::convert::TryFrom;
@@ -33,13 +32,13 @@ macro_rules! impl_concrete {
     ($($ti:expr => $name:ident),*) => {
         paste::paste! {
             $(
-                impl AnyNodeStorage for [<$name NodeStorage>] {}
+                impl AnyNS for [<$name NS>] {}
 
-                pub(crate) type [<$name Node>] = ConcreteNodeArc<[<$name NodeStorage>]>;
+                pub(crate) type [<$name Node>] = ConcreteNodeArc<[<$name NS>]>;
 
-                impl ConcreteNodeArc<[<$name NodeStorage>]> {
-                    pub(crate) fn new(context: Weak<Sandbox>, contents: Arc<[<$name NodeStorage>]>) ->
-                    ConcreteNodeArc<[<$name NodeStorage>]> {
+                impl ConcreteNodeArc<[<$name NS>]> {
+                    pub(crate) fn new(context: Weak<Sandbox>, contents: Arc<[<$name NS>]>) ->
+                    ConcreteNodeArc<[<$name NS>]> {
                         let common = Arc::new_cyclic(|construction_weak| NodeCommon {
                             node_graph: NodeGraphStorage::new(AnyNodeWeak {
                                 contents: (&contents).into(),
@@ -52,13 +51,13 @@ macro_rules! impl_concrete {
                     }
                 }
 
-                impl SandboxMemberBehavior for ConcreteNodeArc<[<$name NodeStorage>]> {
+                impl SandboxMemberBehavior for ConcreteNodeArc<[<$name NS>]> {
                     fn get_context(&self) -> Weak<Sandbox> {
                         self.common.context.clone()
                     }
                 }
 
-                impl TryFrom<AnyNodeArc> for ConcreteNodeArc<[<$name NodeStorage>]> {
+                impl TryFrom<AnyNodeArc> for ConcreteNodeArc<[<$name NS>]> {
                     type Error = DomError;
 
                     fn try_from(value: AnyNodeArc) -> Result<Self, Self::Error> {
@@ -74,7 +73,7 @@ macro_rules! impl_concrete {
                     }
                 }
 
-                impl TryFrom<AnyNodeWeak> for ConcreteNodeWeak<[<$name NodeStorage>]> {
+                impl TryFrom<AnyNodeWeak> for ConcreteNodeWeak<[<$name NS>]> {
                     type Error = DomError;
 
                     fn try_from(value: AnyNodeWeak) -> Result<Self, Self::Error> {
@@ -90,8 +89,8 @@ macro_rules! impl_concrete {
                     }
                 }
 
-                impl From<ConcreteNodeArc<[<$name NodeStorage>]>> for AnyNodeArc {
-                    fn from(concrete: ConcreteNodeArc<[<$name NodeStorage>]>) -> Self {
+                impl From<ConcreteNodeArc<[<$name NS>]>> for AnyNodeArc {
+                    fn from(concrete: ConcreteNodeArc<[<$name NS>]>) -> Self {
                         AnyNodeArc {
                             common: concrete.common,
                             contents: NodeContentsArc::$name(concrete.contents),
@@ -99,8 +98,8 @@ macro_rules! impl_concrete {
                     }
                 }
 
-                impl From<ConcreteNodeWeak<[<$name NodeStorage>]>> for AnyNodeWeak {
-                    fn from(concrete: ConcreteNodeWeak<[<$name NodeStorage>]>) -> Self {
+                impl From<ConcreteNodeWeak<[<$name NS>]>> for AnyNodeWeak {
+                    fn from(concrete: ConcreteNodeWeak<[<$name NS>]>) -> Self {
                         AnyNodeWeak {
                             common: concrete.common,
                             contents: NodeContentsWeak::$name(concrete.contents),
@@ -108,7 +107,7 @@ macro_rules! impl_concrete {
                     }
                 }
 
-                impl NodeBehaviour for ConcreteNodeArc<[<$name NodeStorage>]> {
+                impl NodeBehaviour for ConcreteNodeArc<[<$name NS>]> {
                     fn first_child(&self) -> Option<AnyNodeArc> {
                         self.common.node_graph.first_child()
                     }
@@ -152,6 +151,6 @@ impl_concrete! {
 
 impl DocumentNode {
     pub fn create_text_node(&self, text: String) -> TextNode {
-        TextNode::new(self.get_context(), Arc::new(TextNodeStorage { data: text }))
+        TextNode::new(self.get_context(), Arc::new(TextNS { data: text }))
     }
 }

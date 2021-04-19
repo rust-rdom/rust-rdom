@@ -27,14 +27,14 @@ macro_rules! declare_contents {
             #[derive(Clone)]
             pub(crate) enum NodeContentsArc {
                 $(
-                    $name(Arc<[<$name NodeStorage>]>),
+                    $name(Arc<[<$name NS>]>),
                 )*
             }
 
             #[derive(Clone)]
             pub(crate) enum NodeContentsWeak {
                 $(
-                    $name(Weak<[<$name NodeStorage>]>),
+                    $name(Weak<[<$name NS>]>),
                 )*
             }
 
@@ -75,14 +75,14 @@ macro_rules! declare_contents {
             }
 
             $(
-                impl Builder<[<$name NodeStorage>]> {
-                    pub fn build(&self, storage: [<$name NodeStorage>]) -> ConcreteNodeArc<[<$name NodeStorage>]> {
-                        ConcreteNodeArc::<[<$name NodeStorage>]>::new(self.sandbox.clone(), Arc::new(storage))
+                impl Builder<[<$name NS>]> {
+                    pub fn build(&self, storage: [<$name NS>]) -> ConcreteNodeArc<[<$name NS>]> {
+                        ConcreteNodeArc::<[<$name NS>]>::new(self.sandbox.clone(), Arc::new(storage))
                     }
                 }
 
-                impl From<&Arc<[<$name NodeStorage>]>> for NodeContentsWeak {
-                    fn from(source: &Arc<[<$name NodeStorage>]>) -> NodeContentsWeak {
+                impl From<&Arc<[<$name NS>]>> for NodeContentsWeak {
+                    fn from(source: &Arc<[<$name NS>]>) -> NodeContentsWeak {
                         NodeContentsWeak::$name(Arc::downgrade(source))
                     }
                 }
@@ -92,18 +92,18 @@ macro_rules! declare_contents {
 }
 
 #[derive(Default, Clone)]
-pub(crate) struct DocumentNodeStorage {
+pub(crate) struct DocumentNS {
     /// Pointer back up to the window
     pub(crate) default_view: Weak<Window>,
 }
 
 #[derive(Default, Clone)]
-pub(crate) struct TextNodeStorage {
+pub(crate) struct TextNS {
     /// Text in the text node
     pub(crate) data: String,
 }
 
-impl TextNodeStorage {
+impl TextNS {
     // TODO data should come from CharacterData
 
     /// Gives the text contents of the text node
@@ -113,12 +113,12 @@ impl TextNodeStorage {
 }
 
 #[derive(Default, Clone)]
-pub(crate) struct CommentNodeStorage {
+pub(crate) struct CommentNS {
     /// Text in the comment node
     pub(crate) data: String,
 }
 
-impl CommentNodeStorage {
+impl CommentNS {
     // TODO data should come from CharacterData
 
     /// Gives the text contents of the text node
@@ -128,15 +128,15 @@ impl CommentNodeStorage {
 }
 
 #[derive(Default, Clone)]
-pub(crate) struct AttributeNodeStorage;
+pub(crate) struct AttributeNS;
 #[derive(Default, Clone)]
-pub(crate) struct CDataSectionNodeStorage;
+pub(crate) struct CDataSectionNS;
 #[derive(Default, Clone)]
-pub(crate) struct ProcessingInstructionNodeStorage;
+pub(crate) struct ProcessingInstructionNS;
 #[derive(Default, Clone)]
-pub(crate) struct DocumentTypeNodeStorage;
+pub(crate) struct DocumentTypeNS;
 #[derive(Default, Clone)]
-pub(crate) struct DocumentFragmentNodeStorage;
+pub(crate) struct DocumentFragmentNS;
 
 declare_contents! {
     1 => Element,

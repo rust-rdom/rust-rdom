@@ -5,10 +5,8 @@ use std::sync::Arc;
 
 use crate::config::ScreenMetrics;
 use crate::node::concrete::*;
-use crate::node::contents::{
-    AttributeNodeStorage, CommentNodeStorage, DocumentNodeStorage, NodeType, TextNodeStorage,
-};
-use crate::node::element::{ElementNodeStorage, HtmlButtonElementStorage, HtmlHtmlElementStorage};
+use crate::node::contents::{AttributeNS, CommentNS, DocumentNS, NodeType, TextNS};
+use crate::node::element::{ElementNS, HtmlButtonES, HtmlHtmlES};
 use crate::node::NodeBehaviour;
 use crate::sandbox::Sandbox;
 
@@ -19,7 +17,7 @@ fn it_works() {
     let doc: DocumentNode = sbox.clone().window().document().try_into().unwrap();
     let document_element = ElementNode::new(
         Arc::downgrade(&sbox),
-        Arc::new(ElementNodeStorage::HtmlHtml(HtmlHtmlElementStorage {
+        Arc::new(ElementNS::HtmlHtml(HtmlHtmlES {
             default_view: Arc::downgrade(&sbox.window()),
         })),
     )
@@ -53,7 +51,7 @@ fn test_element_node_m() {
     let _elem = test_node_creation!(
         ElementNode,
         NodeType::Element,
-        Arc::new(ElementNodeStorage::HtmlButton(HtmlButtonElementStorage))
+        Arc::new(ElementNS::HtmlButton(HtmlButtonES))
     );
 }
 
@@ -67,13 +65,13 @@ fn test_text_node() {
     let text = test_node_creation!(
         TextNode,
         NodeType::Text,
-        Arc::new(TextNodeStorage {
+        Arc::new(TextNS {
             data: "test".to_owned()
         })
     );
 
     let node = text.first_child().unwrap();
-    let node: ConcreteNodeArc<TextNodeStorage> = node.try_into().unwrap();
+    let node: ConcreteNodeArc<TextNS> = node.try_into().unwrap();
 
     assert_eq!(node.contents.data().unwrap(), "test".to_owned());
 }
@@ -97,7 +95,7 @@ fn test_comment_node() {
     let _com = test_node_creation!(
         CommentNode,
         NodeType::Comment,
-        Arc::new(CommentNodeStorage {
+        Arc::new(CommentNS {
             data: "test".to_owned()
         })
     );
@@ -124,10 +122,8 @@ fn can_build_node() {
 
     let metrics: ScreenMetrics = Default::default();
     let sbox = Sandbox::new(metrics);
-    let node = sbox
-        .builder::<AttributeNodeStorage>()
-        .build(Default::default());
-    let _: ConcreteNodeArc<AttributeNodeStorage> = node; // assert that we got an AttributeNode
+    let node = sbox.builder::<AttributeNS>().build(Default::default());
+    let _: ConcreteNodeArc<AttributeNS> = node; // assert that we got an AttributeNode
 
     assert!(Weak::ptr_eq(&node.get_context(), &Arc::downgrade(&sbox)));
 }
