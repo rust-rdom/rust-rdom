@@ -1,4 +1,6 @@
-use super::{DocumentNodeStorage, TextNodeStorage};
+use super::{DocumentNodeStorage, TextNodeStorage, NodeCommon, NodeGraphStorage};
+use super::concrete::ConcreteNodeArc;
+use crate::sandbox::Builder;
 use crate::internal_prelude::*;
 
 macro_rules! declare_contents {
@@ -82,17 +84,17 @@ macro_rules! declare_contents {
 };
 }
 
-#[derive(Clone)]
+#[derive(Default, Clone)]
 pub(crate) struct AttributeNodeStorage;
-#[derive(Clone)]
+#[derive(Default, Clone)]
 pub(crate) struct CDataSectionNodeStorage;
-#[derive(Clone)]
+#[derive(Default, Clone)]
 pub(crate) struct ProcessingInstructionNodeStorage;
-#[derive(Clone)]
+#[derive(Default, Clone)]
 pub(crate) struct CommentNodeStorage;
-#[derive(Clone)]
+#[derive(Default, Clone)]
 pub(crate) struct DocumentTypeNodeStorage;
-#[derive(Clone)]
+#[derive(Default, Clone)]
 pub(crate) struct DocumentFragmentNodeStorage;
 
 declare_contents! {
@@ -105,4 +107,10 @@ declare_contents! {
     7 => Document,
     8 => DocumentType,
     9 => DocumentFragment
+}
+
+impl Builder<AttributeNodeStorage> {
+    pub fn build(&self) -> ConcreteNodeArc<AttributeNodeStorage> {
+        ConcreteNodeArc::<AttributeNodeStorage>::new(self.sandbox.clone(), Arc::new(Default::default()))
+    }
 }

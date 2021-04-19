@@ -15,6 +15,8 @@ pub(crate) mod contents;
 pub mod element;
 pub(crate) mod graph_storage;
 
+pub(crate) trait AnyNodeStorage {}
+
 /// An input event
 pub struct InputEvent {}
 

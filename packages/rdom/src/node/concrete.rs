@@ -6,8 +6,9 @@ use super::contents::{
 };
 use super::{
     DocumentNodeStorage, NodeCommon, NodeContentsArc, NodeContentsWeak, NodeGraphStorage,
-    TextNodeStorage,
+    TextNodeStorage, AnyNodeStorage
 };
+use crate::sandbox::Builder;
 use crate::node_list::NodeList;
 use std::convert::TryFrom;
 crate::use_behaviors!(sandbox_member);
@@ -34,6 +35,8 @@ macro_rules! impl_concrete {
     ($($ti:expr => $name:ident),*) => {
         paste::paste! {
             $(
+                impl AnyNodeStorage for [<$name NodeStorage>] {}
+
                 pub(crate) type [<$name Node>] = ConcreteNodeArc<[<$name NodeStorage>]>;
 
                 impl ConcreteNodeArc<[<$name NodeStorage>]> {
