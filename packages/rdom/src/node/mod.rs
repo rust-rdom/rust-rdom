@@ -132,25 +132,6 @@ impl NodeBehaviour for AnyNodeArc {
     }
 }
 
-#[derive(Default, Clone)]
-pub(crate) struct DocumentNodeStorage {
-    /// Pointer back up to the window
-    pub(crate) default_view: Weak<Window>,
-}
-
-#[derive(Default, Clone)]
-pub(crate) struct TextNodeStorage {
-    /// Text in the text node
-    pub(crate) text: String,
-}
-
-impl TextNodeStorage {
-    /// Gives the text contents of the text node
-    pub fn get_text(&self) -> Option<String> {
-        Some(self.text.clone())
-    }
-}
-
 /*
 
 // TODO for DocumentNode; this will require a "nice" instantiation

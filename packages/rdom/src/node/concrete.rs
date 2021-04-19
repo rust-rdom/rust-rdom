@@ -2,12 +2,10 @@ use crate::internal_prelude::*;
 
 use super::contents::{
     AttributeNodeStorage, CDataSectionNodeStorage, CommentNodeStorage, DocumentFragmentNodeStorage,
-    DocumentTypeNodeStorage, ProcessingInstructionNodeStorage,
+    DocumentNodeStorage, DocumentTypeNodeStorage, ProcessingInstructionNodeStorage,
+    TextNodeStorage,
 };
-use super::{
-    AnyNodeStorage, DocumentNodeStorage, NodeCommon, NodeContentsArc, NodeContentsWeak,
-    NodeGraphStorage, TextNodeStorage,
-};
+use super::{AnyNodeStorage, NodeCommon, NodeContentsArc, NodeContentsWeak, NodeGraphStorage};
 use crate::node_list::NodeList;
 use crate::sandbox::Builder;
 use std::convert::TryFrom;
@@ -154,6 +152,6 @@ impl_concrete! {
 
 impl DocumentNode {
     pub fn create_text_node(&self, text: String) -> TextNode {
-        TextNode::new(self.get_context(), Arc::new(TextNodeStorage { text }))
+        TextNode::new(self.get_context(), Arc::new(TextNodeStorage { data: text }))
     }
 }

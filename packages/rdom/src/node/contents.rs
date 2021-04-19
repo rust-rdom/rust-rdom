@@ -1,7 +1,8 @@
 use super::concrete::ConcreteNodeArc;
-use super::{DocumentNodeStorage, NodeCommon, NodeGraphStorage, TextNodeStorage};
+use super::{NodeCommon, NodeGraphStorage};
 use crate::internal_prelude::*;
 use crate::sandbox::Builder;
+use crate::window::Window;
 
 macro_rules! declare_contents {
     ($($ti:expr => $name:ident),*) => {
@@ -91,13 +92,47 @@ macro_rules! declare_contents {
 }
 
 #[derive(Default, Clone)]
+pub(crate) struct DocumentNodeStorage {
+    /// Pointer back up to the window
+    pub(crate) default_view: Weak<Window>,
+}
+
+#[derive(Default, Clone)]
+pub(crate) struct TextNodeStorage {
+    /// Text in the text node
+    pub(crate) data: String,
+}
+
+impl TextNodeStorage {
+    // TODO data should come from CharacterData
+
+    /// Gives the text contents of the text node
+    pub fn data(&self) -> Option<String> {
+        Some(self.data.clone())
+    }
+}
+
+#[derive(Default, Clone)]
+pub(crate) struct CommentNodeStorage {
+    /// Text in the comment node
+    pub(crate) data: String,
+}
+
+impl CommentNodeStorage {
+    // TODO data should come from CharacterData
+
+    /// Gives the text contents of the text node
+    pub fn data(&self) -> Option<String> {
+        Some(self.data.clone())
+    }
+}
+
+#[derive(Default, Clone)]
 pub(crate) struct AttributeNodeStorage;
 #[derive(Default, Clone)]
 pub(crate) struct CDataSectionNodeStorage;
 #[derive(Default, Clone)]
 pub(crate) struct ProcessingInstructionNodeStorage;
-#[derive(Default, Clone)]
-pub(crate) struct CommentNodeStorage;
 #[derive(Default, Clone)]
 pub(crate) struct DocumentTypeNodeStorage;
 #[derive(Default, Clone)]

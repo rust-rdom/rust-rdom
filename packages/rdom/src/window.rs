@@ -2,7 +2,7 @@
 
 use crate::{
     internal_prelude::*,
-    node::{concrete::DocumentNode, DocumentNodeStorage},
+    node::{concrete::DocumentNode, contents::DocumentNodeStorage},
 };
 
 crate::use_behaviors!(sandbox_member);
