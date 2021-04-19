@@ -3,12 +3,16 @@
 use std::sync::Arc;
 
 use crate::config::ScreenMetrics;
-use crate::node::concrete::{DocumentNode, ElementNode};
+use crate::node::concrete::{ConcreteNodeArc, DocumentNode, ElementNode, AttributeNode, TextNode};
 use crate::node::element::ElementNodeStorage;
+use crate::node::contents::NodeType;
+use crate::node::TextNodeStorage;
 
 use crate::node::NodeBehaviour;
 use crate::sandbox::Sandbox;
+use crate::node::DocumentNodeStorage;
 use std::convert::TryInto;
+use quote::quote;
 
 #[test]
 fn it_works() {
@@ -35,36 +39,36 @@ macro_rules! test_node_creation {
         let weak_sbox = Arc::downgrade(&sbox);
 
         let node = <$ty>::new(weak_sbox, $storage);
-        doc.append_child(node);
+        doc.append_child(node.into());
         assert_eq!(doc.child_nodes().length(), 1);
         assert_eq!(
             doc.first_child().unwrap().get_node_type(),
-            $node_type as isize
+            $node_type.get_node_number()
         );
 
         doc
     }};
 }
 
-// #[test]
-// fn test_element_node_m() {
-//     let _doc = test_node_creation!(ElementNode, NodeType::Element, ());
-// }
+#[test]
+fn test_element_node_m() {
+    let _elem = test_node_creation!(ElementNode, NodeType::Element, Arc::new(ElementNodeStorage::HtmlButtonElement));
+}
 
-// #[test]
-// fn test_attr_node() {
-//     let _doc = test_node_creation!(AttrNode, NodeType::Attribute, ());
-// }
+#[test]
+fn test_attr_node() {
+    let _doc = test_node_creation!(AttributeNode, NodeType::Attribute, Default::default());
+}
 
-// #[test]
-// fn test_text_node() {
-//     let _doc = test_node_creation!(TextNode, NodeType::Text, TextNodeStorage {text: "test".to_owned()});
+#[test]
+fn test_text_node() {
+    let text = test_node_creation!(TextNode, NodeType::Text, Arc::new(TextNodeStorage {text: "test".to_owned()}));
 
-//     let node = _doc.first_child().unwrap();
-//     let node = node.downcast_ref::<TextNode>().unwrap();
+    let node = text.first_child().unwrap();
+    let node: ConcreteNodeArc<TextNodeStorage> = node.try_into().unwrap();
 
-//     assert_eq!(node.get_text().unwrap(), "test".to_owned());
-// }
+    assert_eq!(node.contents.get_text().unwrap(), "test".to_owned());
+}
 
 // #[test]
 // fn test_c_data_section_node_node() {

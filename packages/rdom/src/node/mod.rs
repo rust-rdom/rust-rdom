@@ -144,13 +144,14 @@ pub(crate) struct TextNodeStorage {
     pub(crate) text: String,
 }
 
-/*
-
-// TODO for TextNode. this will require a "nice" version
-/// Creates a text node.
-pub fn get_text(&self) -> Option<String> {
-    Some(self.storage.text.clone())
+impl TextNodeStorage {
+    /// Gives the text contents of the text node
+    pub fn get_text(&self) -> Option<String> {
+        Some(self.text.clone())
+    }
 }
+
+/*
 
 // TODO for DocumentNode; this will require a "nice" instantiation
 /// Creates a text node.
