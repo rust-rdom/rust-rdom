@@ -1,7 +1,11 @@
 use crate::behavior::sandbox_member::SandboxMemberBehavior;
 use crate::internal_prelude::*;
+use crate::node::concrete::ElementNode;
 use crate::node_list::{NodeList, NodeListStorage, Query};
-use std::{convert::TryFrom, sync::RwLock};
+use std::{
+    convert::{TryFrom, TryInto},
+    sync::RwLock,
+};
 
 /// NodeGraphStorage contains all the data connected
 /// to graph of the nodes
@@ -55,5 +59,38 @@ impl NodeGraphStorage {
                 children_of: strong_ref,
             }),
         )
+    }
+}
+
+pub struct Selector(String);
+
+impl TryFrom<String> for Selector {
+    type Error = DomError;
+
+    fn try_from(value: String) -> Result<Self, Self::Error> {
+        // validate string (only allow [A-Z] and [0-9])
+        let value = value.to_uppercase();
+        let valid = value.as_bytes().iter().all(|&v| {
+            (v >= ('A' as u8) && v <= ('Z' as u8)) || (v >= ('0' as u8) && v <= ('9' as u8))
+        });
+
+        if valid {
+            Ok(Selector(value))
+        } else {
+            Err(DomError::InvalidQuerySelector)
+        }
+    }
+}
+
+impl Selector {
+    pub fn is_selected_node(&self, node: AnyNodeArc) -> bool {
+        match node.try_into() {
+            Ok(element) => self.is_selected_element(element),
+            Err(_) => false,
+        }
+    }
+
+    pub fn is_selected_element(&self, element: ElementNode) -> bool {
+        element.contents.tag_name() == self.0
     }
 }

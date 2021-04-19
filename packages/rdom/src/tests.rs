@@ -1,14 +1,15 @@
 #![cfg(test)]
 
-use std::convert::TryInto;
+use std::convert::{TryFrom, TryInto};
 use std::sync::Arc;
 
-use crate::config::ScreenMetrics;
 use crate::node::concrete::*;
 use crate::node::contents::{AttributeNS, CommentNS, DocumentNS, NodeType, TextNS};
 use crate::node::element::{ElementNS, HtmlBodyES, HtmlButtonES, HtmlHtmlES};
+use crate::node::AnyNodeArc;
 use crate::node::NodeBehaviour;
 use crate::sandbox::Sandbox;
+use crate::{config::ScreenMetrics, node::graph_storage::Selector};
 
 #[test]
 fn it_works() {
@@ -134,4 +135,21 @@ fn tag_name() {
     let body = ElementNS::HtmlBody(HtmlBodyES);
     assert_eq!(button.tag_name(), "BUTTON");
     assert_eq!(body.tag_name(), "BODY");
+}
+
+#[test]
+fn selector() {
+    let sbox = Sandbox::new(Default::default());
+    let sbox = Arc::downgrade(&sbox);
+
+    let button = ElementNode::new(sbox.clone(), Arc::new(ElementNS::HtmlButton(HtmlButtonES)));
+    let body = ElementNode::new(sbox.clone(), Arc::new(ElementNS::HtmlBody(HtmlBodyES)));
+
+    let button_any = button.clone().into();
+
+    let selector = Selector::try_from("button".to_string()).unwrap();
+
+    assert!(selector.is_selected_node(button_any));
+    assert!(selector.is_selected_element(button));
+    assert!(!selector.is_selected_element(body));
 }
