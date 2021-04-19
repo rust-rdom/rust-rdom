@@ -5,11 +5,11 @@ use super::contents::{
     DocumentTypeNodeStorage, ProcessingInstructionNodeStorage,
 };
 use super::{
-    DocumentNodeStorage, NodeCommon, NodeContentsArc, NodeContentsWeak, NodeGraphStorage,
-    TextNodeStorage, AnyNodeStorage
+    AnyNodeStorage, DocumentNodeStorage, NodeCommon, NodeContentsArc, NodeContentsWeak,
+    NodeGraphStorage, TextNodeStorage,
 };
-use crate::sandbox::Builder;
 use crate::node_list::NodeList;
+use crate::sandbox::Builder;
 use std::convert::TryFrom;
 crate::use_behaviors!(sandbox_member);
 

@@ -3,16 +3,16 @@
 use std::sync::Arc;
 
 use crate::config::ScreenMetrics;
-use crate::node::concrete::{ConcreteNodeArc, DocumentNode, ElementNode, AttributeNode, TextNode};
-use crate::node::element::ElementNodeStorage;
+use crate::node::concrete::{AttributeNode, ConcreteNodeArc, DocumentNode, ElementNode, TextNode};
 use crate::node::contents::NodeType;
+use crate::node::element::ElementNodeStorage;
 use crate::node::TextNodeStorage;
 
+use crate::node::DocumentNodeStorage;
 use crate::node::NodeBehaviour;
 use crate::sandbox::Sandbox;
-use crate::node::DocumentNodeStorage;
-use std::convert::TryInto;
 use quote::quote;
+use std::convert::TryInto;
 
 #[test]
 fn it_works() {
@@ -52,7 +52,11 @@ macro_rules! test_node_creation {
 
 #[test]
 fn test_element_node_m() {
-    let _elem = test_node_creation!(ElementNode, NodeType::Element, Arc::new(ElementNodeStorage::HtmlButtonElement));
+    let _elem = test_node_creation!(
+        ElementNode,
+        NodeType::Element,
+        Arc::new(ElementNodeStorage::HtmlButtonElement)
+    );
 }
 
 #[test]
@@ -62,7 +66,13 @@ fn test_attr_node() {
 
 #[test]
 fn test_text_node() {
-    let text = test_node_creation!(TextNode, NodeType::Text, Arc::new(TextNodeStorage {text: "test".to_owned()}));
+    let text = test_node_creation!(
+        TextNode,
+        NodeType::Text,
+        Arc::new(TextNodeStorage {
+            text: "test".to_owned()
+        })
+    );
 
     let node = text.first_child().unwrap();
     let node: ConcreteNodeArc<TextNodeStorage> = node.try_into().unwrap();

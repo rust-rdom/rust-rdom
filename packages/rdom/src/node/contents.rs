@@ -1,7 +1,7 @@
-use super::{DocumentNodeStorage, TextNodeStorage, NodeCommon, NodeGraphStorage};
 use super::concrete::ConcreteNodeArc;
-use crate::sandbox::Builder;
+use super::{DocumentNodeStorage, NodeCommon, NodeGraphStorage, TextNodeStorage};
 use crate::internal_prelude::*;
+use crate::sandbox::Builder;
 
 macro_rules! declare_contents {
     ($($ti:expr => $name:ident),*) => {
