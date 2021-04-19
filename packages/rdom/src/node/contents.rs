@@ -74,6 +74,12 @@ macro_rules! declare_contents {
         }
 
         $(
+            impl Builder<[<$name NodeStorage>]> {
+                pub fn build(&self, storage: [<$name NodeStorage>]) -> ConcreteNodeArc<[<$name NodeStorage>]> {
+                    ConcreteNodeArc::<[<$name NodeStorage>]>::new(self.sandbox.clone(), Arc::new(storage))
+                }
+            }
+
             impl From<&Arc<[<$name NodeStorage>]>> for NodeContentsWeak {
                 fn from(source: &Arc<[<$name NodeStorage>]>) -> NodeContentsWeak {
                     NodeContentsWeak::$name(Arc::downgrade(source))
@@ -107,40 +113,4 @@ declare_contents! {
     7 => Document,
     8 => DocumentType,
     9 => DocumentFragment
-}
-
-impl Builder<AttributeNodeStorage> {
-    pub fn build(&self) -> ConcreteNodeArc<AttributeNodeStorage> {
-        ConcreteNodeArc::<AttributeNodeStorage>::new(self.sandbox.clone(), Arc::new(Default::default()))
-    }
-}
-
-impl Builder<CDataSectionNodeStorage> {
-    pub fn build(&self) -> ConcreteNodeArc<CDataSectionNodeStorage> {
-        ConcreteNodeArc::<CDataSectionNodeStorage>::new(self.sandbox.clone(), Arc::new(Default::default()))
-    }
-}
-
-impl Builder<ProcessingInstructionNodeStorage> {
-    pub fn build(&self) -> ConcreteNodeArc<ProcessingInstructionNodeStorage> {
-        ConcreteNodeArc::<ProcessingInstructionNodeStorage>::new(self.sandbox.clone(), Arc::new(Default::default()))
-    }
-}
-
-impl Builder<CommentNodeStorage> {
-    pub fn build(&self) -> ConcreteNodeArc<CommentNodeStorage> {
-        ConcreteNodeArc::<CommentNodeStorage>::new(self.sandbox.clone(), Arc::new(Default::default()))
-    }
-}
-
-impl Builder<DocumentTypeNodeStorage> {
-    pub fn build(&self) -> ConcreteNodeArc<DocumentTypeNodeStorage> {
-        ConcreteNodeArc::<DocumentTypeNodeStorage>::new(self.sandbox.clone(), Arc::new(Default::default()))
-    }
-}
-
-impl Builder<DocumentFragmentNodeStorage> {
-    pub fn build(&self) -> ConcreteNodeArc<DocumentFragmentNodeStorage> {
-        ConcreteNodeArc::<DocumentFragmentNodeStorage>::new(self.sandbox.clone(), Arc::new(Default::default()))
-    }
 }
