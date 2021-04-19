@@ -82,12 +82,12 @@ fn test_text_node() {
 
 #[test]
 fn test_c_data_section_node_node() {
-    let _doc = test_node_creation!(CDataSectionNode, NodeType::CDataSection, Default::default());
+    let _cds = test_node_creation!(CDataSectionNode, NodeType::CDataSection, Default::default());
 }
 
 #[test]
 fn test_processing_instruction_node() {
-    let _doc = test_node_creation!(
+    let _pi = test_node_creation!(
         ProcessingInstructionNode,
         NodeType::ProcessingInstruction,
         Default::default()
@@ -96,7 +96,7 @@ fn test_processing_instruction_node() {
 
 #[test]
 fn test_comment_node() {
-    let _doc = test_node_creation!(
+    let _com = test_node_creation!(
         CommentNode,
         NodeType::Comment,
         Arc::new(CommentNodeStorage {
@@ -107,12 +107,12 @@ fn test_comment_node() {
 
 #[test]
 fn test_document_type_node() {
-    let _doc = test_node_creation!(DocumentTypeNode, NodeType::DocumentType, Default::default());
+    let _dt = test_node_creation!(DocumentTypeNode, NodeType::DocumentType, Default::default());
 }
 
 #[test]
 fn test_document_fragment_node() {
-    let _doc = test_node_creation!(
+    let _frag = test_node_creation!(
         DocumentFragmentNode,
         NodeType::DocumentFragment,
         Default::default()
