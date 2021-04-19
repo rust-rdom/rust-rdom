@@ -12,9 +12,6 @@
     unused_qualifications
 )]
 
-#[macro_use]
-extern crate downcast_rs;
-
 pub(crate) mod behavior;
 pub mod config;
 pub mod error;
