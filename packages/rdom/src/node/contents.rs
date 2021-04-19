@@ -114,3 +114,33 @@ impl Builder<AttributeNodeStorage> {
         ConcreteNodeArc::<AttributeNodeStorage>::new(self.sandbox.clone(), Arc::new(Default::default()))
     }
 }
+
+impl Builder<CDataSectionNodeStorage> {
+    pub fn build(&self) -> ConcreteNodeArc<CDataSectionNodeStorage> {
+        ConcreteNodeArc::<CDataSectionNodeStorage>::new(self.sandbox.clone(), Arc::new(Default::default()))
+    }
+}
+
+impl Builder<ProcessingInstructionNodeStorage> {
+    pub fn build(&self) -> ConcreteNodeArc<ProcessingInstructionNodeStorage> {
+        ConcreteNodeArc::<ProcessingInstructionNodeStorage>::new(self.sandbox.clone(), Arc::new(Default::default()))
+    }
+}
+
+impl Builder<CommentNodeStorage> {
+    pub fn build(&self) -> ConcreteNodeArc<CommentNodeStorage> {
+        ConcreteNodeArc::<CommentNodeStorage>::new(self.sandbox.clone(), Arc::new(Default::default()))
+    }
+}
+
+impl Builder<DocumentTypeNodeStorage> {
+    pub fn build(&self) -> ConcreteNodeArc<DocumentTypeNodeStorage> {
+        ConcreteNodeArc::<DocumentTypeNodeStorage>::new(self.sandbox.clone(), Arc::new(Default::default()))
+    }
+}
+
+impl Builder<DocumentFragmentNodeStorage> {
+    pub fn build(&self) -> ConcreteNodeArc<DocumentFragmentNodeStorage> {
+        ConcreteNodeArc::<DocumentFragmentNodeStorage>::new(self.sandbox.clone(), Arc::new(Default::default()))
+    }
+}
