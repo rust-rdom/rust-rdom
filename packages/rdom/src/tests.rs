@@ -1,18 +1,16 @@
 #![cfg(test)]
 
 use std::sync::Arc;
+use std::convert::TryInto;
 
 use crate::config::ScreenMetrics;
 use crate::node::concrete::*;
-use crate::node::contents::NodeType;
 use crate::node::contents::{
-    AttributeNodeStorage, CommentNodeStorage, DocumentNodeStorage, TextNodeStorage,
+    AttributeNodeStorage, CommentNodeStorage, DocumentNodeStorage, TextNodeStorage, NodeType
 };
 use crate::node::element::ElementNodeStorage;
-
 use crate::node::NodeBehaviour;
 use crate::sandbox::Sandbox;
-use std::convert::TryInto;
 
 #[test]
 fn it_works() {
