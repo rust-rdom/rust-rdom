@@ -15,6 +15,17 @@ macro_rules! declare_elements {
                 $name([<$name ES>]),
             )*
         }
+
+        impl ElementNS {
+            /// [Element.tagName](https://developer.mozilla.org/en-US/docs/Web/API/Element/tagName)
+            pub fn tag_name(&self) -> String {
+                match self {
+                    $(
+                        ElementNS::$name(_) => $tag.to_string(),
+                    )*
+                }
+            }
+        }
     }
     };
 }

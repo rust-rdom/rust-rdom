@@ -6,7 +6,7 @@ use std::sync::Arc;
 use crate::config::ScreenMetrics;
 use crate::node::concrete::*;
 use crate::node::contents::{AttributeNS, CommentNS, DocumentNS, NodeType, TextNS};
-use crate::node::element::{ElementNS, HtmlButtonES, HtmlHtmlES};
+use crate::node::element::{ElementNS, HtmlBodyES, HtmlButtonES, HtmlHtmlES};
 use crate::node::NodeBehaviour;
 use crate::sandbox::Sandbox;
 
@@ -126,4 +126,12 @@ fn can_build_node() {
     let _: ConcreteNodeArc<AttributeNS> = node; // assert that we got an AttributeNode
 
     assert!(Weak::ptr_eq(&node.get_context(), &Arc::downgrade(&sbox)));
+}
+
+#[test]
+fn tag_name() {
+    let button = ElementNS::HtmlButton(HtmlButtonES);
+    let body = ElementNS::HtmlBody(HtmlBodyES);
+    assert_eq!(button.tag_name(), "BUTTON");
+    assert_eq!(body.tag_name(), "BODY");
 }
