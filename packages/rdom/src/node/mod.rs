@@ -14,6 +14,7 @@ pub mod concrete;
 pub mod contents;
 pub mod element;
 pub(crate) mod graph_storage;
+pub mod template;
 
 /// Marker trait implemented by all node storage classes
 pub trait AnyNodeStore {}

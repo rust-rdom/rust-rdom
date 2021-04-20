@@ -1,9 +1,13 @@
 use std::sync::Weak;
 
-use crate::internal_prelude::*;
+use crate::{internal_prelude::*, node::template::Template};
 
 pub trait SandboxMemberBehavior {
     fn get_context(&self) -> Weak<Sandbox>;
+
+    fn build<T>(&self, template: impl Template<T>) -> T {
+        template.build(self.get_context())
+    }
 }
 
 pub struct SandboxMemberBehaviorStorage {
