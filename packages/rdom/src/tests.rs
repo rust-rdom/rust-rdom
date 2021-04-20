@@ -149,7 +149,7 @@ fn selector() {
 
     let selector = Selector::try_from("button".to_string()).unwrap();
 
-    assert!(selector.is_selected_node(button_any));
+    assert!(selector.filter_selected_node(button_any).is_ok());
     assert!(selector.is_selected_element(button));
     assert!(!selector.is_selected_element(body));
 }

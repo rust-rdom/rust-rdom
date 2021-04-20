@@ -83,10 +83,16 @@ impl TryFrom<String> for Selector {
 }
 
 impl Selector {
-    pub fn is_selected_node(&self, node: AnyNodeArc) -> bool {
-        match node.try_into() {
-            Ok(element) => self.is_selected_element(element),
-            Err(_) => false,
+    pub fn filter_selected_node(&self, node: AnyNodeArc) -> Result<ElementNode, AnyNodeArc> {
+        match <_ as TryInto<ElementNode>>::try_into(node.clone()) {
+            Ok(element) => {
+                if self.is_selected_element(element.clone()) {
+                    Ok(element)
+                } else {
+                    Err(node)
+                }
+            }
+            Err(_) => Err(node),
         }
     }
 
