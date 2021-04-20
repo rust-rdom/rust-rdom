@@ -9,10 +9,10 @@ use crate::config::ScreenMetrics;
 use crate::node::Buildable;
 use crate::window::Window;
 
-/// A machine which can be used to build nodes of storage type T.
-pub struct Builder<T: Buildable> {
+/// A Builder<R> is a machine which can be used to build nodes of reference type R.
+pub struct Builder<R: Buildable> {
     pub(crate) sandbox: Weak<Sandbox>,
-    _phantom: PhantomData<T>,
+    _phantom: PhantomData<R>,
 }
 
 /// A sandbox represents a virtual browser tab. It contains a document and a window,
