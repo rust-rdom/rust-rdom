@@ -16,19 +16,25 @@ Example Usage
 use std::sync::Arc;
 
 use rdom::config::ScreenMetrics;
+use rdom::node::concrete::*;
+use rdom::node::contents::{CommentNodeStorage, NodeType, TextNodeStorage};
+use rdom::node::element::{ElementNodeStorage, HtmlButtonElementStorage, HtmlHtmlElementStorage};
+use rdom::node::{AnyNodeArc, NodeBehavior};
 use rdom::sandbox::Sandbox;
-use rdom::node::element::{HtmlHtmlElement, HtmlBodyElement};
-use rdom::node::AnyNode;
 
 fn main() {
     let metrics: ScreenMetrics = Default::default();
     let sbox = Sandbox::new(metrics);
     let doc = sbox.clone().window().document();
-    let document_element = HtmlHtmlElement::new(Arc::downgrade(&sbox), ());
-    doc.append_child(document_element);
+
+    let document_element = sbox
+        .builder::<ElementNodeArc>()
+        .build_html(Arc::downgrade(&sbox.window()));
 
     // We don't use the text node, but those are available
     let _text = doc.create_text_node("Hello, world!".to_string());
+
+    doc.append_child(document_element.into());
 
     println!("Doc has {} child node(s)", doc.child_nodes().length());
     // Prints out Doc has 1 child node(s)
