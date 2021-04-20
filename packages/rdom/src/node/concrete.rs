@@ -16,19 +16,19 @@ crate::use_behaviors!(sandbox_member);
 
 #[derive(Clone)]
 /// A strongly-typed handle to a node with a strong reference.
-/// `T` may be the underlying storage
+/// `S` may be the underlying storage
 /// type of any node.
-pub struct ConcreteNodeArc<T> {
-    pub(crate) contents: Arc<T>,
+pub struct ConcreteNodeArc<S: AnyNodeStorage> {
+    pub(crate) contents: Arc<S>,
     pub(crate) common: Arc<NodeCommon>,
 }
 
 #[derive(Clone)]
 /// A strongly-typed handle to a node with a weak reference.
-/// `T` may be the underlying storage
+/// `S` may be the underlying storage
 /// type of any node.
-pub struct ConcreteNodeWeak<T> {
-    pub(crate) contents: Weak<T>,
+pub struct ConcreteNodeWeak<S: AnyNodeStorage> {
+    pub(crate) contents: Weak<S>,
     pub(crate) common: Weak<NodeCommon>,
 }
 
@@ -38,10 +38,10 @@ macro_rules! impl_concrete {
             $(
                 impl AnyNodeStorage for [<$name NodeStorage>] {}
 
-                #[doc = "Convenience alias for ConcreteNodeArc<" $name "NodeStorage>"]
+                #[doc = "Convenience alias for a strong reference to a(n) " $name " node"]
                 pub type [<$name NodeArc>] = ConcreteNodeArc<[<$name NodeStorage>]>;
 
-                #[doc = "Convenience alias for ConcreteNodeWeak<" $name "NodeStorage>"]
+                #[doc = "Convenience alias for a weak reference to a(n) " $name " node"]
                 pub type [<$name NodeWeak>] = ConcreteNodeWeak<[<$name NodeStorage>]>;
 
                 impl ConcreteNodeArc<[<$name NodeStorage>]> {

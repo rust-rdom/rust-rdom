@@ -10,14 +10,14 @@ pub use super::element::ElementNodeStorage;
 macro_rules! declare_contents {
     ($($ti:expr => $name:ident),*) => {
         paste::paste! {
-            pub(crate) enum NodeType {
+            pub enum NodeType {
                 $(
                     $name,
                 )*
             }
 
             impl NodeType {
-                pub(crate) fn get_node_number(&self) -> isize {
+                fn get_node_number(&self) -> isize {
                     match self {
                         $(
                             NodeType::$name => $ti,

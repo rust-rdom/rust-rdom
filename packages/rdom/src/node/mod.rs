@@ -14,7 +14,7 @@ pub mod contents;
 pub mod element;
 pub(crate) mod graph_storage;
 
-pub(crate) trait AnyNodeStorage {}
+pub trait AnyNodeStorage {}
 pub(crate) trait Buildable {
     type Storage: AnyNodeStorage;
 }
