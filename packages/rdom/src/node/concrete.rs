@@ -4,9 +4,9 @@ use super::contents::{
     AttributeNS, CDataSectionNS, CommentNS, DocumentFragmentNS, DocumentNS, DocumentTypeNS,
     ProcessingInstructionNS, TextNS,
 };
+use super::graph_storage::Selector;
 use super::{AnyNS, NodeCommon, NodeContentsArc, NodeContentsWeak, NodeGraphStorage};
 use crate::node_list::NodeList;
-use crate::sandbox::Builder;
 use std::convert::TryFrom;
 crate::use_behaviors!(sandbox_member);
 
@@ -130,6 +130,10 @@ macro_rules! impl_concrete {
 
                     fn get_node_type(&self) -> isize {
                         $ti
+                    }
+
+                    fn query_selector(&self, selector: &Selector) -> Option<ElementNode> {
+                        self.common.node_graph.query_selector_rec(selector)
                     }
                 }
             )*

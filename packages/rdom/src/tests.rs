@@ -15,7 +15,7 @@ use crate::{config::ScreenMetrics, node::graph_storage::Selector};
 fn it_works() {
     let metrics: ScreenMetrics = Default::default();
     let sbox = Sandbox::new(metrics);
-    let doc: DocumentNode = sbox.clone().window().document().try_into().unwrap();
+    let doc = sbox.clone().window().document();
     let document_element = ElementNode::new(
         Arc::downgrade(&sbox),
         Arc::new(ElementNS::HtmlHtml(HtmlHtmlES {
@@ -152,4 +152,50 @@ fn selector() {
     assert!(selector.filter_selected_node(button_any).is_ok());
     assert!(selector.is_selected_element(button));
     assert!(!selector.is_selected_element(body));
+}
+
+#[test]
+fn query_selector() {
+    let sbox_strong = Sandbox::new(Default::default());
+    let sbox = Arc::downgrade(&sbox_strong);
+
+    let button = ElementNode::new(sbox.clone(), Arc::new(ElementNS::HtmlButton(HtmlButtonES)));
+    let body = ElementNode::new(sbox.clone(), Arc::new(ElementNS::HtmlBody(HtmlBodyES)));
+
+    let buttonselector = Selector::try_from("BUTTON").unwrap();
+    let bodyselector = Selector::try_from("BODY").unwrap();
+
+    let doc = sbox_strong.window().document();
+
+    doc.append_child(button.clone().into());
+    doc.append_child(body.clone().into());
+
+    let qbody = doc.query_selector(&bodyselector).unwrap();
+    let qbutton = doc.query_selector(&buttonselector).unwrap();
+
+    assert!(Arc::ptr_eq(&qbody.common, &body.common));
+    assert!(Arc::ptr_eq(&qbutton.common, &button.common));
+}
+
+#[test]
+fn query_selector_child() {
+    let sbox_strong = Sandbox::new(Default::default());
+    let sbox = Arc::downgrade(&sbox_strong);
+
+    let button = ElementNode::new(sbox.clone(), Arc::new(ElementNS::HtmlButton(HtmlButtonES)));
+    let body = ElementNode::new(sbox.clone(), Arc::new(ElementNS::HtmlBody(HtmlBodyES)));
+
+    let buttonselector = Selector::try_from("BUTTON").unwrap();
+    let bodyselector = Selector::try_from("BODY").unwrap();
+
+    let doc = sbox_strong.window().document();
+
+    doc.append_child(body.clone().into());
+    body.append_child(button.clone().into());
+
+    let qbody = doc.query_selector(&bodyselector).unwrap();
+    let qbutton = doc.query_selector(&buttonselector).unwrap();
+
+    assert!(Arc::ptr_eq(&qbody.common, &body.common));
+    assert!(Arc::ptr_eq(&qbutton.common, &button.common));
 }

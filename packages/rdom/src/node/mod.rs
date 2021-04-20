@@ -7,8 +7,9 @@ use crate::node_list::NodeList;
 crate::use_behaviors!(sandbox_member);
 use crate::window::Window;
 
+use concrete::ElementNode;
 use contents::{NodeContentsArc, NodeContentsWeak};
-use graph_storage::NodeGraphStorage;
+use graph_storage::{NodeGraphStorage, Selector};
 
 pub(crate) mod concrete;
 pub(crate) mod contents;
@@ -65,6 +66,8 @@ pub trait NodeBehaviour {
     fn clone_node(&self) -> AnyNodeArc;
     /// [Node.getType](https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType)
     fn get_node_type(&self) -> isize;
+    /// [.querySelector](https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector)
+    fn query_selector(&self, selector: &Selector) -> Option<ElementNode>;
 }
 
 impl AnyNodeWeak {
@@ -129,6 +132,10 @@ impl NodeBehaviour for AnyNodeArc {
 
     fn get_node_type(&self) -> isize {
         self.contents.to_node_type().get_node_number()
+    }
+
+    fn query_selector(&self, selector: &Selector) -> Option<ElementNode> {
+        self.common.node_graph.query_selector_rec(selector)
     }
 }
 

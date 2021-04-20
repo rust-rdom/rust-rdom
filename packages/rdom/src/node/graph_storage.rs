@@ -60,6 +60,16 @@ impl NodeGraphStorage {
             }),
         )
     }
+
+    // IMPORTANT: this function does not check the element itself, it only checks children
+    pub(crate) fn query_selector_rec(&self, selector: &Selector) -> Option<ElementNode> {
+        self.static_child_nodes().into_iter().find_map(|child| {
+            match selector.filter_selected_node(child) {
+                Ok(element) => Some(element),
+                Err(node) => node.common.node_graph.query_selector_rec(selector),
+            }
+        })
+    }
 }
 
 pub struct Selector(String);
@@ -79,6 +89,14 @@ impl TryFrom<String> for Selector {
         } else {
             Err(DomError::InvalidQuerySelector)
         }
+    }
+}
+
+impl TryFrom<&str> for Selector {
+    type Error = DomError;
+
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
+        Selector::try_from(value.to_string())
     }
 }
 
