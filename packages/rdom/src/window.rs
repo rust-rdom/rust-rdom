@@ -31,7 +31,7 @@ impl Window {
 
     /// Gets the window's document
     // would be nice to have DocumentNode
-    pub(crate) fn document(&self) -> DocumentNodeArc {
+    pub fn document(&self) -> DocumentNodeArc {
         self.document.clone()
     }
 }

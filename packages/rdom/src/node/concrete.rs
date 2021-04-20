@@ -1,3 +1,5 @@
+//! Concrete (as opposed to abstract) types of nodes. Each node type is represented in this module.
+
 use crate::internal_prelude::*;
 
 use super::contents::{
@@ -41,8 +43,11 @@ macro_rules! impl_concrete {
             $(
                 impl AnyNodeStorage for [<$name NodeStorage>] {}
 
-                pub(crate) type [<$name NodeArc>] = ConcreteNodeArc<[<$name NodeStorage>]>;
-                pub(crate) type [<$name NodeWeak>] = ConcreteNodeWeak<[<$name NodeStorage>]>;
+                #[doc = "Convenience alias for ConcreteNodeArc<" $name "NodeStorage>"]
+                pub type [<$name NodeArc>] = ConcreteNodeArc<[<$name NodeStorage>]>;
+
+                #[doc = "Convenience alias for ConcreteNodeWeak<" $name "NodeStorage>"]
+                pub type [<$name NodeWeak>] = ConcreteNodeWeak<[<$name NodeStorage>]>;
 
                 impl ConcreteNodeArc<[<$name NodeStorage>]> {
                     pub(crate) fn new(context: Weak<Sandbox>, contents: Arc<[<$name NodeStorage>]>) ->
@@ -162,6 +167,7 @@ impl_concrete! {
 }
 
 impl DocumentNodeArc {
+    /// Creates a new text node with the given text contents
     pub fn create_text_node(&self, text: String) -> TextNodeArc {
         TextNodeArc::new(self.get_context(), Arc::new(TextNodeStorage { data: text }))
     }

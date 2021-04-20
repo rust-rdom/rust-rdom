@@ -1,7 +1,11 @@
+//! Data and functionality specific to each node type live here.
+
 use super::concrete::ConcreteNodeArc;
 use crate::internal_prelude::*;
 use crate::sandbox::Builder;
 use crate::window::Window;
+
+pub use super::element::ElementNodeStorage;
 
 macro_rules! declare_contents {
     ($($ti:expr => $name:ident),*) => {
@@ -99,13 +103,13 @@ macro_rules! impl_standard_builder {
 }
 
 #[derive(Default, Clone)]
-pub(crate) struct DocumentNodeStorage {
+pub struct DocumentNodeStorage {
     /// Pointer back up to the window
     pub(crate) default_view: Weak<Window>,
 }
 
 #[derive(Default, Clone)]
-pub(crate) struct TextNodeStorage {
+pub struct TextNodeStorage {
     /// Text in the text node
     pub(crate) data: String,
 }
@@ -120,7 +124,7 @@ impl TextNodeStorage {
 }
 
 #[derive(Default, Clone)]
-pub(crate) struct CommentNodeStorage {
+pub struct CommentNodeStorage {
     /// Text in the comment node
     pub(crate) data: String,
 }
@@ -135,15 +139,15 @@ impl CommentNodeStorage {
 }
 
 #[derive(Default, Clone)]
-pub(crate) struct AttributeNodeStorage;
+pub struct AttributeNodeStorage;
 #[derive(Default, Clone)]
-pub(crate) struct CDataSectionNodeStorage;
+pub struct CDataSectionNodeStorage;
 #[derive(Default, Clone)]
-pub(crate) struct ProcessingInstructionNodeStorage;
+pub struct ProcessingInstructionNodeStorage;
 #[derive(Default, Clone)]
-pub(crate) struct DocumentTypeNodeStorage;
+pub struct DocumentTypeNodeStorage;
 #[derive(Default, Clone)]
-pub(crate) struct DocumentFragmentNodeStorage;
+pub struct DocumentFragmentNodeStorage;
 
 declare_contents! {
     1 => Element,

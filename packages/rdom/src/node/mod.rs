@@ -9,8 +9,8 @@ crate::use_behaviors!(sandbox_member);
 use contents::{NodeContentsArc, NodeContentsWeak};
 use graph_storage::NodeGraphStorage;
 
-pub(crate) mod concrete;
-pub(crate) mod contents;
+pub mod concrete;
+pub mod contents;
 pub mod element;
 pub(crate) mod graph_storage;
 

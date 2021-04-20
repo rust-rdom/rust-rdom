@@ -1,5 +1,4 @@
-//! Core representation of a DOM element. See `nice` module for distinction from
-//! nice representation.
+//! Data and functionality to each element type live here.
 
 use crate::internal_prelude::*;
 use crate::window::Window;
@@ -9,7 +8,7 @@ use super::concrete::ConcreteNodeArc;
 macro_rules! declare_elements {
     ($($tag:literal => $name:ident),*) => {
         paste::paste! {
-            /// Enum of all concrete elements
+            /// Enum of all concrete element storages
             #[derive(Clone)]
             pub enum ElementNodeStorage {
                 $(
