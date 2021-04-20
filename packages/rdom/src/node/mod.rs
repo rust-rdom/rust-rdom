@@ -6,7 +6,7 @@ use crate::node_list::NodeList;
 
 crate::use_behaviors!(sandbox_member);
 
-use contents::{NodeContentsArc, NodeContentsWeak};
+use contents::{AnyNodeStorage, NodeContentsArc, NodeContentsWeak};
 use graph_storage::NodeGraphStorage;
 
 pub mod concrete;
@@ -14,8 +14,9 @@ pub mod contents;
 pub mod element;
 pub(crate) mod graph_storage;
 
-pub trait AnyNodeStorage {}
-pub(crate) trait Buildable {
+/// Marker trait implemented by any node reference type which can be built.
+pub trait Buildable {
+    /// Underlying storage struct for the node type.
     type Storage: AnyNodeStorage;
 }
 

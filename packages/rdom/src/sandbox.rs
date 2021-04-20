@@ -9,7 +9,8 @@ use crate::config::ScreenMetrics;
 use crate::node::Buildable;
 use crate::window::Window;
 
-pub(crate) struct Builder<T: Buildable> {
+/// A machine which can be used to build nodes of storage type T.
+pub struct Builder<T: Buildable> {
     pub(crate) sandbox: Weak<Sandbox>,
     _phantom: PhantomData<T>,
 }
@@ -41,7 +42,8 @@ impl Sandbox {
         self.window.clone()
     }
 
-    pub(crate) fn builder<T: Buildable>(self: &Arc<Self>) -> Builder<T> {
+    /// Creates a builder for a specific type of node reference
+    pub fn builder<T: Buildable>(self: &Arc<Self>) -> Builder<T> {
         Builder {
             sandbox: Arc::downgrade(self),
             _phantom: PhantomData,

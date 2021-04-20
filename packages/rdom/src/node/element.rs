@@ -2,6 +2,7 @@
 
 use super::concrete::ConcreteNodeArc;
 use crate::internal_prelude::*;
+use crate::node::concrete::ElementNodeArc;
 use crate::sandbox::Builder;
 use crate::window::Window;
 
@@ -39,10 +40,11 @@ pub struct HtmlBodyElementStorage;
 #[derive(Clone)]
 pub struct HtmlButtonElementStorage;
 
-impl Builder<ConcreteNodeArc<ElementNodeStorage>> {
+impl Builder<ElementNodeArc> {
     // TODO it would be nice if these didn't all return generic Elements but instead we had some kind of
     // concrete types representing each element type.
 
+    /// Builds a new HtmlHtmlElement node
     pub fn build_html(&self, default_view: Weak<Window>) -> ConcreteNodeArc<ElementNodeStorage> {
         ConcreteNodeArc::<ElementNodeStorage>::new(
             self.sandbox.clone(),
@@ -52,6 +54,7 @@ impl Builder<ConcreteNodeArc<ElementNodeStorage>> {
         )
     }
 
+    /// Builds a new HtmlBodyElement node
     pub fn build_body(&self, default_view: Weak<Window>) -> ConcreteNodeArc<ElementNodeStorage> {
         ConcreteNodeArc::<ElementNodeStorage>::new(
             self.sandbox.clone(),
@@ -59,6 +62,7 @@ impl Builder<ConcreteNodeArc<ElementNodeStorage>> {
         )
     }
 
+    /// Builds a new HtmlButtonElement node
     pub fn build_button(&self, default_view: Weak<Window>) -> ConcreteNodeArc<ElementNodeStorage> {
         ConcreteNodeArc::<ElementNodeStorage>::new(
             self.sandbox.clone(),

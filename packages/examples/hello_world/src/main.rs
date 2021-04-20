@@ -11,14 +11,11 @@ fn main() {
     let metrics: ScreenMetrics = Default::default();
     let sbox = Sandbox::new(metrics);
     let doc = sbox.clone().window().document();
-    // let document_element = ElementNodeArc::new(
-    //     Arc::downgrade(&sbox),
-    //     Arc::new(ElementNodeStorage::HtmlHtml(HtmlHtmlElementStorage {
-    //         default_view: Arc::downgrade(&sbox.window()),
-    //     })),
-    // )
-    // .into();
-    // let _text = doc.create_text_node("Hello, world!".to_string());
-    // doc.append_child(document_element);
-    // assert_eq!(doc.child_nodes().length(), 1);
+
+    let document_element = sbox.builder::<ElementNodeArc>().build_html(
+        Arc::downgrade(&sbox.window())
+    );
+    let _text = doc.create_text_node("Hello, world!".to_string());
+    doc.append_child(document_element.into());
+    assert_eq!(doc.child_nodes().length(), 1);
 }
