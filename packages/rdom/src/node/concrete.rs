@@ -7,7 +7,6 @@ use super::contents::{
 };
 use super::{AnyNodeStorage, NodeCommon, NodeContentsArc, NodeContentsWeak, NodeGraphStorage};
 use crate::node_list::NodeList;
-use crate::sandbox::Builder;
 use std::convert::TryFrom;
 crate::use_behaviors!(sandbox_member);
 
@@ -35,7 +34,8 @@ macro_rules! impl_concrete {
             $(
                 impl AnyNodeStorage for [<$name NodeStorage>] {}
 
-                pub(crate) type [<$name Node>] = ConcreteNodeArc<[<$name NodeStorage>]>;
+                pub(crate) type [<$name NodeArc>] = ConcreteNodeArc<[<$name NodeStorage>]>;
+                pub(crate) type [<$name NodeWeak>] = ConcreteNodeWeak<[<$name NodeStorage>]>;
 
                 impl ConcreteNodeArc<[<$name NodeStorage>]> {
                     pub(crate) fn new(context: Weak<Sandbox>, contents: Arc<[<$name NodeStorage>]>) ->
@@ -108,7 +108,7 @@ macro_rules! impl_concrete {
                     }
                 }
 
-                impl NodeBehaviour for ConcreteNodeArc<[<$name NodeStorage>]> {
+                impl NodeBehavior for ConcreteNodeArc<[<$name NodeStorage>]> {
                     fn first_child(&self) -> Option<AnyNodeArc> {
                         self.common.node_graph.first_child()
                     }
@@ -150,8 +150,8 @@ impl_concrete! {
     9 => DocumentFragment
 }
 
-impl DocumentNode {
-    pub fn create_text_node(&self, text: String) -> TextNode {
-        TextNode::new(self.get_context(), Arc::new(TextNodeStorage { data: text }))
+impl DocumentNodeArc {
+    pub fn create_text_node(&self, text: String) -> TextNodeArc {
+        TextNodeArc::new(self.get_context(), Arc::new(TextNodeStorage { data: text }))
     }
 }

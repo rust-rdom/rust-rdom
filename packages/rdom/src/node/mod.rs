@@ -50,9 +50,9 @@ pub struct AnyNodeWeak {
     pub(crate) common: Weak<NodeCommon>,
 }
 
-// NodeBehaviour trait will be here for now
+// NodeBehavior trait will be here for now
 /// Trait for main functions connected to node behaviour
-pub trait NodeBehaviour {
+pub trait NodeBehavior {
     /// Returns first child
     fn first_child(&self) -> Option<AnyNodeArc>;
     /// Returns last child
@@ -105,7 +105,7 @@ impl SandboxMemberBehavior for AnyNodeArc {
     }
 }
 
-impl NodeBehaviour for AnyNodeArc {
+impl NodeBehavior for AnyNodeArc {
     fn first_child(&self) -> Option<AnyNodeArc> {
         self.common.node_graph.first_child()
     }
