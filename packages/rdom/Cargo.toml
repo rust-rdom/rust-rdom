@@ -2,7 +2,7 @@
 name = "rdom"
 description = "A Rust-based simulated DOM (browser-independent replacement for web_sys)"
 repository = "https://github.com/philip-peterson/rust-rdom/"
-version = "0.1.8"
+version = "0.2.0"
 authors = ["Philip Peterson <philip.c.peterson@gmail.com>"]
 edition = "2018"
 license = "MIT"
