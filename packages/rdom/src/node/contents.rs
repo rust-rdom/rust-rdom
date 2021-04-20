@@ -1,20 +1,30 @@
-use super::concrete::ConcreteNodeArc;
-use super::{NodeCommon, NodeGraphStorage};
+//! Data and functionality specific to each node type live here.
+
+use super::concrete::*;
 use crate::internal_prelude::*;
 use crate::sandbox::Builder;
 use crate::window::Window;
 
+pub use super::element::ElementNodeStorage;
+/// Marker trait implemented by all node storage classes
+pub trait AnyNodeStorage {}
+
 macro_rules! declare_contents {
     ($($ti:expr => $name:ident),*) => {
         paste::paste! {
-            pub(crate) enum NodeType {
+            /// Specifies the type of the node.
+            /// See https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType
+            pub enum NodeType {
                 $(
+                    #[doc = "A node type corresponding to " $name " nodes"]
                     $name,
                 )*
             }
 
             impl NodeType {
-                pub(crate) fn get_node_number(&self) -> isize {
+                /// Returns the number corresponding to the node type per
+                /// https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType#node_type_constants
+                pub fn get_node_number(&self) -> isize {
                     match self {
                         $(
                             NodeType::$name => $ti,
@@ -23,7 +33,6 @@ macro_rules! declare_contents {
                 }
             }
 
-            /// Node type, as defined in https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType
             #[derive(Clone)]
             pub(crate) enum NodeContentsArc {
                 $(
@@ -75,12 +84,6 @@ macro_rules! declare_contents {
             }
 
             $(
-                impl Builder<[<$name NodeStorage>]> {
-                    pub fn build(&self, storage: [<$name NodeStorage>]) -> ConcreteNodeArc<[<$name NodeStorage>]> {
-                        ConcreteNodeArc::<[<$name NodeStorage>]>::new(self.sandbox.clone(), Arc::new(storage))
-                    }
-                }
-
                 impl From<&Arc<[<$name NodeStorage>]>> for NodeContentsWeak {
                     fn from(source: &Arc<[<$name NodeStorage>]>) -> NodeContentsWeak {
                         NodeContentsWeak::$name(Arc::downgrade(source))
@@ -91,14 +94,31 @@ macro_rules! declare_contents {
     };
 }
 
+macro_rules! impl_standard_builder {
+    ($($name:ident),*) => {
+        paste::paste! {
+            $(
+                impl Builder<[<$name NodeArc>]> {
+                    #[doc = "Builds a new " $name " node with the given storage value"]
+                    pub fn build(&self, storage: [<$name NodeStorage>]) -> [<$name NodeArc>] {
+                        ConcreteNodeArc::<[<$name NodeStorage>]>::new(self.sandbox.clone(), Arc::new(storage))
+                    }
+                }
+            )*
+        }
+    };
+}
+
+/// Storage type for DocumentNode
 #[derive(Default, Clone)]
-pub(crate) struct DocumentNodeStorage {
+pub struct DocumentNodeStorage {
     /// Pointer back up to the window
     pub(crate) default_view: Weak<Window>,
 }
 
+/// Storage type for TextNode
 #[derive(Default, Clone)]
-pub(crate) struct TextNodeStorage {
+pub struct TextNodeStorage {
     /// Text in the text node
     pub(crate) data: String,
 }
@@ -112,8 +132,9 @@ impl TextNodeStorage {
     }
 }
 
+/// Storage type for CommentNode
 #[derive(Default, Clone)]
-pub(crate) struct CommentNodeStorage {
+pub struct CommentNodeStorage {
     /// Text in the comment node
     pub(crate) data: String,
 }
@@ -127,16 +148,25 @@ impl CommentNodeStorage {
     }
 }
 
+/// Storage type for AttributeNode
 #[derive(Default, Clone)]
-pub(crate) struct AttributeNodeStorage;
+pub struct AttributeNodeStorage;
+
+/// Storage type for CDataSectionNode
 #[derive(Default, Clone)]
-pub(crate) struct CDataSectionNodeStorage;
+pub struct CDataSectionNodeStorage;
+
+/// Storage type for ProcessingInstructionNode
 #[derive(Default, Clone)]
-pub(crate) struct ProcessingInstructionNodeStorage;
+pub struct ProcessingInstructionNodeStorage;
+
+/// Storage type for DocumentTypeNode
 #[derive(Default, Clone)]
-pub(crate) struct DocumentTypeNodeStorage;
+pub struct DocumentTypeNodeStorage;
+
+/// Storage type for DocumentFragmentNode
 #[derive(Default, Clone)]
-pub(crate) struct DocumentFragmentNodeStorage;
+pub struct DocumentFragmentNodeStorage;
 
 declare_contents! {
     1 => Element,
@@ -148,4 +178,15 @@ declare_contents! {
     7 => Document,
     8 => DocumentType,
     9 => DocumentFragment
+}
+
+impl_standard_builder! {
+    Attribute,
+    Text,
+    CDataSection,
+    ProcessingInstruction,
+    Comment,
+    Document,
+    DocumentType,
+    DocumentFragment
 }

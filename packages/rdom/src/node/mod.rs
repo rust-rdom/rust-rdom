@@ -5,17 +5,20 @@ use crate::internal_prelude::*;
 use crate::node_list::NodeList;
 
 crate::use_behaviors!(sandbox_member);
-use crate::window::Window;
 
-use contents::{NodeContentsArc, NodeContentsWeak};
+use contents::{AnyNodeStorage, NodeContentsArc, NodeContentsWeak};
 use graph_storage::NodeGraphStorage;
 
-pub(crate) mod concrete;
-pub(crate) mod contents;
+pub mod concrete;
+pub mod contents;
 pub mod element;
 pub(crate) mod graph_storage;
 
-pub(crate) trait AnyNodeStorage {}
+/// Marker trait implemented by any node reference type which can be built.
+pub trait Buildable {
+    /// Underlying storage struct for the node type.
+    type Storage: AnyNodeStorage;
+}
 
 /// An input event
 pub struct InputEvent {}
@@ -50,9 +53,9 @@ pub struct AnyNodeWeak {
     pub(crate) common: Weak<NodeCommon>,
 }
 
-// NodeBehaviour trait will be here for now
+// NodeBehavior trait will be here for now
 /// Trait for main functions connected to node behaviour
-pub trait NodeBehaviour {
+pub trait NodeBehavior {
     /// Returns first child
     fn first_child(&self) -> Option<AnyNodeArc>;
     /// Returns last child
@@ -105,7 +108,7 @@ impl SandboxMemberBehavior for AnyNodeArc {
     }
 }
 
-impl NodeBehaviour for AnyNodeArc {
+impl NodeBehavior for AnyNodeArc {
     fn first_child(&self) -> Option<AnyNodeArc> {
         self.common.node_graph.first_child()
     }

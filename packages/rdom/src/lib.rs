@@ -18,9 +18,6 @@ pub mod error;
 pub(crate) mod internal_prelude;
 pub mod named_node_map;
 
-// Had to get rid of `nice` for now.
-// pub mod nice;
-
 pub mod node;
 pub mod node_list;
 pub mod sandbox;
