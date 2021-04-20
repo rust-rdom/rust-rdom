@@ -5,18 +5,24 @@ use crate::internal_prelude::*;
 use crate::node_list::NodeList;
 
 crate::use_behaviors!(sandbox_member);
-use crate::window::Window;
 
-use concrete::ElementNode;
+use concrete::ElementNodeArc;
 use contents::{NodeContentsArc, NodeContentsWeak};
 use graph_storage::{NodeGraphStorage, Selector};
 
-pub(crate) mod concrete;
-pub(crate) mod contents;
+pub mod concrete;
+pub mod contents;
 pub mod element;
 pub(crate) mod graph_storage;
 
-pub(crate) trait AnyNS {}
+/// Marker trait implemented by all node storage classes
+pub trait AnyNS {}
+
+/// Marker trait implemented by any node reference type which can be built.
+pub trait Buildable {
+    /// Underlying storage struct for the node type.
+    type Storage: AnyNS;
+}
 
 /// An input event
 pub struct InputEvent {}
@@ -51,9 +57,9 @@ pub struct AnyNodeWeak {
     pub(crate) common: Weak<NodeCommon>,
 }
 
-// NodeBehaviour trait will be here for now
+// NodeBehavior trait will be here for now
 /// Trait for main functions connected to node behaviour
-pub trait NodeBehaviour {
+pub trait NodeBehavior {
     /// Returns first child
     fn first_child(&self) -> Option<AnyNodeArc>;
     /// Returns last child
@@ -67,7 +73,7 @@ pub trait NodeBehaviour {
     /// [Node.getType](https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType)
     fn get_node_type(&self) -> isize;
     /// [.querySelector](https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector)
-    fn query_selector(&self, selector: &Selector) -> Option<ElementNode>;
+    fn query_selector(&self, selector: &Selector) -> Option<ElementNodeArc>;
 }
 
 impl AnyNodeWeak {
@@ -108,7 +114,7 @@ impl SandboxMemberBehavior for AnyNodeArc {
     }
 }
 
-impl NodeBehaviour for AnyNodeArc {
+impl NodeBehavior for AnyNodeArc {
     fn first_child(&self) -> Option<AnyNodeArc> {
         self.common.node_graph.first_child()
     }
@@ -134,7 +140,7 @@ impl NodeBehaviour for AnyNodeArc {
         self.contents.to_node_type().get_node_number()
     }
 
-    fn query_selector(&self, selector: &Selector) -> Option<ElementNode> {
+    fn query_selector(&self, selector: &Selector) -> Option<ElementNodeArc> {
         self.common.node_graph.query_selector_rec(selector)
     }
 }

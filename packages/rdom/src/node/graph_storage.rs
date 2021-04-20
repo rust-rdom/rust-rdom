@@ -1,6 +1,6 @@
 use crate::behavior::sandbox_member::SandboxMemberBehavior;
 use crate::internal_prelude::*;
-use crate::node::concrete::ElementNode;
+use crate::node::concrete::ElementNodeArc;
 use crate::node_list::{NodeList, NodeListStorage, Query};
 use std::{
     convert::{TryFrom, TryInto},
@@ -62,7 +62,7 @@ impl NodeGraphStorage {
     }
 
     // IMPORTANT: this function does not check the element itself, it only checks children
-    pub(crate) fn query_selector_rec(&self, selector: &Selector) -> Option<ElementNode> {
+    pub(crate) fn query_selector_rec(&self, selector: &Selector) -> Option<ElementNodeArc> {
         self.static_child_nodes().into_iter().find_map(|child| {
             match selector.filter_selected_node(child) {
                 Ok(element) => Some(element),
@@ -101,8 +101,8 @@ impl TryFrom<&str> for Selector {
 }
 
 impl Selector {
-    pub fn filter_selected_node(&self, node: AnyNodeArc) -> Result<ElementNode, AnyNodeArc> {
-        match <_ as TryInto<ElementNode>>::try_into(node.clone()) {
+    pub fn filter_selected_node(&self, node: AnyNodeArc) -> Result<ElementNodeArc, AnyNodeArc> {
+        match <_ as TryInto<ElementNodeArc>>::try_into(node.clone()) {
             Ok(element) => {
                 if self.is_selected_element(element.clone()) {
                     Ok(element)
@@ -114,7 +114,7 @@ impl Selector {
         }
     }
 
-    pub fn is_selected_element(&self, element: ElementNode) -> bool {
+    pub fn is_selected_element(&self, element: ElementNodeArc) -> bool {
         element.contents.tag_name() == self.0
     }
 }

@@ -2,7 +2,7 @@
 
 use crate::{
     internal_prelude::*,
-    node::{concrete::DocumentNode, contents::DocumentNS},
+    node::{concrete::DocumentNodeArc, contents::DocumentNS},
 };
 
 crate::use_behaviors!(sandbox_member);
@@ -10,13 +10,13 @@ crate::use_behaviors!(sandbox_member);
 /// A simulated window for static rendering
 pub struct Window {
     context: SandboxMemberBehaviorStorage,
-    document: DocumentNode,
+    document: DocumentNodeArc,
 }
 
 impl Window {
     pub(crate) fn new(context: Weak<Sandbox>) -> Arc<Window> {
         Arc::new_cyclic(|win_weak| {
-            let document = DocumentNode::new(
+            let document = DocumentNodeArc::new(
                 context.clone(),
                 Arc::new(DocumentNS {
                     default_view: win_weak.clone(),
@@ -31,7 +31,7 @@ impl Window {
 
     /// Gets the window's document
     // would be nice to have DocumentNode
-    pub(crate) fn document(&self) -> DocumentNode {
+    pub fn document(&self) -> DocumentNodeArc {
         self.document.clone()
     }
 }

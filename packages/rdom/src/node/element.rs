@@ -1,7 +1,9 @@
-//! Core representation of a DOM element. See `nice` module for distinction from
-//! nice representation.
+//! Data and functionality to each element type live here.
 
+use super::concrete::ConcreteNodeArc;
 use crate::internal_prelude::*;
+use crate::node::concrete::ElementNodeArc;
+use crate::sandbox::Builder;
 use crate::window::Window;
 
 macro_rules! declare_elements {
@@ -48,3 +50,32 @@ pub struct HtmlBodyES;
 /// button element storage
 #[derive(Clone)]
 pub struct HtmlButtonES;
+
+impl Builder<ElementNodeArc> {
+    // TODO it would be nice if these didn't all return generic Elements but instead we had some kind of
+    // concrete types representing each element type.
+
+    /// Builds a new HtmlHtmlElement node with a weak reference to its corresponding window
+    pub fn build_html(&self, default_view: Weak<Window>) -> ConcreteNodeArc<ElementNS> {
+        ConcreteNodeArc::<ElementNS>::new(
+            self.sandbox.clone(),
+            Arc::new(ElementNS::HtmlHtml(HtmlHtmlES { default_view })),
+        )
+    }
+
+    /// Builds a new HtmlBodyElement node
+    pub fn build_body(&self) -> ConcreteNodeArc<ElementNS> {
+        ConcreteNodeArc::<ElementNS>::new(
+            self.sandbox.clone(),
+            Arc::new(ElementNS::HtmlBody(HtmlBodyES)),
+        )
+    }
+
+    /// Builds a new HtmlButtonElement node
+    pub fn build_button(&self) -> ConcreteNodeArc<ElementNS> {
+        ConcreteNodeArc::<ElementNS>::new(
+            self.sandbox.clone(),
+            Arc::new(ElementNS::HtmlButton(HtmlButtonES)),
+        )
+    }
+}

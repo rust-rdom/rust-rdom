@@ -1,3 +1,5 @@
+//! Concrete (as opposed to abstract) types of nodes. Each node type is represented in this module.
+
 use crate::internal_prelude::*;
 
 use super::contents::{
@@ -5,26 +7,28 @@ use super::contents::{
     ProcessingInstructionNS, TextNS,
 };
 use super::graph_storage::Selector;
-use super::{AnyNS, NodeCommon, NodeContentsArc, NodeContentsWeak, NodeGraphStorage};
+use super::{
+    AnyNS, Buildable, NodeBehavior, NodeCommon, NodeContentsArc, NodeContentsWeak, NodeGraphStorage,
+};
 use crate::node_list::NodeList;
 use std::convert::TryFrom;
 crate::use_behaviors!(sandbox_member);
 
 #[derive(Clone)]
 /// A strongly-typed handle to a node with a strong reference.
-/// `T` may be the underlying storage
+/// `S` may be the underlying storage
 /// type of any node.
-pub struct ConcreteNodeArc<T> {
-    pub(crate) contents: Arc<T>,
+pub struct ConcreteNodeArc<S: AnyNS> {
+    pub(crate) contents: Arc<S>,
     pub(crate) common: Arc<NodeCommon>,
 }
 
 #[derive(Clone)]
 /// A strongly-typed handle to a node with a weak reference.
-/// `T` may be the underlying storage
+/// `S` may be the underlying storage
 /// type of any node.
-pub struct ConcreteNodeWeak<T> {
-    pub(crate) contents: Weak<T>,
+pub struct ConcreteNodeWeak<S: AnyNS> {
+    pub(crate) contents: Weak<S>,
     pub(crate) common: Weak<NodeCommon>,
 }
 
@@ -34,7 +38,11 @@ macro_rules! impl_concrete {
             $(
                 impl AnyNS for [<$name NS>] {}
 
-                pub(crate) type [<$name Node>] = ConcreteNodeArc<[<$name NS>]>;
+                #[doc = "Convenience alias for a strong reference to a(n) " $name " node"]
+                pub type [<$name NodeArc>] = ConcreteNodeArc<[<$name NS>]>;
+
+                #[doc = "Convenience alias for a weak reference to a(n) " $name " node"]
+                pub type [<$name NodeWeak>] = ConcreteNodeWeak<[<$name NS>]>;
 
                 impl ConcreteNodeArc<[<$name NS>]> {
                     pub(crate) fn new(context: Weak<Sandbox>, contents: Arc<[<$name NS>]>) ->
@@ -51,6 +59,10 @@ macro_rules! impl_concrete {
                     }
                 }
 
+                impl Buildable for ConcreteNodeArc<[<$name NS>]> {
+                    type Storage = [<$name NS>];
+                }
+
                 impl SandboxMemberBehavior for ConcreteNodeArc<[<$name NS>]> {
                     fn get_context(&self) -> Weak<Sandbox> {
                         self.common.context.clone()
@@ -58,34 +70,34 @@ macro_rules! impl_concrete {
                 }
 
                 impl TryFrom<AnyNodeArc> for ConcreteNodeArc<[<$name NS>]> {
-                    type Error = DomError;
+                    type Error = AnyNodeArc;
 
                     fn try_from(value: AnyNodeArc) -> Result<Self, Self::Error> {
-                        let contents = match value.contents {
-                            NodeContentsArc::$name(element) => Ok(element),
-                            _ => Err(DomError::NodeCastFail),
-                        }?;
-
-                        Ok(ConcreteNodeArc {
-                            contents,
-                            common: value.common,
-                        })
+                        match value.contents {
+                            NodeContentsArc::$name(element) => {
+                                return Ok(ConcreteNodeArc {
+                                    contents: element,
+                                    common: value.common,
+                                })
+                            },
+                            _ => Err(value),
+                        }
                     }
                 }
 
                 impl TryFrom<AnyNodeWeak> for ConcreteNodeWeak<[<$name NS>]> {
-                    type Error = DomError;
+                    type Error = AnyNodeWeak;
 
                     fn try_from(value: AnyNodeWeak) -> Result<Self, Self::Error> {
-                        let contents = match value.contents {
-                            NodeContentsWeak::$name(element) => Ok(element),
-                            _ => Err(DomError::NodeCastFail),
-                        }?;
-
-                        Ok(ConcreteNodeWeak {
-                            contents,
-                            common: value.common
-                        })
+                        match value.contents {
+                            NodeContentsWeak::$name(element) => {
+                                return Ok(ConcreteNodeWeak {
+                                    contents: element,
+                                    common: value.common,
+                                })
+                            },
+                            _ => Err(value),
+                        }
                     }
                 }
 
@@ -107,7 +119,7 @@ macro_rules! impl_concrete {
                     }
                 }
 
-                impl NodeBehaviour for ConcreteNodeArc<[<$name NS>]> {
+                impl NodeBehavior for ConcreteNodeArc<[<$name NS>]> {
                     fn first_child(&self) -> Option<AnyNodeArc> {
                         self.common.node_graph.first_child()
                     }
@@ -132,7 +144,7 @@ macro_rules! impl_concrete {
                         $ti
                     }
 
-                    fn query_selector(&self, selector: &Selector) -> Option<ElementNode> {
+                    fn query_selector(&self, selector: &Selector) -> Option<ElementNodeArc> {
                         self.common.node_graph.query_selector_rec(selector)
                     }
                 }
@@ -153,8 +165,9 @@ impl_concrete! {
     9 => DocumentFragment
 }
 
-impl DocumentNode {
-    pub fn create_text_node(&self, text: String) -> TextNode {
-        TextNode::new(self.get_context(), Arc::new(TextNS { data: text }))
+impl DocumentNodeArc {
+    /// Creates a new text node with the given text contents
+    pub fn create_text_node(&self, text: String) -> TextNodeArc {
+        TextNodeArc::new(self.get_context(), Arc::new(TextNS { data: text }))
     }
 }

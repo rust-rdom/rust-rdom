@@ -4,10 +4,9 @@ use std::convert::{TryFrom, TryInto};
 use std::sync::Arc;
 
 use crate::node::concrete::*;
-use crate::node::contents::{AttributeNS, CommentNS, DocumentNS, NodeType, TextNS};
+use crate::node::contents::{AttributeNS, CommentNS, NodeType, TextNS};
 use crate::node::element::{ElementNS, HtmlBodyES, HtmlButtonES, HtmlHtmlES};
-use crate::node::AnyNodeArc;
-use crate::node::NodeBehaviour;
+use crate::node::{AnyNodeArc, NodeBehavior};
 use crate::sandbox::Sandbox;
 use crate::{config::ScreenMetrics, node::graph_storage::Selector};
 
@@ -16,7 +15,7 @@ fn it_works() {
     let metrics: ScreenMetrics = Default::default();
     let sbox = Sandbox::new(metrics);
     let doc = sbox.clone().window().document();
-    let document_element = ElementNode::new(
+    let document_element = ElementNodeArc::new(
         Arc::downgrade(&sbox),
         Arc::new(ElementNS::HtmlHtml(HtmlHtmlES {
             default_view: Arc::downgrade(&sbox.window()),
@@ -50,7 +49,7 @@ macro_rules! test_node_creation {
 #[test]
 fn test_element_node_m() {
     let _elem = test_node_creation!(
-        ElementNode,
+        ElementNodeArc,
         NodeType::Element,
         Arc::new(ElementNS::HtmlButton(HtmlButtonES))
     );
@@ -58,13 +57,13 @@ fn test_element_node_m() {
 
 #[test]
 fn test_attr_node() {
-    let _doc = test_node_creation!(AttributeNode, NodeType::Attribute, Default::default());
+    let _doc = test_node_creation!(AttributeNodeArc, NodeType::Attribute, Default::default());
 }
 
 #[test]
 fn test_text_node() {
     let text = test_node_creation!(
-        TextNode,
+        TextNodeArc,
         NodeType::Text,
         Arc::new(TextNS {
             data: "test".to_owned()
@@ -72,20 +71,30 @@ fn test_text_node() {
     );
 
     let node = text.first_child().unwrap();
-    let node: ConcreteNodeArc<TextNS> = node.try_into().unwrap();
-
-    assert_eq!(node.contents.data().unwrap(), "test".to_owned());
+    let node: Result<TextNodeArc, AnyNodeArc> = node.try_into();
+    match node {
+        Ok(node) => {
+            assert_eq!(node.contents.data().unwrap(), "test".to_owned());
+        }
+        _ => {
+            panic!("Could not cast node");
+        }
+    }
 }
 
 #[test]
 fn test_c_data_section_node_node() {
-    let _cds = test_node_creation!(CDataSectionNode, NodeType::CDataSection, Default::default());
+    let _cds = test_node_creation!(
+        CDataSectionNodeArc,
+        NodeType::CDataSection,
+        Default::default()
+    );
 }
 
 #[test]
 fn test_processing_instruction_node() {
     let _pi = test_node_creation!(
-        ProcessingInstructionNode,
+        ProcessingInstructionNodeArc,
         NodeType::ProcessingInstruction,
         Default::default()
     );
@@ -94,7 +103,7 @@ fn test_processing_instruction_node() {
 #[test]
 fn test_comment_node() {
     let _com = test_node_creation!(
-        CommentNode,
+        CommentNodeArc,
         NodeType::Comment,
         Arc::new(CommentNS {
             data: "test".to_owned()
@@ -104,13 +113,17 @@ fn test_comment_node() {
 
 #[test]
 fn test_document_type_node() {
-    let _dt = test_node_creation!(DocumentTypeNode, NodeType::DocumentType, Default::default());
+    let _dt = test_node_creation!(
+        DocumentTypeNodeArc,
+        NodeType::DocumentType,
+        Default::default()
+    );
 }
 
 #[test]
 fn test_document_fragment_node() {
     let _frag = test_node_creation!(
-        DocumentFragmentNode,
+        DocumentFragmentNodeArc,
         NodeType::DocumentFragment,
         Default::default()
     );
@@ -123,7 +136,7 @@ fn can_build_node() {
 
     let metrics: ScreenMetrics = Default::default();
     let sbox = Sandbox::new(metrics);
-    let node = sbox.builder::<AttributeNS>().build(Default::default());
+    let node = sbox.builder::<AttributeNodeArc>().build(Default::default());
     let _: ConcreteNodeArc<AttributeNS> = node; // assert that we got an AttributeNode
 
     assert!(Weak::ptr_eq(&node.get_context(), &Arc::downgrade(&sbox)));
@@ -142,8 +155,8 @@ fn selector() {
     let sbox = Sandbox::new(Default::default());
     let sbox = Arc::downgrade(&sbox);
 
-    let button = ElementNode::new(sbox.clone(), Arc::new(ElementNS::HtmlButton(HtmlButtonES)));
-    let body = ElementNode::new(sbox.clone(), Arc::new(ElementNS::HtmlBody(HtmlBodyES)));
+    let button = ElementNodeArc::new(sbox.clone(), Arc::new(ElementNS::HtmlButton(HtmlButtonES)));
+    let body = ElementNodeArc::new(sbox.clone(), Arc::new(ElementNS::HtmlBody(HtmlBodyES)));
 
     let button_any = button.clone().into();
 
@@ -159,8 +172,8 @@ fn query_selector() {
     let sbox_strong = Sandbox::new(Default::default());
     let sbox = Arc::downgrade(&sbox_strong);
 
-    let button = ElementNode::new(sbox.clone(), Arc::new(ElementNS::HtmlButton(HtmlButtonES)));
-    let body = ElementNode::new(sbox.clone(), Arc::new(ElementNS::HtmlBody(HtmlBodyES)));
+    let button = ElementNodeArc::new(sbox.clone(), Arc::new(ElementNS::HtmlButton(HtmlButtonES)));
+    let body = ElementNodeArc::new(sbox.clone(), Arc::new(ElementNS::HtmlBody(HtmlBodyES)));
 
     let buttonselector = Selector::try_from("BUTTON").unwrap();
     let bodyselector = Selector::try_from("BODY").unwrap();
@@ -182,8 +195,8 @@ fn query_selector_child() {
     let sbox_strong = Sandbox::new(Default::default());
     let sbox = Arc::downgrade(&sbox_strong);
 
-    let button = ElementNode::new(sbox.clone(), Arc::new(ElementNS::HtmlButton(HtmlButtonES)));
-    let body = ElementNode::new(sbox.clone(), Arc::new(ElementNS::HtmlBody(HtmlBodyES)));
+    let button = ElementNodeArc::new(sbox.clone(), Arc::new(ElementNS::HtmlButton(HtmlButtonES)));
+    let body = ElementNodeArc::new(sbox.clone(), Arc::new(ElementNS::HtmlBody(HtmlBodyES)));
 
     let buttonselector = Selector::try_from("BUTTON").unwrap();
     let bodyselector = Selector::try_from("BODY").unwrap();
