@@ -70,34 +70,34 @@ macro_rules! impl_concrete {
                 }
 
                 impl TryFrom<AnyNodeArc> for ConcreteNodeArc<[<$name NodeStorage>]> {
-                    type Error = DomError;
+                    type Error = AnyNodeArc;
 
                     fn try_from(value: AnyNodeArc) -> Result<Self, Self::Error> {
-                        let contents = match value.contents {
-                            NodeContentsArc::$name(element) => Ok(element),
-                            _ => Err(DomError::NodeCastFail),
-                        }?;
-
-                        Ok(ConcreteNodeArc {
-                            contents,
-                            common: value.common,
-                        })
+                        match value.contents {
+                            NodeContentsArc::$name(element) => {
+                                return Ok(ConcreteNodeArc {
+                                    contents: element,
+                                    common: value.common,
+                                })
+                            },
+                            _ => Err(value),
+                        }
                     }
                 }
 
                 impl TryFrom<AnyNodeWeak> for ConcreteNodeWeak<[<$name NodeStorage>]> {
-                    type Error = DomError;
+                    type Error = AnyNodeWeak;
 
                     fn try_from(value: AnyNodeWeak) -> Result<Self, Self::Error> {
-                        let contents = match value.contents {
-                            NodeContentsWeak::$name(element) => Ok(element),
-                            _ => Err(DomError::NodeCastFail),
-                        }?;
-
-                        Ok(ConcreteNodeWeak {
-                            contents,
-                            common: value.common
-                        })
+                        match value.contents {
+                            NodeContentsWeak::$name(element) => {
+                                return Ok(ConcreteNodeWeak {
+                                    contents: element,
+                                    common: value.common,
+                                })
+                            },
+                            _ => Err(value),
+                        }
                     }
                 }
 

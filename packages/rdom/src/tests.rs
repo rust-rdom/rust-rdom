@@ -4,7 +4,7 @@ use std::sync::Arc;
 use std::convert::TryInto;
 
 use crate::config::ScreenMetrics;
-use crate::node::NodeBehavior;
+use crate::node::{AnyNodeArc, NodeBehavior};
 use crate::node::concrete::*;
 use crate::node::contents::{
     CommentNodeStorage, NodeType, TextNodeStorage,
@@ -73,9 +73,15 @@ fn test_text_node() {
     );
 
     let node = text.first_child().unwrap();
-    let node: TextNodeArc = node.try_into().unwrap();
-
-    assert_eq!(node.contents.data().unwrap(), "test".to_owned());
+    let node: Result<TextNodeArc, AnyNodeArc> = node.try_into();
+    match node {
+        Ok(node) => {
+            assert_eq!(node.contents.data().unwrap(), "test".to_owned());
+        },
+        _ => {
+            panic!("Could not cast node");
+        }
+    }
 }
 
 #[test]
