@@ -75,15 +75,23 @@ macro_rules! declare_contents {
             }
 
             $(
-                impl Builder<ConcreteNodeArc<[<$name NodeStorage>]>> {
-                    pub fn build(&self, storage: [<$name NodeStorage>]) -> ConcreteNodeArc<[<$name NodeStorage>]> {
-                        ConcreteNodeArc::<[<$name NodeStorage>]>::new(self.sandbox.clone(), Arc::new(storage))
-                    }
-                }
-
                 impl From<&Arc<[<$name NodeStorage>]>> for NodeContentsWeak {
                     fn from(source: &Arc<[<$name NodeStorage>]>) -> NodeContentsWeak {
                         NodeContentsWeak::$name(Arc::downgrade(source))
+                    }
+                }
+            )*
+        }
+    };
+}
+
+macro_rules! impl_standard_builder {
+    ($($name:ident),*) => {
+        paste::paste! {
+            $(
+                impl Builder<ConcreteNodeArc<[<$name NodeStorage>]>> {
+                    pub fn build(&self, storage: [<$name NodeStorage>]) -> ConcreteNodeArc<[<$name NodeStorage>]> {
+                        ConcreteNodeArc::<[<$name NodeStorage>]>::new(self.sandbox.clone(), Arc::new(storage))
                     }
                 }
             )*
@@ -148,4 +156,15 @@ declare_contents! {
     7 => Document,
     8 => DocumentType,
     9 => DocumentFragment
+}
+
+impl_standard_builder! {
+    Attribute,
+    Text,
+    CDataSection,
+    ProcessingInstruction,
+    Comment,
+    Document,
+    DocumentType,
+    DocumentFragment
 }
