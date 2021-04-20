@@ -7,7 +7,7 @@ use crate::config::ScreenMetrics;
 use crate::node::NodeBehavior;
 use crate::node::concrete::*;
 use crate::node::contents::{
-    AttributeNodeStorage, CommentNodeStorage, NodeType, TextNodeStorage,
+    CommentNodeStorage, NodeType, TextNodeStorage,
 };
 use crate::node::element::{ElementNodeStorage, HtmlButtonElementStorage, HtmlHtmlElementStorage};
 use crate::sandbox::Sandbox;
@@ -125,7 +125,7 @@ fn can_build_node() {
     let metrics: ScreenMetrics = Default::default();
     let sbox = Sandbox::new(metrics);
     let node = sbox
-        .builder::<AttributeNodeStorage>()
+        .builder::<AttributeNodeArc>()
         .build(Default::default());
     let _: AttributeNodeArc = node; // assert that we got an AttributeNode
 

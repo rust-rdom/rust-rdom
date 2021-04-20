@@ -5,7 +5,14 @@ use super::contents::{
     DocumentNodeStorage, DocumentTypeNodeStorage, ProcessingInstructionNodeStorage,
     TextNodeStorage,
 };
-use super::{AnyNodeStorage, NodeCommon, NodeContentsArc, NodeContentsWeak, NodeGraphStorage};
+use super::{
+    Buildable,
+    AnyNodeStorage,
+    NodeCommon,
+    NodeContentsArc,
+    NodeContentsWeak,
+    NodeGraphStorage
+};
 use crate::node_list::NodeList;
 use std::convert::TryFrom;
 crate::use_behaviors!(sandbox_member);
@@ -50,6 +57,10 @@ macro_rules! impl_concrete {
 
                         ConcreteNodeArc { contents, common }
                     }
+                }
+
+                impl Buildable for ConcreteNodeArc<[<$name NodeStorage>]> {
+                    type Storage = [<$name NodeStorage>];
                 }
 
                 impl SandboxMemberBehavior for ConcreteNodeArc<[<$name NodeStorage>]> {

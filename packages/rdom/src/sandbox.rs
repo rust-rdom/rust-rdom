@@ -6,10 +6,10 @@ use std::marker::PhantomData;
 use crate::internal_prelude::*;
 
 use crate::config::ScreenMetrics;
-use crate::node::{self, element, AnyNodeStorage};
+use crate::node::Buildable;
 use crate::window::Window;
 
-pub(crate) struct Builder<T: AnyNodeStorage> {
+pub(crate) struct Builder<T: Buildable> {
     pub(crate) sandbox: Weak<Sandbox>,
     _phantom: PhantomData<T>,
 }
@@ -41,7 +41,7 @@ impl Sandbox {
         self.window.clone()
     }
 
-    pub(crate) fn builder<T: AnyNodeStorage>(self: &Arc<Self>) -> Builder<T> {
+    pub(crate) fn builder<T: Buildable>(self: &Arc<Self>) -> Builder<T> {
         Builder {
             sandbox: Arc::downgrade(self),
             _phantom: PhantomData,

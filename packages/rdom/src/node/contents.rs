@@ -75,7 +75,7 @@ macro_rules! declare_contents {
             }
 
             $(
-                impl Builder<[<$name NodeStorage>]> {
+                impl Builder<ConcreteNodeArc<[<$name NodeStorage>]>> {
                     pub fn build(&self, storage: [<$name NodeStorage>]) -> ConcreteNodeArc<[<$name NodeStorage>]> {
                         ConcreteNodeArc::<[<$name NodeStorage>]>::new(self.sandbox.clone(), Arc::new(storage))
                     }

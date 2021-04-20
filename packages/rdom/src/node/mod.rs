@@ -5,7 +5,6 @@ use crate::internal_prelude::*;
 use crate::node_list::NodeList;
 
 crate::use_behaviors!(sandbox_member);
-use crate::window::Window;
 
 use contents::{NodeContentsArc, NodeContentsWeak};
 use graph_storage::NodeGraphStorage;
@@ -16,6 +15,9 @@ pub mod element;
 pub(crate) mod graph_storage;
 
 pub(crate) trait AnyNodeStorage {}
+pub(crate) trait Buildable {
+    type Storage: AnyNodeStorage;
+}
 
 /// An input event
 pub struct InputEvent {}
