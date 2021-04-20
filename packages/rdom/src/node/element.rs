@@ -14,7 +14,7 @@ macro_rules! declare_elements {
         pub enum ElementStore {
             $(
                 #[doc = "[" $tag "](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/" $tag ")"]
-                $name([<$name ES>]),
+                $name([<$name Store>]),
             )*
         }
 
@@ -40,16 +40,16 @@ declare_elements! {
 
 /// html element storage
 #[derive(Clone)]
-pub struct HtmlHtmlES {
+pub struct HtmlHtmlStore {
     /// pointer up to the window
     pub default_view: Weak<Window>,
 }
 /// body element storage
 #[derive(Clone)]
-pub struct HtmlBodyES;
+pub struct HtmlBodyStore;
 /// button element storage
 #[derive(Clone)]
-pub struct HtmlButtonES;
+pub struct HtmlButtonStore;
 
 impl Builder<ElementNodeArc> {
     // TODO it would be nice if these didn't all return generic Elements but instead we had some kind of
@@ -59,7 +59,7 @@ impl Builder<ElementNodeArc> {
     pub fn build_html(&self, default_view: Weak<Window>) -> ConcreteNodeArc<ElementStore> {
         ConcreteNodeArc::<ElementStore>::new(
             self.sandbox.clone(),
-            Arc::new(ElementStore::HtmlHtml(HtmlHtmlES { default_view })),
+            Arc::new(ElementStore::HtmlHtml(HtmlHtmlStore { default_view })),
         )
     }
 
@@ -67,7 +67,7 @@ impl Builder<ElementNodeArc> {
     pub fn build_body(&self) -> ConcreteNodeArc<ElementStore> {
         ConcreteNodeArc::<ElementStore>::new(
             self.sandbox.clone(),
-            Arc::new(ElementStore::HtmlBody(HtmlBodyES)),
+            Arc::new(ElementStore::HtmlBody(HtmlBodyStore)),
         )
     }
 
@@ -75,7 +75,7 @@ impl Builder<ElementNodeArc> {
     pub fn build_button(&self) -> ConcreteNodeArc<ElementStore> {
         ConcreteNodeArc::<ElementStore>::new(
             self.sandbox.clone(),
-            Arc::new(ElementStore::HtmlButton(HtmlButtonES)),
+            Arc::new(ElementStore::HtmlButton(HtmlButtonStore)),
         )
     }
 }
