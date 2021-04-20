@@ -16,12 +16,12 @@ pub mod element;
 pub(crate) mod graph_storage;
 
 /// Marker trait implemented by all node storage classes
-pub trait AnyNS {}
+pub trait AnyStore {}
 
 /// Marker trait implemented by any node reference type which can be built.
 pub trait Buildable {
     /// Underlying storage struct for the node type.
-    type Storage: AnyNS;
+    type Storage: AnyStore;
 }
 
 /// An input event
@@ -150,7 +150,7 @@ impl NodeBehavior for AnyNodeArc {
 // TODO for DocumentNode; this will require a "nice" instantiation
 /// Creates a text node.
 pub fn create_text_node(&self, text: String) -> Arc<TextNode> {
-    TextNode::new(self.get_context(), TextNS { text })
+    TextNode::new(self.get_context(), TextStore { text })
 }
 
 */
