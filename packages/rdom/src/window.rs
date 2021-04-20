@@ -2,7 +2,7 @@
 
 use crate::{
     internal_prelude::*,
-    node::{concrete::DocumentNodeArc, contents::DocumentNodeStorage},
+    node::{concrete::DocumentNodeArc, contents::DocumentStore},
 };
 
 crate::use_behaviors!(sandbox_member);
@@ -18,7 +18,7 @@ impl Window {
         Arc::new_cyclic(|win_weak| {
             let document = DocumentNodeArc::new(
                 context.clone(),
-                Arc::new(DocumentNodeStorage {
+                Arc::new(DocumentStore {
                     default_view: win_weak.clone(),
                 }),
             );

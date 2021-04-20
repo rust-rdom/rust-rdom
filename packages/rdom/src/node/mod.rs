@@ -6,18 +6,22 @@ use crate::node_list::NodeList;
 
 crate::use_behaviors!(sandbox_member);
 
-use contents::{AnyNodeStorage, NodeContentsArc, NodeContentsWeak};
-use graph_storage::NodeGraphStorage;
+use concrete::ElementNodeArc;
+use contents::{NodeContentsArc, NodeContentsWeak};
+use graph_storage::{NodeGraphStorage, Selector};
 
 pub mod concrete;
 pub mod contents;
 pub mod element;
 pub(crate) mod graph_storage;
 
+/// Marker trait implemented by all node storage classes
+pub trait AnyNodeStore {}
+
 /// Marker trait implemented by any node reference type which can be built.
 pub trait Buildable {
     /// Underlying storage struct for the node type.
-    type Storage: AnyNodeStorage;
+    type Storage: AnyNodeStore;
 }
 
 /// An input event
@@ -68,6 +72,8 @@ pub trait NodeBehavior {
     fn clone_node(&self) -> AnyNodeArc;
     /// [Node.getType](https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType)
     fn get_node_type(&self) -> isize;
+    /// [.querySelector](https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector)
+    fn query_selector(&self, selector: &Selector) -> Option<ElementNodeArc>;
 }
 
 impl AnyNodeWeak {
@@ -133,6 +139,10 @@ impl NodeBehavior for AnyNodeArc {
     fn get_node_type(&self) -> isize {
         self.contents.to_node_type().get_node_number()
     }
+
+    fn query_selector(&self, selector: &Selector) -> Option<ElementNodeArc> {
+        self.common.node_graph.query_selector_rec(selector)
+    }
 }
 
 /*
@@ -140,7 +150,7 @@ impl NodeBehavior for AnyNodeArc {
 // TODO for DocumentNode; this will require a "nice" instantiation
 /// Creates a text node.
 pub fn create_text_node(&self, text: String) -> Arc<TextNode> {
-    TextNode::new(self.get_context(), TextNodeStorage { text })
+    TextNode::new(self.get_context(), TextStore { text })
 }
 
 */

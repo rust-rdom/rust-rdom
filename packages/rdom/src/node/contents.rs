@@ -5,9 +5,7 @@ use crate::internal_prelude::*;
 use crate::sandbox::Builder;
 use crate::window::Window;
 
-pub use super::element::ElementNodeStorage;
-/// Marker trait implemented by all node storage classes
-pub trait AnyNodeStorage {}
+pub use super::element::ElementStore;
 
 macro_rules! declare_contents {
     ($($ti:expr => $name:ident),*) => {
@@ -36,14 +34,14 @@ macro_rules! declare_contents {
             #[derive(Clone)]
             pub(crate) enum NodeContentsArc {
                 $(
-                    $name(Arc<[<$name NodeStorage>]>),
+                    $name(Arc<[<$name Store>]>),
                 )*
             }
 
             #[derive(Clone)]
             pub(crate) enum NodeContentsWeak {
                 $(
-                    $name(Weak<[<$name NodeStorage>]>),
+                    $name(Weak<[<$name Store>]>),
                 )*
             }
 
@@ -84,8 +82,8 @@ macro_rules! declare_contents {
             }
 
             $(
-                impl From<&Arc<[<$name NodeStorage>]>> for NodeContentsWeak {
-                    fn from(source: &Arc<[<$name NodeStorage>]>) -> NodeContentsWeak {
+                impl From<&Arc<[<$name Store>]>> for NodeContentsWeak {
+                    fn from(source: &Arc<[<$name Store>]>) -> NodeContentsWeak {
                         NodeContentsWeak::$name(Arc::downgrade(source))
                     }
                 }
@@ -100,8 +98,8 @@ macro_rules! impl_standard_builder {
             $(
                 impl Builder<[<$name NodeArc>]> {
                     #[doc = "Builds a new " $name " node with the given storage value"]
-                    pub fn build(&self, storage: [<$name NodeStorage>]) -> [<$name NodeArc>] {
-                        ConcreteNodeArc::<[<$name NodeStorage>]>::new(self.sandbox.clone(), Arc::new(storage))
+                    pub fn build(&self, storage: [<$name Store>]) -> [<$name NodeArc>] {
+                        ConcreteNodeArc::<[<$name Store>]>::new(self.sandbox.clone(), Arc::new(storage))
                     }
                 }
             )*
@@ -111,19 +109,19 @@ macro_rules! impl_standard_builder {
 
 /// Storage type for DocumentNode
 #[derive(Default, Clone)]
-pub struct DocumentNodeStorage {
+pub struct DocumentStore {
     /// Pointer back up to the window
     pub(crate) default_view: Weak<Window>,
 }
 
 /// Storage type for TextNode
 #[derive(Default, Clone)]
-pub struct TextNodeStorage {
+pub struct TextStore {
     /// Text in the text node
     pub(crate) data: String,
 }
 
-impl TextNodeStorage {
+impl TextStore {
     // TODO data should come from CharacterData
 
     /// Gives the text contents of the text node
@@ -134,12 +132,12 @@ impl TextNodeStorage {
 
 /// Storage type for CommentNode
 #[derive(Default, Clone)]
-pub struct CommentNodeStorage {
+pub struct CommentStore {
     /// Text in the comment node
     pub(crate) data: String,
 }
 
-impl CommentNodeStorage {
+impl CommentStore {
     // TODO data should come from CharacterData
 
     /// Gives the text contents of the text node
@@ -150,23 +148,23 @@ impl CommentNodeStorage {
 
 /// Storage type for AttributeNode
 #[derive(Default, Clone)]
-pub struct AttributeNodeStorage;
+pub struct AttributeStore;
 
 /// Storage type for CDataSectionNode
 #[derive(Default, Clone)]
-pub struct CDataSectionNodeStorage;
+pub struct CDataSectionStore;
 
 /// Storage type for ProcessingInstructionNode
 #[derive(Default, Clone)]
-pub struct ProcessingInstructionNodeStorage;
+pub struct ProcessingInstructionStore;
 
 /// Storage type for DocumentTypeNode
 #[derive(Default, Clone)]
-pub struct DocumentTypeNodeStorage;
+pub struct DocumentTypeStore;
 
 /// Storage type for DocumentFragmentNode
 #[derive(Default, Clone)]
-pub struct DocumentFragmentNodeStorage;
+pub struct DocumentFragmentStore;
 
 declare_contents! {
     1 => Element,
