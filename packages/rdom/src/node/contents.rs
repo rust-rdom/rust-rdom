@@ -151,15 +151,19 @@ impl CommentNodeStorage {
 /// Storage type for AttributeNode
 #[derive(Default, Clone)]
 pub struct AttributeNodeStorage;
+
 /// Storage type for CDataSectionNode
 #[derive(Default, Clone)]
 pub struct CDataSectionNodeStorage;
+
 /// Storage type for ProcessingInstructionNode
 #[derive(Default, Clone)]
 pub struct ProcessingInstructionNodeStorage;
+
 /// Storage type for DocumentTypeNode
 #[derive(Default, Clone)]
 pub struct DocumentTypeNodeStorage;
+
 /// Storage type for DocumentFragmentNode
 #[derive(Default, Clone)]
 pub struct DocumentFragmentNodeStorage;
