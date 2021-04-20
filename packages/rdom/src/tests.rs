@@ -1,15 +1,13 @@
 #![cfg(test)]
 
-use std::sync::Arc;
 use std::convert::TryInto;
+use std::sync::Arc;
 
 use crate::config::ScreenMetrics;
-use crate::node::{AnyNodeArc, NodeBehavior};
 use crate::node::concrete::*;
-use crate::node::contents::{
-    CommentNodeStorage, NodeType, TextNodeStorage,
-};
+use crate::node::contents::{CommentNodeStorage, NodeType, TextNodeStorage};
 use crate::node::element::{ElementNodeStorage, HtmlButtonElementStorage, HtmlHtmlElementStorage};
+use crate::node::{AnyNodeArc, NodeBehavior};
 use crate::sandbox::Sandbox;
 
 #[test]
@@ -77,7 +75,7 @@ fn test_text_node() {
     match node {
         Ok(node) => {
             assert_eq!(node.contents.data().unwrap(), "test".to_owned());
-        },
+        }
         _ => {
             panic!("Could not cast node");
         }
@@ -86,7 +84,11 @@ fn test_text_node() {
 
 #[test]
 fn test_c_data_section_node_node() {
-    let _cds = test_node_creation!(CDataSectionNodeArc, NodeType::CDataSection, Default::default());
+    let _cds = test_node_creation!(
+        CDataSectionNodeArc,
+        NodeType::CDataSection,
+        Default::default()
+    );
 }
 
 #[test]
@@ -111,7 +113,11 @@ fn test_comment_node() {
 
 #[test]
 fn test_document_type_node() {
-    let _dt = test_node_creation!(DocumentTypeNodeArc, NodeType::DocumentType, Default::default());
+    let _dt = test_node_creation!(
+        DocumentTypeNodeArc,
+        NodeType::DocumentType,
+        Default::default()
+    );
 }
 
 #[test]
@@ -130,9 +136,7 @@ fn can_build_node() {
 
     let metrics: ScreenMetrics = Default::default();
     let sbox = Sandbox::new(metrics);
-    let node = sbox
-        .builder::<AttributeNodeArc>()
-        .build(Default::default());
+    let node = sbox.builder::<AttributeNodeArc>().build(Default::default());
     let _: AttributeNodeArc = node; // assert that we got an AttributeNode
 
     assert!(Weak::ptr_eq(&node.get_context(), &Arc::downgrade(&sbox)));

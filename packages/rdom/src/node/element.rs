@@ -1,9 +1,9 @@
 //! Data and functionality to each element type live here.
 
-use crate::internal_prelude::*;
-use crate::window::Window;
-use crate::sandbox::Builder;
 use super::concrete::ConcreteNodeArc;
+use crate::internal_prelude::*;
+use crate::sandbox::Builder;
+use crate::window::Window;
 
 macro_rules! declare_elements {
     ($($tag:literal => $name:ident),*) => {
@@ -46,29 +46,23 @@ impl Builder<ConcreteNodeArc<ElementNodeStorage>> {
     pub fn build_html(&self, default_view: Weak<Window>) -> ConcreteNodeArc<ElementNodeStorage> {
         ConcreteNodeArc::<ElementNodeStorage>::new(
             self.sandbox.clone(),
-            Arc::new(ElementNodeStorage::HtmlHtml(
-                HtmlHtmlElementStorage {
-                    default_view
-                }
-            ))
+            Arc::new(ElementNodeStorage::HtmlHtml(HtmlHtmlElementStorage {
+                default_view,
+            })),
         )
     }
 
     pub fn build_body(&self, default_view: Weak<Window>) -> ConcreteNodeArc<ElementNodeStorage> {
         ConcreteNodeArc::<ElementNodeStorage>::new(
             self.sandbox.clone(),
-            Arc::new(ElementNodeStorage::HtmlBody(
-                HtmlBodyElementStorage
-            ))
+            Arc::new(ElementNodeStorage::HtmlBody(HtmlBodyElementStorage)),
         )
     }
 
     pub fn build_button(&self, default_view: Weak<Window>) -> ConcreteNodeArc<ElementNodeStorage> {
         ConcreteNodeArc::<ElementNodeStorage>::new(
             self.sandbox.clone(),
-            Arc::new(ElementNodeStorage::HtmlButton(
-                HtmlButtonElementStorage
-            ))
+            Arc::new(ElementNodeStorage::HtmlButton(HtmlButtonElementStorage)),
         )
     }
 }

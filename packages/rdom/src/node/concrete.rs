@@ -8,12 +8,7 @@ use super::contents::{
     TextNodeStorage,
 };
 use super::{
-    Buildable,
-    AnyNodeStorage,
-    NodeCommon,
-    NodeContentsArc,
-    NodeContentsWeak,
-    NodeGraphStorage
+    AnyNodeStorage, Buildable, NodeCommon, NodeContentsArc, NodeContentsWeak, NodeGraphStorage,
 };
 use crate::node_list::NodeList;
 use std::convert::TryFrom;

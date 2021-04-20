@@ -1,12 +1,10 @@
 use std::sync::Arc;
 
 use rdom::config::ScreenMetrics;
-use rdom::node::{AnyNodeArc, NodeBehavior};
 use rdom::node::concrete::*;
-use rdom::node::contents::{
-    CommentNodeStorage, NodeType, TextNodeStorage,
-};
+use rdom::node::contents::{CommentNodeStorage, NodeType, TextNodeStorage};
 use rdom::node::element::{ElementNodeStorage, HtmlButtonElementStorage, HtmlHtmlElementStorage};
+use rdom::node::{AnyNodeArc, NodeBehavior};
 use rdom::sandbox::Sandbox;
 
 fn main() {
