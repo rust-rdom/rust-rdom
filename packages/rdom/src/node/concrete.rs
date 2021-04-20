@@ -8,7 +8,7 @@ use super::contents::{
 };
 use super::graph_storage::Selector;
 use super::{
-    AnyStore, Buildable, NodeBehavior, NodeCommon, NodeContentsArc, NodeContentsWeak,
+    AnyNodeStore, Buildable, NodeBehavior, NodeCommon, NodeContentsArc, NodeContentsWeak,
     NodeGraphStorage,
 };
 use crate::node_list::NodeList;
@@ -19,7 +19,7 @@ crate::use_behaviors!(sandbox_member);
 /// A strongly-typed handle to a node with a strong reference.
 /// `S` may be the underlying storage
 /// type of any node.
-pub struct ConcreteNodeArc<S: AnyStore> {
+pub struct ConcreteNodeArc<S: AnyNodeStore> {
     pub(crate) contents: Arc<S>,
     pub(crate) common: Arc<NodeCommon>,
 }
@@ -28,7 +28,7 @@ pub struct ConcreteNodeArc<S: AnyStore> {
 /// A strongly-typed handle to a node with a weak reference.
 /// `S` may be the underlying storage
 /// type of any node.
-pub struct ConcreteNodeWeak<S: AnyStore> {
+pub struct ConcreteNodeWeak<S: AnyNodeStore> {
     pub(crate) contents: Weak<S>,
     pub(crate) common: Weak<NodeCommon>,
 }
@@ -37,7 +37,7 @@ macro_rules! impl_concrete {
     ($($ti:expr => $name:ident),*) => {
         paste::paste! {
             $(
-                impl AnyStore for [<$name Store>] {}
+                impl AnyNodeStore for [<$name Store>] {}
 
                 #[doc = "Convenience alias for a strong reference to a(n) " $name " node"]
                 pub type [<$name NodeArc>] = ConcreteNodeArc<[<$name Store>]>;

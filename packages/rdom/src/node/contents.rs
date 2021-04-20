@@ -6,8 +6,6 @@ use crate::sandbox::Builder;
 use crate::window::Window;
 
 pub use super::element::ElementStore;
-/// Marker trait implemented by all node storage classes
-pub trait AnyStore {}
 
 macro_rules! declare_contents {
     ($($ti:expr => $name:ident),*) => {

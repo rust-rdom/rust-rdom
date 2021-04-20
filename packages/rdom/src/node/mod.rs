@@ -16,12 +16,12 @@ pub mod element;
 pub(crate) mod graph_storage;
 
 /// Marker trait implemented by all node storage classes
-pub trait AnyStore {}
+pub trait AnyNodeStore {}
 
 /// Marker trait implemented by any node reference type which can be built.
 pub trait Buildable {
     /// Underlying storage struct for the node type.
-    type Storage: AnyStore;
+    type Storage: AnyNodeStore;
 }
 
 /// An input event
