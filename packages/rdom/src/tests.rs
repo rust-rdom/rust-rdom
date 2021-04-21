@@ -3,9 +3,11 @@
 use std::convert::{TryFrom, TryInto};
 use std::sync::Arc;
 
+use crate::behavior::sandbox_member::SandboxMemberBehavior;
 use crate::node::concrete::*;
 use crate::node::contents::{AttributeStore, CommentStore, NodeType, TextStore};
-use crate::node::element::{ElementStore, HtmlBodyStore, HtmlButtonStore, HtmlHtmlStore};
+use crate::node::element::{ElementStore, HtmlBodyStore, HtmlButtonStore};
+use crate::node::template::HtmlHtmlTemplate;
 use crate::node::{AnyNodeArc, NodeBehavior};
 use crate::sandbox::Sandbox;
 use crate::{config::ScreenMetrics, node::graph_storage::Selector};
@@ -15,13 +17,7 @@ fn it_works() {
     let metrics: ScreenMetrics = Default::default();
     let sbox = Sandbox::new(metrics);
     let doc = sbox.clone().window().document();
-    let document_element = ElementNodeArc::new(
-        Arc::downgrade(&sbox),
-        Arc::new(ElementStore::HtmlHtml(HtmlHtmlStore {
-            default_view: Arc::downgrade(&sbox.window()),
-        })),
-    )
-    .into();
+    let document_element = doc.build(HtmlHtmlTemplate).unwrap().into();
     let _text = doc.create_text_node("Hello, world!".to_string());
     doc.append_child(document_element);
     assert_eq!(doc.child_nodes().length(), 1);

@@ -1,12 +1,13 @@
-use std::sync::Weak;
-
 use crate::{internal_prelude::*, node::template::Template};
 
 pub trait SandboxMemberBehavior {
     fn get_context(&self) -> Weak<Sandbox>;
 
-    fn build<T>(&self, template: impl Template<T>) -> T {
-        template.build(self.get_context())
+    fn build<T>(&self, template: impl Template<T>) -> Result<T, DomError> {
+        match self.get_context().upgrade() {
+            Some(sbox) => Ok(template.build(sbox)),
+            None => Err(DomError::SandboxDropped),
+        }
     }
 }
 
