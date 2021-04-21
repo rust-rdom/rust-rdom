@@ -2,7 +2,6 @@
 
 use super::concrete::*;
 use crate::internal_prelude::*;
-use crate::sandbox::Builder;
 use crate::window::Window;
 
 pub use super::element::ElementStore;
@@ -176,15 +175,4 @@ declare_contents! {
     7 => Document,
     8 => DocumentType,
     9 => DocumentFragment
-}
-
-impl_standard_builder! {
-    Attribute,
-    Text,
-    CDataSection,
-    ProcessingInstruction,
-    Comment,
-    Document,
-    DocumentType,
-    DocumentFragment
 }

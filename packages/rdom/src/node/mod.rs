@@ -19,12 +19,6 @@ pub mod template;
 /// Marker trait implemented by all node storage classes
 pub trait AnyNodeStore {}
 
-/// Marker trait implemented by any node reference type which can be built.
-pub trait Buildable {
-    /// Underlying storage struct for the node type.
-    type Storage: AnyNodeStore;
-}
-
 /// An input event
 pub struct InputEvent {}
 

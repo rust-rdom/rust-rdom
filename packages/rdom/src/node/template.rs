@@ -14,17 +14,3 @@ impl<T, F: Fn(Arc<Sandbox>) -> T> Template<T> for F {
         (self)(context)
     }
 }
-
-/// Template for html
-pub struct HtmlHtmlTemplate;
-
-impl Template<ElementNodeArc> for HtmlHtmlTemplate {
-    fn build(self, context: Arc<Sandbox>) -> ElementNodeArc {
-        ElementNodeArc::new(
-            Arc::downgrade(&context),
-            Arc::new(ElementStore::HtmlHtml(HtmlHtmlStore {
-                default_view: Arc::downgrade(&context.window()),
-            })),
-        )
-    }
-}

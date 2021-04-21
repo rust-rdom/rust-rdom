@@ -7,7 +7,7 @@ use crate::behavior::sandbox_member::SandboxMemberBehavior;
 use crate::node::concrete::*;
 use crate::node::contents::{AttributeStore, CommentStore, NodeType, TextStore};
 use crate::node::element::{ElementStore, HtmlBodyStore, HtmlButtonStore};
-use crate::node::template::HtmlHtmlTemplate;
+use crate::node::element::{HtmlBodyTemplate, HtmlButtonTemplate, HtmlHtmlTemplate};
 use crate::node::{AnyNodeArc, NodeBehavior};
 use crate::sandbox::Sandbox;
 use crate::{config::ScreenMetrics, node::graph_storage::Selector};
@@ -132,7 +132,8 @@ fn can_build_node() {
 
     let metrics: ScreenMetrics = Default::default();
     let sbox = Sandbox::new(metrics);
-    let node = sbox.builder::<AttributeNodeArc>().build(Default::default());
+
+    let node = sbox.build(AttributeTemplate(Default::default())).unwrap();
     let _: ConcreteNodeArc<AttributeStore> = node; // assert that we got an AttributeNode
 
     assert!(Weak::ptr_eq(&node.get_context(), &Arc::downgrade(&sbox)));
@@ -149,16 +150,9 @@ fn tag_name() {
 #[test]
 fn selector() {
     let sbox = Sandbox::new(Default::default());
-    let sbox = Arc::downgrade(&sbox);
 
-    let button = ElementNodeArc::new(
-        sbox.clone(),
-        Arc::new(ElementStore::HtmlButton(HtmlButtonStore)),
-    );
-    let body = ElementNodeArc::new(
-        sbox.clone(),
-        Arc::new(ElementStore::HtmlBody(HtmlBodyStore)),
-    );
+    let button = sbox.build(HtmlButtonTemplate).unwrap();
+    let body = sbox.build(HtmlBodyTemplate).unwrap();
 
     let button_any = button.clone().into();
 

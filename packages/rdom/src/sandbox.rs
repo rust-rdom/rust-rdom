@@ -1,19 +1,12 @@
 //! A sandbox represents a virtual browser tab. It contains a document and a window,
 //! as well as some configuration information for screen dimensions.
 
-use std::marker::PhantomData;
-
-use crate::internal_prelude::*;
+use crate::{
+    behavior::sandbox_member::SandboxMemberBehavior, internal_prelude::*, node::template::Template,
+};
 
 use crate::config::ScreenMetrics;
-use crate::node::Buildable;
 use crate::window::Window;
-
-/// A Builder<R> is a machine which can be used to build nodes of reference type R.
-pub struct Builder<R: Buildable> {
-    pub(crate) sandbox: Weak<Sandbox>,
-    _phantom: PhantomData<R>,
-}
 
 /// A sandbox represents a virtual browser tab. It contains a document and a window,
 /// as well as some configuration information for screen dimensions.
@@ -41,12 +34,14 @@ impl Sandbox {
         // This will be fixable when arc_new_cyclic is stable.
         self.window.clone()
     }
+}
 
-    /// Creates a builder for a specific type of node reference
-    pub fn builder<T: Buildable>(self: &Arc<Self>) -> Builder<T> {
-        Builder {
-            sandbox: Arc::downgrade(self),
-            _phantom: PhantomData,
-        }
+impl SandboxMemberBehavior for Arc<Sandbox> {
+    fn get_context(&self) -> Weak<Sandbox> {
+        Arc::downgrade(self)
+    }
+
+    fn build<T>(&self, template: impl Template<T>) -> Result<T, DomError> {
+        Ok(template.build(self.clone()))
     }
 }

@@ -8,7 +8,7 @@ use super::contents::{
 };
 use super::graph_storage::Selector;
 use super::{
-    AnyNodeStore, Buildable, NodeBehavior, NodeCommon, NodeContentsArc, NodeContentsWeak,
+    template::Template, AnyNodeStore, NodeBehavior, NodeCommon, NodeContentsArc, NodeContentsWeak,
     NodeGraphStorage,
 };
 use crate::node_list::NodeList;
@@ -58,10 +58,6 @@ macro_rules! impl_concrete {
 
                         ConcreteNodeArc { contents, common }
                     }
-                }
-
-                impl Buildable for ConcreteNodeArc<[<$name Store>]> {
-                    type Storage = [<$name Store>];
                 }
 
                 impl SandboxMemberBehavior for ConcreteNodeArc<[<$name Store>]> {
@@ -147,6 +143,15 @@ macro_rules! impl_concrete {
 
                     fn query_selector(&self, selector: &Selector) -> Option<ElementNodeArc> {
                         self.common.node_graph.query_selector_rec(selector)
+                    }
+                }
+
+                #[doc = "template for " $name]
+                pub struct [<$name Template>](pub [<$name Store>]);
+
+                impl Template<[<$name NodeArc>]> for [<$name Template>] {
+                    fn build(self, context: Arc<Sandbox>) -> [<$name NodeArc>] {
+                        [<$name NodeArc>]::new(Arc::downgrade(&context), Arc::new(self.0))
                     }
                 }
             )*

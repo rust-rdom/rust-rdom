@@ -1,9 +1,8 @@
 //! Data and functionality to each element type live here.
 
-use super::concrete::ConcreteNodeArc;
+use super::{concrete::ConcreteNodeArc, template::Template};
 use crate::internal_prelude::*;
 use crate::node::concrete::ElementNodeArc;
-use crate::sandbox::Builder;
 use crate::window::Window;
 
 macro_rules! declare_elements {
@@ -51,30 +50,39 @@ pub struct HtmlBodyStore;
 #[derive(Clone)]
 pub struct HtmlButtonStore;
 
-impl Builder<ElementNodeArc> {
-    // TODO it would be nice if these didn't all return generic Elements but instead we had some kind of
-    // concrete types representing each element type.
+/// Template for html
+pub struct HtmlHtmlTemplate;
 
-    /// Builds a new HtmlHtmlElement node with a weak reference to its corresponding window
-    pub fn build_html(&self, default_view: Weak<Window>) -> ConcreteNodeArc<ElementStore> {
-        ConcreteNodeArc::<ElementStore>::new(
-            self.sandbox.clone(),
-            Arc::new(ElementStore::HtmlHtml(HtmlHtmlStore { default_view })),
+impl Template<ElementNodeArc> for HtmlHtmlTemplate {
+    fn build(self, context: Arc<Sandbox>) -> ElementNodeArc {
+        ElementNodeArc::new(
+            Arc::downgrade(&context),
+            Arc::new(ElementStore::HtmlHtml(HtmlHtmlStore {
+                default_view: Arc::downgrade(&context.window()),
+            })),
         )
     }
+}
 
-    /// Builds a new HtmlBodyElement node
-    pub fn build_body(&self) -> ConcreteNodeArc<ElementStore> {
-        ConcreteNodeArc::<ElementStore>::new(
-            self.sandbox.clone(),
+/// Template for body
+pub struct HtmlBodyTemplate;
+
+impl Template<ElementNodeArc> for HtmlBodyTemplate {
+    fn build(self, context: Arc<Sandbox>) -> ElementNodeArc {
+        ElementNodeArc::new(
+            Arc::downgrade(&context),
             Arc::new(ElementStore::HtmlBody(HtmlBodyStore)),
         )
     }
+}
 
-    /// Builds a new HtmlButtonElement node
-    pub fn build_button(&self) -> ConcreteNodeArc<ElementStore> {
-        ConcreteNodeArc::<ElementStore>::new(
-            self.sandbox.clone(),
+/// Template for button
+pub struct HtmlButtonTemplate;
+
+impl Template<ElementNodeArc> for HtmlButtonTemplate {
+    fn build(self, context: Arc<Sandbox>) -> ElementNodeArc {
+        ElementNodeArc::new(
+            Arc::downgrade(&context),
             Arc::new(ElementStore::HtmlButton(HtmlButtonStore)),
         )
     }
