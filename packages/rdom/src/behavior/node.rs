@@ -10,7 +10,7 @@ use crate::node::AnyNodeArc;
 use crate::node_list::NodeList;
 
 // NodeBehavior trait will be here for now
-/// Trait for main functions connected to node behaviour
+/// Trait for main functions connected to node behavior.
 pub trait NodeBehavior {
     /// Returns first child
     fn first_child(&self) -> Option<AnyNodeArc>;

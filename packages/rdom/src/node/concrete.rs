@@ -1,4 +1,4 @@
-//! Concrete (as opposed to abstract) types of nodes. Each node type is represented in this module.
+//! Concrete (as opposed to abstract) types of nodes. Each node class is represented in this module.
 
 use crate::internal_prelude::*;
 
@@ -17,8 +17,8 @@ crate::use_behaviors!(sandbox_member);
 
 #[derive(Clone)]
 /// A strongly-typed handle to a node with a strong reference.
-/// `S` may be the underlying storage
-/// type of any node.
+/// Generic type `S` may be the underlying storage
+/// type of any node class.
 pub struct ConcreteNodeArc<S: AnyNodeStore> {
     pub(crate) contents: Arc<S>,
     pub(crate) common: Arc<NodeCommon>,
@@ -26,8 +26,8 @@ pub struct ConcreteNodeArc<S: AnyNodeStore> {
 
 #[derive(Clone)]
 /// A strongly-typed handle to a node with a weak reference.
-/// `S` may be the underlying storage
-/// type of any node.
+/// Generic type `S` may be the underlying storage
+/// type of any node class.
 pub struct ConcreteNodeWeak<S: AnyNodeStore> {
     pub(crate) contents: Weak<S>,
     pub(crate) common: Weak<NodeCommon>,

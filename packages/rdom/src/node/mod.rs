@@ -1,5 +1,4 @@
-//! Core representation of a DOM node. See `nice` module for distinction from
-//! nice representation.
+//! Types representing references to DOM nodes.
 
 use crate::internal_prelude::*;
 use crate::node_list::NodeList;
@@ -17,7 +16,7 @@ pub(crate) mod graph_storage;
 
 pub use crate::behavior::node::NodeBehavior;
 
-/// Marker trait implemented by all node storage classes
+/// Marker trait implemented by all node storage classes.
 pub trait AnyNodeStore {}
 
 /// Marker trait implemented by any node reference type which can be built.
@@ -26,14 +25,11 @@ pub trait Buildable {
     type Storage: AnyNodeStore;
 }
 
-/// An input event
-pub struct InputEvent {}
-
 /// The DOM [node](https://developer.mozilla.org/en-US/docs/Web/API/Node)
 pub(crate) struct NodeCommon {
     pub(crate) node_graph: NodeGraphStorage,
 
-    // just a context without behaviour wrapper for now
+    // just a context without behavior wrapper for now
     /// Context, pointing to the Sandbox
     pub context: Weak<Sandbox>,
 }
@@ -46,14 +42,14 @@ pub(crate) struct NodeCommon {
 // are in Arcs, AnyNodeRef and ConcreteNodeRef are just wrappers
 // With this we would actually probably not even need nice
 #[derive(Clone)]
-/// A strong reference to any node (nonspecific type).
+/// A strong reference to any node (abstract, nonspecific type).
 pub struct AnyNodeArc {
     pub(crate) contents: NodeContentsArc,
     pub(crate) common: Arc<NodeCommon>,
 }
 
 #[derive(Clone)]
-/// A weak reference to any node (nonspecific type).
+/// A weak reference to any node (abstract, nonspecific type).
 pub struct AnyNodeWeak {
     pub(crate) contents: NodeContentsWeak,
     pub(crate) common: Weak<NodeCommon>,
