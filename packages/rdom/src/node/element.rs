@@ -6,24 +6,24 @@ use crate::node::concrete::ElementNodeArc;
 use crate::sandbox::Builder;
 use crate::window::Window;
 
-macro_rules! declare_elements {
+macro_rules! declare_html_elements {
     ($($tag:literal => $name:ident),*) => {
         paste::paste! {
-        /// Enum of all concrete elements
+        /// Enum of all HTMLElements
         #[derive(Clone)]
-        pub enum ElementStore {
+        pub enum HtmlElementStore {
             $(
                 #[doc = "[" $tag "](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/" $tag ")"]
                 $name([<$name Store>]),
             )*
         }
 
-        impl ElementStore {
+        impl HtmlElementStore {
             /// [Element.tagName](https://developer.mozilla.org/en-US/docs/Web/API/Element/tagName)
             pub fn tag_name(&self) -> String {
                 match self {
                     $(
-                        ElementStore::$name(_) => $tag.to_string(),
+                        HtmlElementStore::$name(_) => $tag.to_string(),
                     )*
                 }
             }
@@ -32,7 +32,33 @@ macro_rules! declare_elements {
     };
 }
 
-declare_elements! {
+/// Enum of all SVGElements
+#[derive(Clone)]
+pub enum SvgElementStore {}
+
+/// Enum of all concrete elements
+#[derive(Clone)]
+pub enum ElementStore {
+    /// Enum variant for an HTMLElement
+    HtmlElement(HtmlElementStore),
+
+    /// Enum variant for an SVGElement
+    SvgElement(SvgElementStore)
+}
+
+impl ElementStore {
+    /// [Element.tagName](https://developer.mozilla.org/en-US/docs/Web/API/Element/tagName)
+    pub fn tag_name(&self) -> String {
+        match self {
+            ElementStore::HtmlElement(el) => el.tag_name(),
+            ElementStore::SvgElement(_) => {
+                unimplemented!()
+            }
+        }
+    }
+}
+
+declare_html_elements! {
     "HTML" => HtmlHtml,
     "BODY" => HtmlBody,
     "BUTTON" => HtmlButton
@@ -59,7 +85,7 @@ impl Builder<ElementNodeArc> {
     pub fn build_html(&self, default_view: Weak<Window>) -> ConcreteNodeArc<ElementStore> {
         ConcreteNodeArc::<ElementStore>::new(
             self.sandbox.clone(),
-            Arc::new(ElementStore::HtmlHtml(HtmlHtmlStore { default_view })),
+            Arc::new(ElementStore::HtmlElement(HtmlElementStore::HtmlHtml(HtmlHtmlStore { default_view }))),
         )
     }
 
@@ -67,7 +93,7 @@ impl Builder<ElementNodeArc> {
     pub fn build_body(&self) -> ConcreteNodeArc<ElementStore> {
         ConcreteNodeArc::<ElementStore>::new(
             self.sandbox.clone(),
-            Arc::new(ElementStore::HtmlBody(HtmlBodyStore)),
+            Arc::new(ElementStore::HtmlElement(HtmlElementStore::HtmlBody(HtmlBodyStore))),
         )
     }
 
@@ -75,7 +101,7 @@ impl Builder<ElementNodeArc> {
     pub fn build_button(&self) -> ConcreteNodeArc<ElementStore> {
         ConcreteNodeArc::<ElementStore>::new(
             self.sandbox.clone(),
-            Arc::new(ElementStore::HtmlButton(HtmlButtonStore)),
+            Arc::new(ElementStore::HtmlElement(HtmlElementStore::HtmlButton(HtmlButtonStore))),
         )
     }
 }
