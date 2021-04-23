@@ -69,10 +69,7 @@ declare_html_elements! {
 
 /// html element storage
 #[derive(Clone)]
-pub struct HtmlHtmlStore {
-    /// pointer up to the window
-    default_view: Weak<Window>,
-}
+pub struct HtmlHtmlStore;
 /// html unknown element storage
 #[derive(Clone)]
 pub struct HtmlUnknownStore {
@@ -90,10 +87,10 @@ impl Builder<ElementNodeArc> {
     // concrete types representing each element type.
 
     /// Builds a new HtmlHtmlElement node with a weak reference to its corresponding window
-    pub fn build_html(&self, default_view: Weak<Window>) -> ConcreteNodeArc<ElementStore> {
+    pub fn build_html(&self) -> ConcreteNodeArc<ElementStore> {
         ConcreteNodeArc::<ElementStore>::new(
             self.sandbox.clone(),
-            Arc::new(ElementStore::HtmlElement(HtmlElementStore::HtmlHtml(HtmlHtmlStore { default_view }))),
+            Arc::new(ElementStore::HtmlElement(HtmlElementStore::HtmlHtml(HtmlHtmlStore))),
         )
     }
 

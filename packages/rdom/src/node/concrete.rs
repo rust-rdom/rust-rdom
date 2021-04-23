@@ -12,6 +12,7 @@ use super::{
     NodeGraphStorage,
 };
 use crate::node_list::NodeList;
+use crate::node::element::{ElementStore, HtmlElementStore, HtmlHtmlStore, HtmlBodyStore, HtmlButtonStore};
 use std::convert::TryFrom;
 crate::use_behaviors!(sandbox_member);
 
@@ -175,5 +176,22 @@ impl DocumentNodeArc {
                 return Err(DomError::SandboxDropped)
             }
         }
+    }
+
+    /// Creates an HTML element with the given tag name
+    pub fn create_element(&self, tag_name: String) -> Result<ElementNodeArc, DomError> {
+        let context = self.get_context().upgrade().ok_or(DomError::SandboxDropped)?;
+
+        let win = context.window();
+        let builder = context.builder::<ElementNodeArc>();
+
+        Ok(match tag_name.to_lowercase().as_ref() {
+            "html" => builder.build_html(),
+            "body" => builder.build_body(),
+            "button" => builder.build_button(),
+            _ => {
+                unimplemented!()
+            }
+        })
     }
 }

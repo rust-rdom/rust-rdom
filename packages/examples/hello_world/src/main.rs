@@ -12,7 +12,7 @@ fn main() {
 
     let document_element = sbox
         .builder::<ElementNodeArc>()
-        .build_html(Arc::downgrade(&sbox.window()));
+        .build_html();
     let _text = doc.create_text_node("Hello, world!".to_string());
     doc.append_child(document_element.into());
     assert_eq!(doc.child_nodes().length(), 1);
