@@ -29,10 +29,14 @@ macro_rules! use_behaviors {
 }
 
 pub mod element;
-pub mod node;
 pub mod parent;
 pub mod sandbox_member;
 
 generate_preludes! {
     sandbox_member SandboxMember
+}
+
+pub mod node;
+pub mod node_prelude {
+    pub use super::node::NodeBehavior;
 }

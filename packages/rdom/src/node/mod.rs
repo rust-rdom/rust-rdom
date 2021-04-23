@@ -4,7 +4,7 @@
 use crate::internal_prelude::*;
 use crate::node_list::NodeList;
 
-crate::use_behaviors!(sandbox_member);
+crate::use_behaviors!(sandbox_member, node);
 
 use concrete::ElementNodeArc;
 use contents::{NodeContentsArc, NodeContentsWeak};
@@ -14,6 +14,8 @@ pub mod concrete;
 pub mod contents;
 pub mod element;
 pub(crate) mod graph_storage;
+
+pub use crate::behavior::node::NodeBehavior;
 
 /// Marker trait implemented by all node storage classes
 pub trait AnyNodeStore {}
@@ -55,25 +57,6 @@ pub struct AnyNodeArc {
 pub struct AnyNodeWeak {
     pub(crate) contents: NodeContentsWeak,
     pub(crate) common: Weak<NodeCommon>,
-}
-
-// NodeBehavior trait will be here for now
-/// Trait for main functions connected to node behaviour
-pub trait NodeBehavior {
-    /// Returns first child
-    fn first_child(&self) -> Option<AnyNodeArc>;
-    /// Returns last child
-    fn last_child(&self) -> Option<AnyNodeArc>;
-    /// Adds child to child list
-    fn append_child(&self, other: AnyNodeArc);
-    /// Gets live list of all child nodes
-    fn child_nodes(&self) -> Arc<NodeList>;
-    /// Clones node
-    fn clone_node(&self) -> AnyNodeArc;
-    /// [Node.getType](https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType)
-    fn get_node_type(&self) -> isize;
-    /// [.querySelector](https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector)
-    fn query_selector(&self, selector: &Selector) -> Option<ElementNodeArc>;
 }
 
 impl AnyNodeWeak {
