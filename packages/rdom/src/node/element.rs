@@ -46,7 +46,7 @@ pub enum ElementStore {
     HtmlElement(HtmlElementStore),
 
     /// Enum variant for an SVGElement
-    SvgElement(SvgElementStore)
+    SvgElement(SvgElementStore),
 }
 
 impl ElementStore {
@@ -90,7 +90,9 @@ impl Builder<ElementNodeArc> {
     pub fn build_html(&self) -> ConcreteNodeArc<ElementStore> {
         ConcreteNodeArc::<ElementStore>::new(
             self.sandbox.clone(),
-            Arc::new(ElementStore::HtmlElement(HtmlElementStore::HtmlHtml(HtmlHtmlStore))),
+            Arc::new(ElementStore::HtmlElement(HtmlElementStore::HtmlHtml(
+                HtmlHtmlStore,
+            ))),
         )
     }
 
@@ -98,7 +100,9 @@ impl Builder<ElementNodeArc> {
     pub fn build_body(&self) -> ConcreteNodeArc<ElementStore> {
         ConcreteNodeArc::<ElementStore>::new(
             self.sandbox.clone(),
-            Arc::new(ElementStore::HtmlElement(HtmlElementStore::HtmlBody(HtmlBodyStore))),
+            Arc::new(ElementStore::HtmlElement(HtmlElementStore::HtmlBody(
+                HtmlBodyStore,
+            ))),
         )
     }
 
@@ -106,7 +110,9 @@ impl Builder<ElementNodeArc> {
     pub fn build_button(&self) -> ConcreteNodeArc<ElementStore> {
         ConcreteNodeArc::<ElementStore>::new(
             self.sandbox.clone(),
-            Arc::new(ElementStore::HtmlElement(HtmlElementStore::HtmlButton(HtmlButtonStore))),
+            Arc::new(ElementStore::HtmlElement(HtmlElementStore::HtmlButton(
+                HtmlButtonStore,
+            ))),
         )
     }
 
@@ -114,9 +120,9 @@ impl Builder<ElementNodeArc> {
     pub fn build_unknown(&self, tag_name: String) -> ConcreteNodeArc<ElementStore> {
         ConcreteNodeArc::<ElementStore>::new(
             self.sandbox.clone(),
-            Arc::new(ElementStore::HtmlElement(HtmlElementStore::HtmlUnknown(HtmlUnknownStore {
-                tag_name
-            }))),
+            Arc::new(ElementStore::HtmlElement(HtmlElementStore::HtmlUnknown(
+                HtmlUnknownStore { tag_name },
+            ))),
         )
     }
 }
