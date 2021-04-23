@@ -16,6 +16,8 @@ macro_rules! declare_html_elements {
                 #[doc = "[" $tag "](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/" $tag ")"]
                 $name([<$name Store>]),
             )*
+            /// Represents an invalid HTML element
+            Unknown(HtmlUnknownStore)
         }
 
         impl HtmlElementStore {
@@ -25,6 +27,7 @@ macro_rules! declare_html_elements {
                     $(
                         HtmlElementStore::$name(_) => $tag.to_string(),
                     )*
+                    HtmlElementStore::Unknown(store) => store.tag_name.clone(),
                 }
             }
         }
@@ -68,7 +71,12 @@ declare_html_elements! {
 #[derive(Clone)]
 pub struct HtmlHtmlStore {
     /// pointer up to the window
-    pub default_view: Weak<Window>,
+    default_view: Weak<Window>,
+}
+/// html unknown element storage
+#[derive(Clone)]
+pub struct HtmlUnknownStore {
+    tag_name: String,
 }
 /// body element storage
 #[derive(Clone)]
