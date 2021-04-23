@@ -168,7 +168,12 @@ impl_concrete! {
 
 impl DocumentNodeArc {
     /// Creates a new text node with the given text contents
-    pub fn create_text_node(&self, text: String) -> TextNodeArc {
-        TextNodeArc::new(self.get_context(), Arc::new(TextStore { data: text }))
+    pub fn create_text_node(&self, text: String) -> Result<TextNodeArc, DomError> {
+        match self.get_context().upgrade() {
+            Some(context) => Ok(context.builder::<TextNodeArc>().build(TextStore { data: text })),
+            None => {
+                return Err(DomError::SandboxDropped)
+            }
+        }
     }
 }
