@@ -123,13 +123,3 @@ impl NodeBehavior for AnyNodeArc {
         self.common.node_graph.query_selector_rec(selector)
     }
 }
-
-/*
-
-// TODO for DocumentNode; this will require a "nice" instantiation
-/// Creates a text node.
-pub fn create_text_node(&self, text: String) -> Arc<TextNode> {
-    TextNode::new(self.get_context(), TextStore { text })
-}
-
-*/
