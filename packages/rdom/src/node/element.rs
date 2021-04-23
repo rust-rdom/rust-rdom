@@ -17,7 +17,7 @@ macro_rules! declare_html_elements {
                 $name([<$name Store>]),
             )*
             /// Represents an invalid HTML element
-            Unknown(HtmlUnknownStore)
+            HtmlUnknown(HtmlUnknownStore)
         }
 
         impl HtmlElementStore {
@@ -27,7 +27,7 @@ macro_rules! declare_html_elements {
                     $(
                         HtmlElementStore::$name(_) => $tag.to_string(),
                     )*
-                    HtmlElementStore::Unknown(store) => store.tag_name.clone(),
+                    HtmlElementStore::HtmlUnknown(store) => store.tag_name.clone(),
                 }
             }
         }
@@ -107,6 +107,16 @@ impl Builder<ElementNodeArc> {
         ConcreteNodeArc::<ElementStore>::new(
             self.sandbox.clone(),
             Arc::new(ElementStore::HtmlElement(HtmlElementStore::HtmlButton(HtmlButtonStore))),
+        )
+    }
+
+    /// Builds a new HtmlUnknownElement node
+    pub fn build_unknown(&self, tag_name: String) -> ConcreteNodeArc<ElementStore> {
+        ConcreteNodeArc::<ElementStore>::new(
+            self.sandbox.clone(),
+            Arc::new(ElementStore::HtmlElement(HtmlElementStore::HtmlUnknown(HtmlUnknownStore {
+                tag_name
+            }))),
         )
     }
 }

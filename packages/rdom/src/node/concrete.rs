@@ -182,16 +182,13 @@ impl DocumentNodeArc {
     pub fn create_element(&self, tag_name: String) -> Result<ElementNodeArc, DomError> {
         let context = self.get_context().upgrade().ok_or(DomError::SandboxDropped)?;
 
-        let win = context.window();
         let builder = context.builder::<ElementNodeArc>();
 
         Ok(match tag_name.to_lowercase().as_ref() {
             "html" => builder.build_html(),
             "body" => builder.build_body(),
             "button" => builder.build_button(),
-            _ => {
-                unimplemented!()
-            }
+            _ => builder.build_unknown(tag_name)
         })
     }
 }
