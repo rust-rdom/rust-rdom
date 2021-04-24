@@ -32,10 +32,8 @@ impl TryFrom<&str> for Selector {
 
 impl Selector {
     pub fn matches_selected_node(&self, node: &AnyNodeArc) -> Option<ElementNodeArc> {
-        println!("Looking...");
         match <_ as TryInto<ElementNodeArc>>::try_into(node.clone()) {
             Ok(element) => {
-                println!("Its an elemetn {}", element.contents.tag_name());
                 if self.is_selected_element(element.clone()) {
                     Some(element)
                 } else {
