@@ -64,8 +64,6 @@ macro_rules! impl_concrete {
                     }
                 }
 
-                impl_parent_node!(ConcreteNodeArc<[<$name Store>]>, common.parent_node_behavior);
-
                 impl Buildable for ConcreteNodeArc<[<$name Store>]> {
                     type Storage = [<$name Store>];
                 }
@@ -171,6 +169,9 @@ impl_concrete! {
     8 => DocumentType,
     9 => DocumentFragment
 }
+
+impl_parent_node!(ConcreteNodeArc<ElementStore>, common.parent_node_behavior);
+impl_parent_node!(ConcreteNodeArc<DocumentStore>, common.parent_node_behavior);
 
 impl DocumentNodeArc {
     /// Creates a new text node with the given text contents

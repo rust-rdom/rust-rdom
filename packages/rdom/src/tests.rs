@@ -11,6 +11,7 @@ use crate::node::element::{
 use crate::node::{AnyNodeArc, NodeBehavior};
 use crate::sandbox::Sandbox;
 use crate::{config::ScreenMetrics, node::graph_storage::Selector};
+use crate::behavior::parent_node::ParentNodeBehavior;
 
 #[test]
 fn it_works() {
@@ -212,6 +213,7 @@ fn query_selector() {
 
     assert!(Arc::ptr_eq(&qbody.common, &body.common));
     assert!(Arc::ptr_eq(&qbutton.common, &button.common));
+    assert_eq!(doc.child_element_count().unwrap(), 2);
 }
 
 #[test]
