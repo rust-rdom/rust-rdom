@@ -21,5 +21,6 @@ pub mod named_node_map;
 pub mod node;
 pub mod node_list;
 pub mod sandbox;
+mod selector;
 pub mod tests;
 pub mod window;

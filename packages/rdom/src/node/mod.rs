@@ -1,13 +1,14 @@
 //! Types representing references to DOM nodes.
 
 use crate::node_list::NodeList;
+use crate::selector::Selector;
 use crate::{behavior::parent_node_prelude::ParentNodeBehaviorStorage, internal_prelude::*};
 
 crate::use_behaviors!(sandbox_member, node);
 
 use concrete::ElementNodeArc;
 use contents::{NodeContentsArc, NodeContentsWeak};
-use graph_storage::{NodeGraphStorage, Selector};
+use graph_storage::NodeGraphStorage;
 
 pub mod concrete;
 pub mod contents;
@@ -124,7 +125,7 @@ impl NodeBehavior for AnyNodeArc {
         self.contents.to_node_type().get_node_number()
     }
 
-    fn query_selector(&self, selector: &Selector) -> Option<ElementNodeArc> {
-        self.common.node_graph.query_selector_rec(selector)
+    fn query_selector(&self, selector: &Selector) -> Result<Option<ElementNodeArc>, DomError> {
+        self.common.parent_node_behavior.query_selector(selector)
     }
 }

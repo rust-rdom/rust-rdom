@@ -1,12 +1,12 @@
 //! Concrete (as opposed to abstract) types of nodes. Each node class is represented in this module.
 
 use crate::internal_prelude::*;
+use crate::selector::Selector;
 
 use super::contents::{
     AttributeStore, CDataSectionStore, CommentStore, DocumentFragmentStore, DocumentStore,
     DocumentTypeStore, ProcessingInstructionStore, TextStore,
 };
-use super::graph_storage::Selector;
 use super::{
     AnyNodeStore, Buildable, NodeBehavior, NodeCommon, NodeContentsArc, NodeContentsWeak,
     NodeGraphStorage,
@@ -149,8 +149,8 @@ macro_rules! impl_concrete {
                         $ti
                     }
 
-                    fn query_selector(&self, selector: &Selector) -> Option<ElementNodeArc> {
-                        self.common.node_graph.query_selector_rec(selector)
+                    fn query_selector(&self, selector: &Selector) -> Result<Option<ElementNodeArc>, DomError> {
+                        self.common.parent_node_behavior.query_selector(selector)
                     }
                 }
             )*
