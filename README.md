@@ -29,7 +29,7 @@ fn main() {
 
     let document_element = sbox
         .builder::<ElementNodeArc>()
-        .build_html(Arc::downgrade(&sbox.window()));
+        .build_html();
 
     // We don't use the text node, but those are available
     let _text = doc.create_text_node("Hello, world!".to_string());

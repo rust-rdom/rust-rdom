@@ -11,6 +11,9 @@ use super::{
     AnyNodeStore, Buildable, NodeBehavior, NodeCommon, NodeContentsArc, NodeContentsWeak,
     NodeGraphStorage,
 };
+use crate::node::element::{
+    ElementStore, HtmlBodyStore, HtmlButtonStore, HtmlElementStore, HtmlHtmlStore,
+};
 use crate::node_list::NodeList;
 use std::convert::TryFrom;
 crate::use_behaviors!(sandbox_member);
@@ -168,7 +171,29 @@ impl_concrete! {
 
 impl DocumentNodeArc {
     /// Creates a new text node with the given text contents
-    pub fn create_text_node(&self, text: String) -> TextNodeArc {
-        TextNodeArc::new(self.get_context(), Arc::new(TextStore { data: text }))
+    pub fn create_text_node(&self, text: String) -> Result<TextNodeArc, DomError> {
+        match self.get_context().upgrade() {
+            Some(context) => Ok(context
+                .builder::<TextNodeArc>()
+                .build(TextStore { data: text })),
+            None => return Err(DomError::SandboxDropped),
+        }
+    }
+
+    /// Creates an HTML element with the given tag name
+    pub fn create_element(&self, tag_name: String) -> Result<ElementNodeArc, DomError> {
+        let context = self
+            .get_context()
+            .upgrade()
+            .ok_or(DomError::SandboxDropped)?;
+
+        let builder = context.builder::<ElementNodeArc>();
+
+        Ok(match tag_name.to_lowercase().as_ref() {
+            "html" => builder.build_html(),
+            "body" => builder.build_body(),
+            "button" => builder.build_button(),
+            _ => builder.build_unknown(tag_name),
+        })
     }
 }
