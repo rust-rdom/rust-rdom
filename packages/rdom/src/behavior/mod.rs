@@ -1,3 +1,5 @@
+pub use super::node::NodeBehavior;
+
 /// Macro for generating preludes and enforcing mod names
 macro_rules! generate_preludes {
     ($($modname: ident $traitname: ident),*) => {
