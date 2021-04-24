@@ -16,7 +16,7 @@ use crate::node::element::{
 };
 use crate::node_list::NodeList;
 use std::convert::TryFrom;
-crate::use_behaviors!(sandbox_member);
+crate::use_behaviors!(sandbox_member, parent_node);
 
 #[derive(Clone)]
 /// A strongly-typed handle to a node with a strong reference.
@@ -56,12 +56,15 @@ macro_rules! impl_concrete {
                                 contents: (&contents).into(),
                                 common: construction_weak.clone(),
                             }),
+                            parent_node_behavior: ParentNodeBehaviorStorage::new(construction_weak.clone()),
                             context,
                         });
 
                         ConcreteNodeArc { contents, common }
                     }
                 }
+
+                impl_parent_node!(ConcreteNodeArc<[<$name Store>]>, common.parent_node_behavior);
 
                 impl Buildable for ConcreteNodeArc<[<$name Store>]> {
                     type Storage = [<$name Store>];

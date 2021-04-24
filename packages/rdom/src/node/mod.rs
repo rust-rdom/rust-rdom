@@ -1,7 +1,7 @@
 //! Types representing references to DOM nodes.
 
-use crate::internal_prelude::*;
 use crate::node_list::NodeList;
+use crate::{behavior::parent_node_prelude::ParentNodeBehaviorStorage, internal_prelude::*};
 
 crate::use_behaviors!(sandbox_member, node);
 
@@ -25,9 +25,13 @@ pub trait Buildable {
     type Storage: AnyNodeStore;
 }
 
-/// The DOM [node](https://developer.mozilla.org/en-US/docs/Web/API/Node)
-pub(crate) struct NodeCommon {
+/// Contains links to mixins/behaviors used by the
+/// [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node)
+/// class
+pub struct NodeCommon {
     pub(crate) node_graph: NodeGraphStorage,
+
+    pub(crate) parent_node_behavior: ParentNodeBehaviorStorage,
 
     // just a context without behavior wrapper for now
     /// Context, pointing to the Sandbox
@@ -80,6 +84,7 @@ impl AnyNodeArc {
                 common: construction_weak.clone(),
                 contents: contents.downgrade(),
             }),
+            parent_node_behavior: ParentNodeBehaviorStorage::new(construction_weak.clone()),
             context,
         });
 

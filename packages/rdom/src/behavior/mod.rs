@@ -29,11 +29,12 @@ macro_rules! use_behaviors {
 }
 
 pub mod element;
-pub mod parent;
+pub mod parent_node;
 pub mod sandbox_member;
 
 generate_preludes! {
-    sandbox_member SandboxMember
+    sandbox_member SandboxMember,
+    parent_node ParentNode
 }
 
 pub mod node;
