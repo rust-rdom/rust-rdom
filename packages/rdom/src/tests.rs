@@ -165,22 +165,15 @@ fn selector() {
 
 #[test]
 fn query_selector() {
-    let sbox_strong = Sandbox::new(Default::default());
-    let sbox = Arc::downgrade(&sbox_strong);
+    let sbox = Sandbox::new(Default::default());
 
-    let button = ElementNodeArc::new(
-        sbox.clone(),
-        Arc::new(ElementStore::HtmlButton(HtmlButtonStore)),
-    );
-    let body = ElementNodeArc::new(
-        sbox.clone(),
-        Arc::new(ElementStore::HtmlBody(HtmlBodyStore)),
-    );
+    let button: ElementNodeArc = sbox.build(HtmlButtonTemplate).unwrap().into();
+    let body: ElementNodeArc = sbox.build(HtmlBodyTemplate).unwrap().into();
 
     let buttonselector = Selector::try_from("BUTTON").unwrap();
     let bodyselector = Selector::try_from("BODY").unwrap();
 
-    let doc = sbox_strong.window().document();
+    let doc = sbox.window().document();
 
     doc.append_child(button.clone().into());
     doc.append_child(body.clone().into());
@@ -194,22 +187,15 @@ fn query_selector() {
 
 #[test]
 fn query_selector_child() {
-    let sbox_strong = Sandbox::new(Default::default());
-    let sbox = Arc::downgrade(&sbox_strong);
+    let sbox = Sandbox::new(Default::default());
 
-    let button = ElementNodeArc::new(
-        sbox.clone(),
-        Arc::new(ElementStore::HtmlButton(HtmlButtonStore)),
-    );
-    let body = ElementNodeArc::new(
-        sbox.clone(),
-        Arc::new(ElementStore::HtmlBody(HtmlBodyStore)),
-    );
+    let button: ElementNodeArc = sbox.build(HtmlButtonTemplate).unwrap().into();
+    let body: ElementNodeArc = sbox.build(HtmlBodyTemplate).unwrap().into();
 
     let buttonselector = Selector::try_from("BUTTON").unwrap();
     let bodyselector = Selector::try_from("BODY").unwrap();
 
-    let doc = sbox_strong.window().document();
+    let doc = sbox.window().document();
 
     doc.append_child(body.clone().into());
     body.append_child(button.clone().into());
