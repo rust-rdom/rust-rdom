@@ -12,7 +12,7 @@
     unused_qualifications
 )]
 
-pub(crate) mod behavior;
+pub mod behavior;
 pub mod config;
 pub mod error;
 pub(crate) mod internal_prelude;

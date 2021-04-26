@@ -1,8 +1,11 @@
+//! Mod for all the different behaviors that are defined in the MDN
+
 /// Macro for generating preludes and enforcing mod names
 macro_rules! generate_preludes {
     ($($modname: ident $traitname: ident),*) => {
         paste::paste! {
             $(
+                #[doc="prelude for "$modname]
                 pub mod [<$modname _prelude>] {
                     pub use super::$modname::{
                         [<$traitname Behavior>],
@@ -28,9 +31,9 @@ macro_rules! use_behaviors {
     }
 }
 
-pub mod element;
+pub(crate) mod element;
 pub mod node;
-pub mod parent;
+pub(crate) mod parent;
 pub mod sandbox_member;
 
 generate_preludes! {
