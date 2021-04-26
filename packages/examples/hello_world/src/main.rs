@@ -1,9 +1,6 @@
-use std::sync::Arc;
-
 use rdom::behavior::sandbox_member::SandboxMemberBehavior;
 use rdom::config::ScreenMetrics;
-use rdom::node::concrete::*;
-use rdom::node::element::HtmlHtmlTemplate;
+use rdom::node::template::HtmlHtmlTemplate;
 use rdom::node::NodeBehavior;
 use rdom::sandbox::Sandbox;
 

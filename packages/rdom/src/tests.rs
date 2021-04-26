@@ -7,7 +7,7 @@ use crate::behavior::sandbox_member::SandboxMemberBehavior;
 use crate::node::concrete::*;
 use crate::node::contents::{AttributeStore, CommentStore, NodeType, TextStore};
 use crate::node::element::{ElementStore, HtmlBodyStore, HtmlButtonStore};
-use crate::node::element::{HtmlBodyTemplate, HtmlButtonTemplate, HtmlHtmlTemplate};
+use crate::node::template::{HtmlBodyTemplate, HtmlButtonTemplate, HtmlHtmlTemplate};
 use crate::node::{AnyNodeArc, NodeBehavior};
 use crate::sandbox::Sandbox;
 use crate::{config::ScreenMetrics, node::graph_storage::Selector};
@@ -133,7 +133,7 @@ fn can_build_node() {
     let metrics: ScreenMetrics = Default::default();
     let sbox = Sandbox::new(metrics);
 
-    let node = sbox.build(AttributeTemplate(Default::default())).unwrap();
+    let node = sbox.build(AttributeStore::default()).unwrap();
     let _: ConcreteNodeArc<AttributeStore> = node; // assert that we got an AttributeNode
 
     assert!(Weak::ptr_eq(&node.get_context(), &Arc::downgrade(&sbox)));

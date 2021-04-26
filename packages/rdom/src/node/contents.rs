@@ -1,6 +1,5 @@
 //! Data and functionality specific to each node type live here.
 
-use super::concrete::*;
 use crate::internal_prelude::*;
 use crate::window::Window;
 
@@ -84,21 +83,6 @@ macro_rules! declare_contents {
                 impl From<&Arc<[<$name Store>]>> for NodeContentsWeak {
                     fn from(source: &Arc<[<$name Store>]>) -> NodeContentsWeak {
                         NodeContentsWeak::$name(Arc::downgrade(source))
-                    }
-                }
-            )*
-        }
-    };
-}
-
-macro_rules! impl_standard_builder {
-    ($($name:ident),*) => {
-        paste::paste! {
-            $(
-                impl Builder<[<$name NodeArc>]> {
-                    #[doc = "Builds a new " $name " node with the given storage value"]
-                    pub fn build(&self, storage: [<$name Store>]) -> [<$name NodeArc>] {
-                        ConcreteNodeArc::<[<$name Store>]>::new(self.sandbox.clone(), Arc::new(storage))
                     }
                 }
             )*

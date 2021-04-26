@@ -27,6 +27,16 @@ macro_rules! declare_elements {
                 }
             }
         }
+
+        $(
+            impl Template<ElementNodeArc> for [<$name Store>] {
+                fn build(self, context: Arc<Sandbox>) -> ElementNodeArc {
+                    ElementNodeArc::new(
+                        Arc::downgrade(&context),
+                        Arc::new(ElementStore::$name(self)))
+                }
+            }
+        )*
     }
     };
 }
@@ -49,41 +59,3 @@ pub struct HtmlBodyStore;
 /// button element storage
 #[derive(Clone)]
 pub struct HtmlButtonStore;
-
-/// Template for html
-pub struct HtmlHtmlTemplate;
-
-impl Template<ElementNodeArc> for HtmlHtmlTemplate {
-    fn build(self, context: Arc<Sandbox>) -> ElementNodeArc {
-        ElementNodeArc::new(
-            Arc::downgrade(&context),
-            Arc::new(ElementStore::HtmlHtml(HtmlHtmlStore {
-                default_view: Arc::downgrade(&context.window()),
-            })),
-        )
-    }
-}
-
-/// Template for body
-pub struct HtmlBodyTemplate;
-
-impl Template<ElementNodeArc> for HtmlBodyTemplate {
-    fn build(self, context: Arc<Sandbox>) -> ElementNodeArc {
-        ElementNodeArc::new(
-            Arc::downgrade(&context),
-            Arc::new(ElementStore::HtmlBody(HtmlBodyStore)),
-        )
-    }
-}
-
-/// Template for button
-pub struct HtmlButtonTemplate;
-
-impl Template<ElementNodeArc> for HtmlButtonTemplate {
-    fn build(self, context: Arc<Sandbox>) -> ElementNodeArc {
-        ElementNodeArc::new(
-            Arc::downgrade(&context),
-            Arc::new(ElementStore::HtmlButton(HtmlButtonStore)),
-        )
-    }
-}

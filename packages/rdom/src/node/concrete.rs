@@ -146,12 +146,9 @@ macro_rules! impl_concrete {
                     }
                 }
 
-                #[doc = "template for " $name]
-                pub struct [<$name Template>](pub [<$name Store>]);
-
-                impl Template<[<$name NodeArc>]> for [<$name Template>] {
+                impl Template<[<$name NodeArc>]> for [<$name Store>] {
                     fn build(self, context: Arc<Sandbox>) -> [<$name NodeArc>] {
-                        [<$name NodeArc>]::new(Arc::downgrade(&context), Arc::new(self.0))
+                        [<$name NodeArc>]::new(Arc::downgrade(&context), Arc::new(self))
                     }
                 }
             )*
