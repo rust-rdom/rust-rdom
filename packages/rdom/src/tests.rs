@@ -133,7 +133,7 @@ fn can_build_node() {
     let metrics: ScreenMetrics = Default::default();
     let sbox = Sandbox::new(metrics);
 
-    let node = sbox.build(AttributeStore::default()).unwrap();
+    let node = sbox.buildw(AttributeStore::default());
     let _: ConcreteNodeArc<AttributeStore> = node; // assert that we got an AttributeNode
 
     assert!(Weak::ptr_eq(&node.get_context(), &Arc::downgrade(&sbox)));
@@ -151,8 +151,8 @@ fn tag_name() {
 fn selector() {
     let sbox = Sandbox::new(Default::default());
 
-    let button = sbox.build(HtmlButtonTemplate).unwrap();
-    let body = sbox.build(HtmlBodyTemplate).unwrap();
+    let button = sbox.buildw(HtmlButtonTemplate);
+    let body = sbox.buildw(HtmlBodyTemplate);
 
     let button_any = button.clone().into();
 
@@ -167,8 +167,8 @@ fn selector() {
 fn query_selector() {
     let sbox = Sandbox::new(Default::default());
 
-    let button: ElementNodeArc = sbox.build(HtmlButtonTemplate).unwrap().into();
-    let body: ElementNodeArc = sbox.build(HtmlBodyTemplate).unwrap().into();
+    let button: ElementNodeArc = sbox.buildw(HtmlButtonTemplate).into();
+    let body: ElementNodeArc = sbox.buildw(HtmlBodyTemplate).into();
 
     let buttonselector = Selector::try_from("BUTTON").unwrap();
     let bodyselector = Selector::try_from("BODY").unwrap();
@@ -189,8 +189,8 @@ fn query_selector() {
 fn query_selector_child() {
     let sbox = Sandbox::new(Default::default());
 
-    let button: ElementNodeArc = sbox.build(HtmlButtonTemplate).unwrap().into();
-    let body: ElementNodeArc = sbox.build(HtmlBodyTemplate).unwrap().into();
+    let button: ElementNodeArc = sbox.buildw(HtmlButtonTemplate).into();
+    let body: ElementNodeArc = sbox.buildw(HtmlBodyTemplate).into();
 
     let buttonselector = Selector::try_from("BUTTON").unwrap();
     let bodyselector = Selector::try_from("BODY").unwrap();

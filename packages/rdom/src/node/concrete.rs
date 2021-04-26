@@ -8,8 +8,8 @@ use super::contents::{
 };
 use super::graph_storage::Selector;
 use super::{
-    template::Template, AnyNodeStore, NodeBehavior, NodeCommon, NodeContentsArc, NodeContentsWeak,
-    NodeGraphStorage,
+    template::TemplateWeak, AnyNodeStore, NodeBehavior, NodeCommon, NodeContentsArc,
+    NodeContentsWeak, NodeGraphStorage,
 };
 use crate::node_list::NodeList;
 use std::convert::TryFrom;
@@ -146,9 +146,9 @@ macro_rules! impl_concrete {
                     }
                 }
 
-                impl Template<[<$name NodeArc>]> for [<$name Store>] {
-                    fn build(self, context: Arc<Sandbox>) -> [<$name NodeArc>] {
-                        [<$name NodeArc>]::new(Arc::downgrade(&context), Arc::new(self))
+                impl TemplateWeak<[<$name NodeArc>]> for [<$name Store>] {
+                    fn build(self, context: Weak<Sandbox>) -> [<$name NodeArc>] {
+                        [<$name NodeArc>]::new(context, Arc::new(self))
                     }
                 }
             )*

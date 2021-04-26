@@ -2,7 +2,8 @@
 //! as well as some configuration information for screen dimensions.
 
 use crate::{
-    behavior::sandbox_member::SandboxMemberBehavior, internal_prelude::*, node::template::Template,
+    behavior::sandbox_member::SandboxMemberBehavior, internal_prelude::*,
+    node::template::TemplateArc,
 };
 
 use crate::config::ScreenMetrics;
@@ -41,7 +42,7 @@ impl SandboxMemberBehavior for Arc<Sandbox> {
         Arc::downgrade(self)
     }
 
-    fn build<T>(&self, template: impl Template<T>) -> Result<T, DomError> {
+    fn build<T>(&self, template: impl TemplateArc<T>) -> Result<T, DomError> {
         Ok(template.build(self.clone()))
     }
 }

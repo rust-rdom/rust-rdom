@@ -1,6 +1,6 @@
 //! Data and functionality to each element type live here.
 
-use super::{concrete::ConcreteNodeArc, template::Template};
+use super::template::TemplateWeak;
 use crate::internal_prelude::*;
 use crate::node::concrete::ElementNodeArc;
 use crate::window::Window;
@@ -29,10 +29,10 @@ macro_rules! declare_elements {
         }
 
         $(
-            impl Template<ElementNodeArc> for [<$name Store>] {
-                fn build(self, context: Arc<Sandbox>) -> ElementNodeArc {
+            impl TemplateWeak<ElementNodeArc> for [<$name Store>] {
+                fn build(self, context: Weak<Sandbox>) -> ElementNodeArc {
                     ElementNodeArc::new(
-                        Arc::downgrade(&context),
+                        context,
                         Arc::new(ElementStore::$name(self)))
                 }
             }
