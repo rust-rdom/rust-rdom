@@ -39,3 +39,7 @@ pub mod sandbox_member;
 generate_preludes! {
     sandbox_member SandboxMember
 }
+
+pub(crate) mod node_prelude {
+    pub use super::node::NodeBehavior;
+}

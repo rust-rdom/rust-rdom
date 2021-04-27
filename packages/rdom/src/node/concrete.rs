@@ -1,24 +1,28 @@
-//! Concrete (as opposed to abstract) types of nodes. Each node type is represented in this module.
+//! Concrete (as opposed to abstract) types of nodes. Each node class is represented in this module.
 
 use crate::internal_prelude::*;
 
-use super::contents::{
-    AttributeStore, CDataSectionStore, CommentStore, DocumentFragmentStore, DocumentStore,
-    DocumentTypeStore, ProcessingInstructionStore, TextStore,
-};
 use super::graph_storage::Selector;
+use super::{
+    contents::{
+        AttributeStore, CDataSectionStore, CommentStore, DocumentFragmentStore, DocumentStore,
+        DocumentTypeStore, ProcessingInstructionStore, TextStore,
+    },
+    template::{HtmlBodyTemplate, HtmlButtonTemplate, HtmlHtmlTemplate, HtmlUnknownTemplate},
+};
 use super::{
     template::TemplateWeak, AnyNodeStore, NodeBehavior, NodeCommon, NodeContentsArc,
     NodeContentsWeak, NodeGraphStorage,
 };
+use crate::node::element::ElementStore;
 use crate::node_list::NodeList;
 use std::convert::TryFrom;
 crate::use_behaviors!(sandbox_member);
 
 #[derive(Clone)]
 /// A strongly-typed handle to a node with a strong reference.
-/// `S` may be the underlying storage
-/// type of any node.
+/// Generic type `S` may be the underlying storage
+/// type of any node class.
 pub struct ConcreteNodeArc<S: AnyNodeStore> {
     pub(crate) contents: Arc<S>,
     pub(crate) common: Arc<NodeCommon>,
@@ -26,8 +30,8 @@ pub struct ConcreteNodeArc<S: AnyNodeStore> {
 
 #[derive(Clone)]
 /// A strongly-typed handle to a node with a weak reference.
-/// `S` may be the underlying storage
-/// type of any node.
+/// Generic type `S` may be the underlying storage
+/// type of any node class.
 pub struct ConcreteNodeWeak<S: AnyNodeStore> {
     pub(crate) contents: Weak<S>,
     pub(crate) common: Weak<NodeCommon>,
@@ -171,6 +175,16 @@ impl_concrete! {
 impl DocumentNodeArc {
     /// Creates a new text node with the given text contents
     pub fn create_text_node(&self, text: String) -> TextNodeArc {
-        TextNodeArc::new(self.get_context(), Arc::new(TextStore { data: text }))
+        self.buildw(TextStore { data: text })
+    }
+
+    /// Creates an HTML element with the given tag name
+    pub fn create_element(&self, tag_name: String) -> ElementNodeArc {
+        match tag_name.to_lowercase().as_ref() {
+            "html" => self.buildw(HtmlHtmlTemplate),
+            "body" => self.buildw(HtmlBodyTemplate),
+            "button" => self.buildw(HtmlButtonTemplate),
+            _ => self.buildw(HtmlUnknownTemplate(tag_name)),
+        }
     }
 }

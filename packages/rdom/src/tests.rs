@@ -6,7 +6,7 @@ use std::sync::Arc;
 use crate::behavior::sandbox_member::SandboxMemberBehavior;
 use crate::node::concrete::*;
 use crate::node::contents::{AttributeStore, CommentStore, NodeType, TextStore};
-use crate::node::element::{ElementStore, HtmlBodyStore, HtmlButtonStore};
+use crate::node::element::{ElementStore, HtmlBodyStore, HtmlButtonStore, HtmlElementStore};
 use crate::node::template::{HtmlBodyTemplate, HtmlButtonTemplate, HtmlHtmlTemplate};
 use crate::node::{AnyNodeArc, NodeBehavior};
 use crate::sandbox::Sandbox;
@@ -17,7 +17,7 @@ fn it_works() {
     let metrics: ScreenMetrics = Default::default();
     let sbox = Sandbox::new(metrics);
     let doc = sbox.clone().window().document();
-    let document_element = doc.build(HtmlHtmlTemplate).unwrap().into();
+    let document_element = doc.buildw(HtmlHtmlTemplate).into();
     let _text = doc.create_text_node("Hello, world!".to_string());
     doc.append_child(document_element);
     assert_eq!(doc.child_nodes().length(), 1);
@@ -47,7 +47,9 @@ fn test_element_node_m() {
     let _elem = test_node_creation!(
         ElementNodeArc,
         NodeType::Element,
-        Arc::new(ElementStore::HtmlButton(HtmlButtonStore))
+        Arc::new(ElementStore::HtmlElement(HtmlElementStore::HtmlButton(
+            HtmlButtonStore
+        )))
     );
 }
 
@@ -141,8 +143,8 @@ fn can_build_node() {
 
 #[test]
 fn tag_name() {
-    let button = ElementStore::HtmlButton(HtmlButtonStore);
-    let body = ElementStore::HtmlBody(HtmlBodyStore);
+    let button = ElementStore::HtmlElement(HtmlElementStore::HtmlButton(HtmlButtonStore));
+    let body = ElementStore::HtmlElement(HtmlElementStore::HtmlBody(HtmlBodyStore));
     assert_eq!(button.tag_name(), "BUTTON");
     assert_eq!(body.tag_name(), "BODY");
 }

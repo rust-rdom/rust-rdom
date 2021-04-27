@@ -1,10 +1,9 @@
-//! Core representation of a DOM node. See `nice` module for distinction from
-//! nice representation.
+//! Types representing references to DOM nodes.
 
 use crate::internal_prelude::*;
 use crate::node_list::NodeList;
 
-crate::use_behaviors!(sandbox_member);
+crate::use_behaviors!(sandbox_member, node);
 
 use concrete::ElementNodeArc;
 use contents::{NodeContentsArc, NodeContentsWeak};
@@ -16,7 +15,9 @@ pub mod element;
 pub(crate) mod graph_storage;
 pub mod template;
 
-/// Marker trait implemented by all node storage classes
+pub use crate::behavior::node::NodeBehavior;
+
+/// Marker trait implemented by all node storage classes.
 pub trait AnyNodeStore {}
 
 /// An input event
@@ -26,7 +27,7 @@ pub struct InputEvent {}
 pub(crate) struct NodeCommon {
     pub(crate) node_graph: NodeGraphStorage,
 
-    // just a context without behaviour wrapper for now
+    // just a context without behavior wrapper for now
     /// Context, pointing to the Sandbox
     pub context: Weak<Sandbox>,
 }
@@ -39,36 +40,17 @@ pub(crate) struct NodeCommon {
 // are in Arcs, AnyNodeRef and ConcreteNodeRef are just wrappers
 // With this we would actually probably not even need nice
 #[derive(Clone)]
-/// A strong reference to any node (nonspecific type).
+/// A strong reference to any node (abstract, nonspecific type).
 pub struct AnyNodeArc {
     pub(crate) contents: NodeContentsArc,
     pub(crate) common: Arc<NodeCommon>,
 }
 
 #[derive(Clone)]
-/// A weak reference to any node (nonspecific type).
+/// A weak reference to any node (abstract, nonspecific type).
 pub struct AnyNodeWeak {
     pub(crate) contents: NodeContentsWeak,
     pub(crate) common: Weak<NodeCommon>,
-}
-
-// NodeBehavior trait will be here for now
-/// Trait for main functions connected to node behaviour
-pub trait NodeBehavior {
-    /// Returns first child
-    fn first_child(&self) -> Option<AnyNodeArc>;
-    /// Returns last child
-    fn last_child(&self) -> Option<AnyNodeArc>;
-    /// Adds child to child list
-    fn append_child(&self, other: AnyNodeArc);
-    /// Gets live list of all child nodes
-    fn child_nodes(&self) -> Arc<NodeList>;
-    /// Clones node
-    fn clone_node(&self) -> AnyNodeArc;
-    /// [Node.getType](https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType)
-    fn get_node_type(&self) -> isize;
-    /// [.querySelector](https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector)
-    fn query_selector(&self, selector: &Selector) -> Option<ElementNodeArc>;
 }
 
 impl AnyNodeWeak {
@@ -139,13 +121,3 @@ impl NodeBehavior for AnyNodeArc {
         self.common.node_graph.query_selector_rec(selector)
     }
 }
-
-/*
-
-// TODO for DocumentNode; this will require a "nice" instantiation
-/// Creates a text node.
-pub fn create_text_node(&self, text: String) -> Arc<TextNode> {
-    TextNode::new(self.get_context(), TextStore { text })
-}
-
-*/

@@ -9,7 +9,7 @@ fn main() {
     let sbox = Sandbox::new(metrics);
     let doc = sbox.clone().window().document();
 
-    let document_element = doc.build(HtmlHtmlTemplate).unwrap();
+    let document_element = doc.buildw(HtmlHtmlTemplate);
 
     let _text = doc.create_text_node("Hello, world!".to_string());
     doc.append_child(document_element.into());

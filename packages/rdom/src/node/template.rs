@@ -2,7 +2,9 @@
 
 use crate::internal_prelude::*;
 use crate::node::concrete::ElementNodeArc;
-use crate::node::element::{HtmlBodyStore, HtmlButtonStore, HtmlHtmlStore};
+use crate::node::element::{HtmlBodyStore, HtmlButtonStore, HtmlElementStore, HtmlHtmlStore};
+
+use super::element::HtmlUnknownStore;
 
 /// Template for building nodes from context
 pub trait TemplateArc<T> {
@@ -38,13 +40,13 @@ where
 /// Template for html
 pub struct HtmlHtmlTemplate;
 
-impl TemplateArc<ElementNodeArc> for HtmlHtmlTemplate {
-    fn build(self, context: Arc<Sandbox>) -> ElementNodeArc {
+impl TemplateWeak<ElementNodeArc> for HtmlHtmlTemplate {
+    fn build(self, context: Weak<Sandbox>) -> ElementNodeArc {
         ElementNodeArc::new(
-            Arc::downgrade(&context),
-            Arc::new(ElementStore::HtmlHtml(HtmlHtmlStore {
-                default_view: Arc::downgrade(&context.window()),
-            })),
+            context,
+            Arc::new(ElementStore::HtmlElement(HtmlElementStore::HtmlHtml(
+                HtmlHtmlStore,
+            ))),
         )
     }
 }
@@ -54,7 +56,12 @@ pub struct HtmlBodyTemplate;
 
 impl TemplateWeak<ElementNodeArc> for HtmlBodyTemplate {
     fn build(self, context: Weak<Sandbox>) -> ElementNodeArc {
-        ElementNodeArc::new(context, Arc::new(ElementStore::HtmlBody(HtmlBodyStore)))
+        ElementNodeArc::new(
+            context,
+            Arc::new(ElementStore::HtmlElement(HtmlElementStore::HtmlBody(
+                HtmlBodyStore,
+            ))),
+        )
     }
 }
 
@@ -63,6 +70,25 @@ pub struct HtmlButtonTemplate;
 
 impl TemplateWeak<ElementNodeArc> for HtmlButtonTemplate {
     fn build(self, context: Weak<Sandbox>) -> ElementNodeArc {
-        ElementNodeArc::new(context, Arc::new(ElementStore::HtmlButton(HtmlButtonStore)))
+        ElementNodeArc::new(
+            context,
+            Arc::new(ElementStore::HtmlElement(HtmlElementStore::HtmlButton(
+                HtmlButtonStore,
+            ))),
+        )
+    }
+}
+
+/// Template for unknown
+pub struct HtmlUnknownTemplate(pub String);
+
+impl TemplateWeak<ElementNodeArc> for HtmlUnknownTemplate {
+    fn build(self, context: Weak<Sandbox>) -> ElementNodeArc {
+        ElementNodeArc::new(
+            context,
+            Arc::new(ElementStore::HtmlElement(HtmlElementStore::HtmlUnknown(
+                HtmlUnknownStore { tag_name: self.0 },
+            ))),
+        )
     }
 }
