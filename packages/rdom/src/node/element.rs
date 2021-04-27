@@ -1,9 +1,8 @@
 //! Data and functionality to each element type live here.
 
-use super::concrete::ConcreteNodeArc;
+use super::template::TemplateWeak;
 use crate::internal_prelude::*;
 use crate::node::concrete::ElementNodeArc;
-use crate::sandbox::Builder;
 use crate::window::Window;
 
 macro_rules! declare_html_elements {
@@ -31,6 +30,16 @@ macro_rules! declare_html_elements {
                 }
             }
         }
+
+        $(
+            impl TemplateWeak<ElementNodeArc> for [<$name Store>] {
+                fn build(self, context: Weak<Sandbox>) -> ElementNodeArc {
+                    ElementNodeArc::new(
+                        context,
+                        Arc::new(ElementStore::HtmlElement(HtmlElementStore::$name(self))))
+                }
+            }
+        )*
     }
     };
 }
@@ -73,7 +82,7 @@ pub struct HtmlHtmlStore;
 /// html unknown element storage
 #[derive(Clone)]
 pub struct HtmlUnknownStore {
-    tag_name: String,
+    pub(crate) tag_name: String,
 }
 /// body element storage
 #[derive(Clone)]
@@ -81,48 +90,3 @@ pub struct HtmlBodyStore;
 /// button element storage
 #[derive(Clone)]
 pub struct HtmlButtonStore;
-
-impl Builder<ElementNodeArc> {
-    // TODO it would be nice if these didn't all return generic Elements but instead we had some kind of
-    // concrete types representing each element type.
-
-    /// Builds a new HtmlHtmlElement node with a weak reference to its corresponding window
-    pub fn build_html(&self) -> ConcreteNodeArc<ElementStore> {
-        ConcreteNodeArc::<ElementStore>::new(
-            self.sandbox.clone(),
-            Arc::new(ElementStore::HtmlElement(HtmlElementStore::HtmlHtml(
-                HtmlHtmlStore,
-            ))),
-        )
-    }
-
-    /// Builds a new HtmlBodyElement node
-    pub fn build_body(&self) -> ConcreteNodeArc<ElementStore> {
-        ConcreteNodeArc::<ElementStore>::new(
-            self.sandbox.clone(),
-            Arc::new(ElementStore::HtmlElement(HtmlElementStore::HtmlBody(
-                HtmlBodyStore,
-            ))),
-        )
-    }
-
-    /// Builds a new HtmlButtonElement node
-    pub fn build_button(&self) -> ConcreteNodeArc<ElementStore> {
-        ConcreteNodeArc::<ElementStore>::new(
-            self.sandbox.clone(),
-            Arc::new(ElementStore::HtmlElement(HtmlElementStore::HtmlButton(
-                HtmlButtonStore,
-            ))),
-        )
-    }
-
-    /// Builds a new HtmlUnknownElement node
-    pub fn build_unknown(&self, tag_name: String) -> ConcreteNodeArc<ElementStore> {
-        ConcreteNodeArc::<ElementStore>::new(
-            self.sandbox.clone(),
-            Arc::new(ElementStore::HtmlElement(HtmlElementStore::HtmlUnknown(
-                HtmlUnknownStore { tag_name },
-            ))),
-        )
-    }
-}

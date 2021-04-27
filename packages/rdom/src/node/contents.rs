@@ -1,8 +1,6 @@
 //! Data and functionality specific to each node type live here.
 
-use super::concrete::*;
 use crate::internal_prelude::*;
-use crate::sandbox::Builder;
 use crate::window::Window;
 
 pub use super::element::ElementStore;
@@ -92,21 +90,6 @@ macro_rules! declare_contents {
     };
 }
 
-macro_rules! impl_standard_builder {
-    ($($name:ident),*) => {
-        paste::paste! {
-            $(
-                impl Builder<[<$name NodeArc>]> {
-                    #[doc = "Builds a new " $name " node with the given storage value"]
-                    pub fn build(&self, storage: [<$name Store>]) -> [<$name NodeArc>] {
-                        ConcreteNodeArc::<[<$name Store>]>::new(self.sandbox.clone(), Arc::new(storage))
-                    }
-                }
-            )*
-        }
-    };
-}
-
 /// Storage type for DocumentNode
 #[derive(Default, Clone)]
 pub struct DocumentStore {
@@ -176,15 +159,4 @@ declare_contents! {
     7 => Document,
     8 => DocumentType,
     9 => DocumentFragment
-}
-
-impl_standard_builder! {
-    Attribute,
-    Text,
-    CDataSection,
-    ProcessingInstruction,
-    Comment,
-    Document,
-    DocumentType,
-    DocumentFragment
 }

@@ -3,11 +3,11 @@
 use std::convert::{TryFrom, TryInto};
 use std::sync::Arc;
 
+use crate::behavior::sandbox_member::SandboxMemberBehavior;
 use crate::node::concrete::*;
 use crate::node::contents::{AttributeStore, CommentStore, NodeType, TextStore};
-use crate::node::element::{
-    ElementStore, HtmlBodyStore, HtmlButtonStore, HtmlElementStore, HtmlHtmlStore,
-};
+use crate::node::element::{ElementStore, HtmlBodyStore, HtmlButtonStore, HtmlElementStore};
+use crate::node::template::{HtmlBodyTemplate, HtmlButtonTemplate, HtmlHtmlTemplate};
 use crate::node::{AnyNodeArc, NodeBehavior};
 use crate::sandbox::Sandbox;
 use crate::{config::ScreenMetrics, node::graph_storage::Selector};
@@ -17,13 +17,7 @@ fn it_works() {
     let metrics: ScreenMetrics = Default::default();
     let sbox = Sandbox::new(metrics);
     let doc = sbox.clone().window().document();
-    let document_element = ElementNodeArc::new(
-        Arc::downgrade(&sbox),
-        Arc::new(ElementStore::HtmlElement(HtmlElementStore::HtmlHtml(
-            HtmlHtmlStore {},
-        ))),
-    )
-    .into();
+    let document_element = doc.buildw(HtmlHtmlTemplate).into();
     let _text = doc.create_text_node("Hello, world!".to_string());
     doc.append_child(document_element);
     assert_eq!(doc.child_nodes().length(), 1);
@@ -140,7 +134,8 @@ fn can_build_node() {
 
     let metrics: ScreenMetrics = Default::default();
     let sbox = Sandbox::new(metrics);
-    let node = sbox.builder::<AttributeNodeArc>().build(Default::default());
+
+    let node = sbox.buildw(AttributeStore::default());
     let _: ConcreteNodeArc<AttributeStore> = node; // assert that we got an AttributeNode
 
     assert!(Weak::ptr_eq(&node.get_context(), &Arc::downgrade(&sbox)));
@@ -157,20 +152,9 @@ fn tag_name() {
 #[test]
 fn selector() {
     let sbox = Sandbox::new(Default::default());
-    let sbox = Arc::downgrade(&sbox);
 
-    let button = ElementNodeArc::new(
-        sbox.clone(),
-        Arc::new(ElementStore::HtmlElement(HtmlElementStore::HtmlButton(
-            HtmlButtonStore,
-        ))),
-    );
-    let body = ElementNodeArc::new(
-        sbox.clone(),
-        Arc::new(ElementStore::HtmlElement(HtmlElementStore::HtmlBody(
-            HtmlBodyStore,
-        ))),
-    );
+    let button = sbox.buildw(HtmlButtonTemplate);
+    let body = sbox.buildw(HtmlBodyTemplate);
 
     let button_any = button.clone().into();
 
@@ -183,26 +167,15 @@ fn selector() {
 
 #[test]
 fn query_selector() {
-    let sbox_strong = Sandbox::new(Default::default());
-    let sbox = Arc::downgrade(&sbox_strong);
+    let sbox = Sandbox::new(Default::default());
 
-    let button = ElementNodeArc::new(
-        sbox.clone(),
-        Arc::new(ElementStore::HtmlElement(HtmlElementStore::HtmlButton(
-            HtmlButtonStore,
-        ))),
-    );
-    let body = ElementNodeArc::new(
-        sbox.clone(),
-        Arc::new(ElementStore::HtmlElement(HtmlElementStore::HtmlBody(
-            HtmlBodyStore,
-        ))),
-    );
+    let button: ElementNodeArc = sbox.buildw(HtmlButtonTemplate).into();
+    let body: ElementNodeArc = sbox.buildw(HtmlBodyTemplate).into();
 
     let buttonselector = Selector::try_from("BUTTON").unwrap();
     let bodyselector = Selector::try_from("BODY").unwrap();
 
-    let doc = sbox_strong.window().document();
+    let doc = sbox.window().document();
 
     doc.append_child(button.clone().into());
     doc.append_child(body.clone().into());
@@ -216,26 +189,15 @@ fn query_selector() {
 
 #[test]
 fn query_selector_child() {
-    let sbox_strong = Sandbox::new(Default::default());
-    let sbox = Arc::downgrade(&sbox_strong);
+    let sbox = Sandbox::new(Default::default());
 
-    let button = ElementNodeArc::new(
-        sbox.clone(),
-        Arc::new(ElementStore::HtmlElement(HtmlElementStore::HtmlButton(
-            HtmlButtonStore,
-        ))),
-    );
-    let body = ElementNodeArc::new(
-        sbox.clone(),
-        Arc::new(ElementStore::HtmlElement(HtmlElementStore::HtmlBody(
-            HtmlBodyStore,
-        ))),
-    );
+    let button: ElementNodeArc = sbox.buildw(HtmlButtonTemplate).into();
+    let body: ElementNodeArc = sbox.buildw(HtmlBodyTemplate).into();
 
     let buttonselector = Selector::try_from("BUTTON").unwrap();
     let bodyselector = Selector::try_from("BODY").unwrap();
 
-    let doc = sbox_strong.window().document();
+    let doc = sbox.window().document();
 
     doc.append_child(body.clone().into());
     body.append_child(button.clone().into());

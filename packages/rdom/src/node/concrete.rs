@@ -2,18 +2,19 @@
 
 use crate::internal_prelude::*;
 
-use super::contents::{
-    AttributeStore, CDataSectionStore, CommentStore, DocumentFragmentStore, DocumentStore,
-    DocumentTypeStore, ProcessingInstructionStore, TextStore,
-};
 use super::graph_storage::Selector;
 use super::{
-    AnyNodeStore, Buildable, NodeBehavior, NodeCommon, NodeContentsArc, NodeContentsWeak,
-    NodeGraphStorage,
+    contents::{
+        AttributeStore, CDataSectionStore, CommentStore, DocumentFragmentStore, DocumentStore,
+        DocumentTypeStore, ProcessingInstructionStore, TextStore,
+    },
+    template::{HtmlBodyTemplate, HtmlButtonTemplate, HtmlHtmlTemplate, HtmlUnknownTemplate},
 };
-use crate::node::element::{
-    ElementStore, HtmlBodyStore, HtmlButtonStore, HtmlElementStore, HtmlHtmlStore,
+use super::{
+    template::TemplateWeak, AnyNodeStore, NodeBehavior, NodeCommon, NodeContentsArc,
+    NodeContentsWeak, NodeGraphStorage,
 };
+use crate::node::element::ElementStore;
 use crate::node_list::NodeList;
 use std::convert::TryFrom;
 crate::use_behaviors!(sandbox_member);
@@ -61,10 +62,6 @@ macro_rules! impl_concrete {
 
                         ConcreteNodeArc { contents, common }
                     }
-                }
-
-                impl Buildable for ConcreteNodeArc<[<$name Store>]> {
-                    type Storage = [<$name Store>];
                 }
 
                 impl SandboxMemberBehavior for ConcreteNodeArc<[<$name Store>]> {
@@ -152,6 +149,12 @@ macro_rules! impl_concrete {
                         self.common.node_graph.query_selector_rec(selector)
                     }
                 }
+
+                impl TemplateWeak<[<$name NodeArc>]> for [<$name Store>] {
+                    fn build(self, context: Weak<Sandbox>) -> [<$name NodeArc>] {
+                        [<$name NodeArc>]::new(context, Arc::new(self))
+                    }
+                }
             )*
         }
     }
@@ -171,29 +174,17 @@ impl_concrete! {
 
 impl DocumentNodeArc {
     /// Creates a new text node with the given text contents
-    pub fn create_text_node(&self, text: String) -> Result<TextNodeArc, DomError> {
-        match self.get_context().upgrade() {
-            Some(context) => Ok(context
-                .builder::<TextNodeArc>()
-                .build(TextStore { data: text })),
-            None => return Err(DomError::SandboxDropped),
-        }
+    pub fn create_text_node(&self, text: String) -> TextNodeArc {
+        self.buildw(TextStore { data: text })
     }
 
     /// Creates an HTML element with the given tag name
-    pub fn create_element(&self, tag_name: String) -> Result<ElementNodeArc, DomError> {
-        let context = self
-            .get_context()
-            .upgrade()
-            .ok_or(DomError::SandboxDropped)?;
-
-        let builder = context.builder::<ElementNodeArc>();
-
-        Ok(match tag_name.to_lowercase().as_ref() {
-            "html" => builder.build_html(),
-            "body" => builder.build_body(),
-            "button" => builder.build_button(),
-            _ => builder.build_unknown(tag_name),
-        })
+    pub fn create_element(&self, tag_name: String) -> ElementNodeArc {
+        match tag_name.to_lowercase().as_ref() {
+            "html" => self.buildw(HtmlHtmlTemplate),
+            "body" => self.buildw(HtmlBodyTemplate),
+            "button" => self.buildw(HtmlButtonTemplate),
+            _ => self.buildw(HtmlUnknownTemplate(tag_name)),
+        }
     }
 }

@@ -1,7 +1,6 @@
 ![rdom logo](rdom-logo.png)
 
-DOM in Rust without a browser
-===
+# DOM in Rust without a browser
 
 Hello and welcome. This library provides server-side or browserless simulation of a DOM.
 
@@ -9,17 +8,13 @@ Hello and welcome. This library provides server-side or browserless simulation o
 [<img alt="CI status" src="https://github.com/philip-peterson/rust-rdom/actions/workflows/ci.yml/badge.svg?branch=master" />](https://github.com/philip-peterson/rust-rdom/actions/workflows/ci.yml?query=branch%3Amaster)
 [![Discord Chat](https://img.shields.io/discord/826351203637133373.svg)](https://discord.gg/a6AWa35Sj8)
 
-Example Usage
----
+## Example Usage
 
 ```rust
-use std::sync::Arc;
-
+use rdom::behavior::sandbox_member::SandboxMemberBehavior;
 use rdom::config::ScreenMetrics;
-use rdom::node::concrete::*;
-use rdom::node::contents::{CommentNodeStorage, NodeType, TextNodeStorage};
-use rdom::node::element::{ElementNodeStorage, HtmlButtonElementStorage, HtmlHtmlElementStorage};
-use rdom::node::{AnyNodeArc, NodeBehavior};
+use rdom::node::template::HtmlHtmlTemplate;
+use rdom::node::NodeBehavior;
 use rdom::sandbox::Sandbox;
 
 fn main() {
@@ -27,26 +22,21 @@ fn main() {
     let sbox = Sandbox::new(metrics);
     let doc = sbox.clone().window().document();
 
-    let document_element = sbox
-        .builder::<ElementNodeArc>()
-        .build_html();
+    let document_element = doc.buildw(HtmlHtmlTemplate);
 
-    // We don't use the text node, but those are available
     let _text = doc.create_text_node("Hello, world!".to_string());
-
     doc.append_child(document_element.into());
-
-    println!("Doc has {} child node(s)", doc.child_nodes().length());
+    assert_eq!(doc.child_nodes().length(), 1);
     // Prints out Doc has 1 child node(s)
 }
 ```
 
-Is this library ready yet?
-----
+## Is this library ready yet?
+
 No, it's still a pre-alpha work in progress. However, it is open to collaboration.
 
-What's the difference between this library and say, web-sys or Dodrio?
------
+## What's the difference between this library and say, web-sys or Dodrio?
+
 Rdom tries to behave like web-sys as much as possible, in that it provides a DOM
 that looks and acts a lot like a DOM as a Rust programmer would see a DOM via interaction
 with web-sys.
@@ -64,8 +54,7 @@ of how to manipulate a DOM to match some ideal, like React's virtual DOM does. I
 unclear, Dodrio targets web-sys as a backend (it's a dependency), and in theory, this library
 could also be a backend for Dodrio someday.
 
-Not all of the DOM has been implemented. How did you decide what parts to implement?
-----
+## Not all of the DOM has been implemented. How did you decide what parts to implement?
 
 The reason for developing this library was to enable SSR support for Yew. That was the entire
 purpose, so while it is built to be as versatile as reasonable, that is the main use case that

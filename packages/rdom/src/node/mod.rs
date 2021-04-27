@@ -13,17 +13,15 @@ pub mod concrete;
 pub mod contents;
 pub mod element;
 pub(crate) mod graph_storage;
+pub mod template;
 
 pub use crate::behavior::node::NodeBehavior;
 
 /// Marker trait implemented by all node storage classes.
 pub trait AnyNodeStore {}
 
-/// Marker trait implemented by any node reference type which can be built.
-pub trait Buildable {
-    /// Underlying storage struct for the node type.
-    type Storage: AnyNodeStore;
-}
+/// An input event
+pub struct InputEvent {}
 
 /// The DOM [node](https://developer.mozilla.org/en-US/docs/Web/API/Node)
 pub(crate) struct NodeCommon {
