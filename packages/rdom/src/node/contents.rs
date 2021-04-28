@@ -5,6 +5,8 @@ use crate::internal_prelude::*;
 use crate::sandbox::Builder;
 use crate::window::Window;
 
+crate::use_behaviors!(parent_node);
+
 pub use super::element::ElementStore;
 
 macro_rules! declare_contents {
@@ -12,6 +14,7 @@ macro_rules! declare_contents {
         paste::paste! {
             /// Specifies the type of the node.
             /// See https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType
+            #[derive(Eq, PartialEq)]
             pub enum NodeType {
                 $(
                     #[doc = "A node type corresponding to " $name " nodes"]

@@ -5,9 +5,9 @@
 
 use crate::internal_prelude::*;
 use crate::node::concrete::ElementNodeArc;
-use crate::node::graph_storage::Selector;
 use crate::node::AnyNodeArc;
 use crate::node_list::NodeList;
+use crate::selector::Selector;
 
 // NodeBehavior trait will be here for now
 /// Trait for main functions connected to node behavior.
@@ -25,5 +25,5 @@ pub trait NodeBehavior {
     /// [Node.getType](https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType)
     fn get_node_type(&self) -> isize;
     /// [.querySelector](https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector)
-    fn query_selector(&self, selector: &Selector) -> Option<ElementNodeArc>;
+    fn query_selector(&self, selector: &Selector) -> Result<Option<ElementNodeArc>, DomError>;
 }

@@ -3,6 +3,8 @@
 use std::convert::{TryFrom, TryInto};
 use std::sync::Arc;
 
+use crate::behavior::parent_node::ParentNodeBehavior;
+use crate::config::ScreenMetrics;
 use crate::node::concrete::*;
 use crate::node::contents::{AttributeStore, CommentStore, NodeType, TextStore};
 use crate::node::element::{
@@ -10,7 +12,7 @@ use crate::node::element::{
 };
 use crate::node::{AnyNodeArc, NodeBehavior};
 use crate::sandbox::Sandbox;
-use crate::{config::ScreenMetrics, node::graph_storage::Selector};
+use crate::selector::Selector;
 
 #[test]
 fn it_works() {
@@ -172,11 +174,11 @@ fn selector() {
         ))),
     );
 
-    let button_any = button.clone().into();
+    let button_any: AnyNodeArc = button.clone().into();
 
     let selector = Selector::try_from("button".to_string()).unwrap();
 
-    assert!(selector.filter_selected_node(button_any).is_ok());
+    assert_eq!(selector.matches_selected_node(&button_any).is_some(), true);
     assert!(selector.is_selected_element(button));
     assert!(!selector.is_selected_element(body));
 }
@@ -207,11 +209,12 @@ fn query_selector() {
     doc.append_child(button.clone().into());
     doc.append_child(body.clone().into());
 
-    let qbody = doc.query_selector(&bodyselector).unwrap();
-    let qbutton = doc.query_selector(&buttonselector).unwrap();
+    let qbody = doc.query_selector(&bodyselector).unwrap().unwrap();
+    let qbutton = doc.query_selector(&buttonselector).unwrap().unwrap();
 
     assert!(Arc::ptr_eq(&qbody.common, &body.common));
     assert!(Arc::ptr_eq(&qbutton.common, &button.common));
+    assert_eq!(doc.child_element_count().unwrap(), 2);
 }
 
 #[test]
@@ -240,8 +243,8 @@ fn query_selector_child() {
     doc.append_child(body.clone().into());
     body.append_child(button.clone().into());
 
-    let qbody = doc.query_selector(&bodyselector).unwrap();
-    let qbutton = doc.query_selector(&buttonselector).unwrap();
+    let qbody = doc.query_selector(&bodyselector).unwrap().unwrap();
+    let qbutton = doc.query_selector(&buttonselector).unwrap().unwrap();
 
     assert!(Arc::ptr_eq(&qbody.common, &body.common));
     assert!(Arc::ptr_eq(&qbutton.common, &button.common));

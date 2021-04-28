@@ -1,13 +1,14 @@
 //! Types representing references to DOM nodes.
 
-use crate::internal_prelude::*;
 use crate::node_list::NodeList;
+use crate::selector::Selector;
+use crate::{behavior::parent_node_prelude::ParentNodeBehaviorStorage, internal_prelude::*};
 
 crate::use_behaviors!(sandbox_member, node);
 
 use concrete::ElementNodeArc;
 use contents::{NodeContentsArc, NodeContentsWeak};
-use graph_storage::{NodeGraphStorage, Selector};
+use graph_storage::NodeGraphStorage;
 
 pub mod concrete;
 pub mod contents;
@@ -25,9 +26,13 @@ pub trait Buildable {
     type Storage: AnyNodeStore;
 }
 
-/// The DOM [node](https://developer.mozilla.org/en-US/docs/Web/API/Node)
-pub(crate) struct NodeCommon {
+/// Contains links to mixins/behaviors used by the
+/// [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node)
+/// class
+pub struct NodeCommon {
     pub(crate) node_graph: NodeGraphStorage,
+
+    pub(crate) parent_node_behavior: ParentNodeBehaviorStorage,
 
     // just a context without behavior wrapper for now
     /// Context, pointing to the Sandbox
@@ -80,6 +85,7 @@ impl AnyNodeArc {
                 common: construction_weak.clone(),
                 contents: contents.downgrade(),
             }),
+            parent_node_behavior: ParentNodeBehaviorStorage::new(construction_weak.clone()),
             context,
         });
 
@@ -119,7 +125,7 @@ impl NodeBehavior for AnyNodeArc {
         self.contents.to_node_type().get_node_number()
     }
 
-    fn query_selector(&self, selector: &Selector) -> Option<ElementNodeArc> {
-        self.common.node_graph.query_selector_rec(selector)
+    fn query_selector(&self, selector: &Selector) -> Result<Option<ElementNodeArc>, DomError> {
+        self.common.parent_node_behavior.query_selector(selector)
     }
 }

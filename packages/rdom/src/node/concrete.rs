@@ -1,12 +1,12 @@
 //! Concrete (as opposed to abstract) types of nodes. Each node class is represented in this module.
 
 use crate::internal_prelude::*;
+use crate::selector::Selector;
 
 use super::contents::{
     AttributeStore, CDataSectionStore, CommentStore, DocumentFragmentStore, DocumentStore,
     DocumentTypeStore, ProcessingInstructionStore, TextStore,
 };
-use super::graph_storage::Selector;
 use super::{
     AnyNodeStore, Buildable, NodeBehavior, NodeCommon, NodeContentsArc, NodeContentsWeak,
     NodeGraphStorage,
@@ -16,7 +16,7 @@ use crate::node::element::{
 };
 use crate::node_list::NodeList;
 use std::convert::TryFrom;
-crate::use_behaviors!(sandbox_member);
+crate::use_behaviors!(sandbox_member, parent_node);
 
 #[derive(Clone)]
 /// A strongly-typed handle to a node with a strong reference.
@@ -56,6 +56,7 @@ macro_rules! impl_concrete {
                                 contents: (&contents).into(),
                                 common: construction_weak.clone(),
                             }),
+                            parent_node_behavior: ParentNodeBehaviorStorage::new(construction_weak.clone()),
                             context,
                         });
 
@@ -148,8 +149,8 @@ macro_rules! impl_concrete {
                         $ti
                     }
 
-                    fn query_selector(&self, selector: &Selector) -> Option<ElementNodeArc> {
-                        self.common.node_graph.query_selector_rec(selector)
+                    fn query_selector(&self, selector: &Selector) -> Result<Option<ElementNodeArc>, DomError> {
+                        self.common.parent_node_behavior.query_selector(selector)
                     }
                 }
             )*
@@ -168,6 +169,9 @@ impl_concrete! {
     8 => DocumentType,
     9 => DocumentFragment
 }
+
+impl_parent_node!(ConcreteNodeArc<ElementStore>, common.parent_node_behavior);
+impl_parent_node!(ConcreteNodeArc<DocumentStore>, common.parent_node_behavior);
 
 impl DocumentNodeArc {
     /// Creates a new text node with the given text contents

@@ -1,3 +1,5 @@
+pub use super::node::NodeBehavior;
+
 /// Macro for generating preludes and enforcing mod names
 macro_rules! generate_preludes {
     ($($modname: ident $traitname: ident),*) => {
@@ -29,11 +31,12 @@ macro_rules! use_behaviors {
 }
 
 pub mod element;
-pub mod parent;
+pub mod parent_node;
 pub mod sandbox_member;
 
 generate_preludes! {
-    sandbox_member SandboxMember
+    sandbox_member SandboxMember,
+    parent_node ParentNode
 }
 
 pub mod node;
