@@ -180,7 +180,7 @@ impl DocumentNodeArc {
             Some(context) => Ok(context
                 .builder::<TextNodeArc>()
                 .build(TextStore { data: text })),
-            None => return Err(DomError::SandboxDropped),
+            None => Err(DomError::SandboxDropped),
         }
     }
 

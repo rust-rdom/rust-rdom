@@ -43,7 +43,7 @@ impl ParentNodeBehaviorStorage {
             }
         }
 
-        return Ok(None);
+        Ok(None)
     }
 }
 

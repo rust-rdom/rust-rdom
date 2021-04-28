@@ -10,9 +10,10 @@ impl TryFrom<String> for Selector {
     fn try_from(value: String) -> Result<Self, Self::Error> {
         // validate string (only allow [A-Z] and [0-9])
         let value = value.to_uppercase();
-        let valid = value.as_bytes().iter().all(|&v| {
-            (v >= ('A' as u8) && v <= ('Z' as u8)) || (v >= ('0' as u8) && v <= ('9' as u8))
-        });
+        let valid = value
+            .as_bytes()
+            .iter()
+            .all(|&v| (b'A'..=b'Z').contains(&v) || (b'0'..=b'9').contains(&v));
 
         if valid {
             Ok(Selector(value))
