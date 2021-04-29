@@ -106,6 +106,10 @@ pub struct TextStore {
 
 impl TextStore {
     // TODO data should come from CharacterData
+    /// Constructs a `TextStore` with given data
+    pub fn new(data: String) -> TextStore {
+        TextStore { data }
+    }
 
     /// Gives the text contents of the text node
     pub fn data(&self) -> Option<String> {

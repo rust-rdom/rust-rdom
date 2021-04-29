@@ -46,3 +46,9 @@ impl SandboxMemberBehavior for Arc<Sandbox> {
         Ok(template.build(self.clone()))
     }
 }
+
+impl SandboxMemberBehavior for Weak<Sandbox> {
+    fn get_context(&self) -> Weak<Sandbox> {
+        self.clone()
+    }
+}

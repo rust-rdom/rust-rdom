@@ -1,5 +1,6 @@
 [workspace]
 members = [
   "packages/rdom",
-  "packages/examples/hello_world"
+  "packages/examples/hello_world",
+  "packages/examples/components"
 ]

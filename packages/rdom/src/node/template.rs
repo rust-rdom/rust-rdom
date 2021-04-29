@@ -14,7 +14,7 @@ pub trait TemplateArc<T> {
 
 impl<T, F> TemplateArc<T> for F
 where
-    F: Fn(Arc<Sandbox>) -> T,
+    F: FnOnce(Arc<Sandbox>) -> T,
 {
     fn build(self, context: Arc<Sandbox>) -> T {
         (self)(context)
@@ -30,7 +30,7 @@ pub trait TemplateWeak<T> {
 
 impl<T, F> TemplateWeak<T> for F
 where
-    F: Fn(Weak<Sandbox>) -> T,
+    F: FnOnce(Weak<Sandbox>) -> T,
 {
     fn build(self, context: Weak<Sandbox>) -> T {
         (self)(context)
