@@ -3,9 +3,9 @@ on:
   pull_request:
   push:
     branches:
-    - master
+      - master
   schedule:
-    - cron: '00 01 * * *'
+    - cron: "00 01 * * *"
 jobs:
   test:
     name: test
@@ -19,17 +19,18 @@ jobs:
         include:
           - build: nightly-pinned
             os: ubuntu-latest
-            rust: nightly-2021-03-23  
+            rust: nightly-2021-03-23
     steps:
-      - name: Checkout repository
+      - name: checkout repository
         uses: actions/checkout@v2
 
-      - name: Install Rust
+      - name: install Rust
         uses: actions-rs/toolchain@v1
         with:
           toolchain: ${{ matrix.rust }}
           profile: minimal
           override: true
+          components: rustfmt
 
-      - name: Build rdom
-        run: cargo build --verbose --all
+      - name: test
+        run: cargo test --verbose --all
