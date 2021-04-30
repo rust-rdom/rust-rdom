@@ -2,4 +2,5 @@
 members = [
   "packages/rdom",
   "packages/examples/hello_world",
+  "packages/build"
 ]

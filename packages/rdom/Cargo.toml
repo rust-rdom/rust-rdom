@@ -17,11 +17,4 @@ thiserror = "1"
 sourcegen = "0.3.0"
 
 [build-dependencies]
-sourcegen-cli = "0.4.0"
-quote = "1.0.9"
-syn = "1.0.71"
-anyhow = "1.0.40"
-proc-macro2 = "1.0.26"
-serde = "1.0.125"
-serde_yaml = "0.8.17"
-serde_derive = "1.0.125"
+build = {path="../build"}
