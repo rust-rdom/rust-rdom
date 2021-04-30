@@ -1,0 +1,3 @@
+fields:
+  document: DocumentNodeArc
+  context: Weak<Sandbox>
