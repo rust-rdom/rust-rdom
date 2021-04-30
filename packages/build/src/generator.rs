@@ -11,7 +11,6 @@ pub(crate) struct Generator(pub Template);
 
 impl Generator {
     pub(crate) fn load(path: impl AsRef<Path>) -> Generator {
-        eprintln!("{:?}", path.as_ref());
         let contents = read_to_string(path).unwrap();
         Generator(serde_yaml::from_str(&contents).unwrap())
     }

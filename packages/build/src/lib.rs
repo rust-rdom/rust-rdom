@@ -38,7 +38,6 @@ pub fn main() {
         .map(|(s, g)| (s.as_str(), g as &dyn SourceGenerator))
         .collect::<Vec<_>>();
 
-    eprintln!("{:?}", data);
     let parameters = SourcegenParameters {
         generators: &dataref[..],
         ..Default::default()
