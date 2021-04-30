@@ -1,4 +1,4 @@
-use serde::de::{Deserialize, Deserializer, MapAccess, Visitor};
+use serde::de::{Deserialize, Deserializer, MapAccess, SeqAccess, Visitor};
 use serde_derive::Deserialize;
 use std::fmt;
 
@@ -36,18 +36,49 @@ impl<'de> Visitor<'de> for FieldsVisitor {
     {
         let mut v = vec![];
         loop {
-            match map.next_entry::<String, String>() {
-                Ok(Some((ident, decl))) => {
-                    let decl = decl.split_whitespace().collect::<Vec<_>>();
-                    if decl.len() == 1 {
-                        v.push((String::new(), ident, decl[0].to_string()));
-                    } else {
-                        v.push((decl[0].to_string(), ident, decl[1].to_string()));
-                    }
-                }
+            match map.next_entry::<String, TEntry>() {
+                Ok(Some((ident, te))) => v.push((te.0, ident, te.1)),
                 Ok(None) => break Ok(Fields(v)),
                 Err(e) => break Err(e),
             }
         }
+    }
+}
+
+#[derive(Debug)]
+pub(crate) struct TEntry(pub String, pub String);
+
+impl<'de> Deserialize<'de> for TEntry {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        deserializer.deserialize_any(TEntryVisitor)
+    }
+}
+
+struct TEntryVisitor;
+
+impl<'de> Visitor<'de> for TEntryVisitor {
+    type Value = TEntry;
+
+    fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+        write!(formatter, "a pair or a string")
+    }
+
+    fn visit_str<E>(self, v: &str) -> Result<Self::Value, E>
+    where
+        E: serde::de::Error,
+    {
+        Ok(TEntry(String::new(), v.to_string()))
+    }
+
+    fn visit_seq<A>(self, mut seq: A) -> Result<Self::Value, A::Error>
+    where
+        A: SeqAccess<'de>,
+    {
+        let vis = seq.next_element()?.unwrap();
+        let ty = seq.next_element()?.unwrap();
+        Ok(TEntry(vis, ty))
     }
 }
