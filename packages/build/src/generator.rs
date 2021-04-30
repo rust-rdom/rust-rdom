@@ -4,7 +4,7 @@ use proc_macro2::TokenStream;
 use quote::quote;
 use sourcegen_cli::SourceGenerator;
 
-use crate::Template;
+use crate::template::Template;
 
 #[derive(Debug)]
 pub(crate) struct Generator(pub Template);
@@ -40,14 +40,16 @@ impl SourceGenerator for Generator {
         let generics = &item.generics;
 
         let definition = {
-            let fields = template
-                .fields
-                .iter()
-                .fold(TokenStream::new(), |mut acc, (ident, ty)| {
-                    let stream: TokenStream = format!("{}: {},", ident, ty).parse().unwrap();
-                    acc.extend(stream);
-                    acc
-                });
+            let fields =
+                template
+                    .fields
+                    .0
+                    .iter()
+                    .fold(TokenStream::new(), |mut acc, (ident, ty)| {
+                        let stream: TokenStream = format!("{}: {},", ident, ty).parse().unwrap();
+                        acc.extend(stream);
+                        acc
+                    });
 
             quote! {
                 #attrs

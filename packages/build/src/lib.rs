@@ -1,10 +1,10 @@
-use serde_derive::Deserialize;
-use std::{collections::HashMap, fs, path::Path};
+use std::{fs, path::Path};
 
 use generator::Generator;
 use sourcegen_cli::{run_sourcegen, SourceGenerator, SourcegenParameters};
 
 pub(crate) mod generator;
+pub(crate) mod template;
 
 // recursive function traverses `dir`
 // it also adds prefixes with '-' if the file is in a folder
@@ -44,9 +44,4 @@ pub fn main() {
         ..Default::default()
     };
     run_sourcegen(&parameters).unwrap();
-}
-
-#[derive(Deserialize, Debug)]
-pub(crate) struct Template {
-    fields: HashMap<String, String>,
 }
