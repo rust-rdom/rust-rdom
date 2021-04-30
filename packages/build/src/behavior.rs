@@ -28,7 +28,7 @@ fn sandbox_member(fields: Vec<&str>, item: &syn::ItemStruct) -> Result<TokenStre
         return Err(anyhow!("Wrong number of arguments, expected 1"));
     }
 
-    let field = quote::format_ident!("{}", fields[0]);
+    let field: TokenStream = fields[0].parse().unwrap();
 
     let ident = &item.ident;
     let generics = &item.generics;

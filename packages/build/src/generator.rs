@@ -40,25 +40,25 @@ impl SourceGenerator for Generator {
 
         let generics = &item.generics;
 
-        let mut output = {
-            let fields =
-                template
-                    .fields
-                    .0
-                    .iter()
-                    .fold(TokenStream::new(), |mut acc, (ident, ty)| {
-                        let stream: TokenStream = format!("{}: {},", ident, ty).parse().unwrap();
+        let mut output =
+            {
+                let fields = template.fields.0.iter().fold(
+                    TokenStream::new(),
+                    |mut acc, (vis, ident, ty)| {
+                        let stream: TokenStream =
+                            format!("{} {}: {},", vis, ident, ty).parse().unwrap();
                         acc.extend(stream);
                         acc
-                    });
+                    },
+                );
 
-            quote! {
-                #attrs
-                #vis struct #ident #generics {
-                    #fields
+                quote! {
+                    #attrs
+                    #vis struct #ident #generics {
+                        #fields
+                    }
                 }
-            }
-        };
+            };
 
         for behavior in template.behaviors.iter() {
             let (base, rest) = {

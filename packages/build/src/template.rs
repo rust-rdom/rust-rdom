@@ -8,8 +8,9 @@ pub(crate) struct Template {
     pub behaviors: Vec<String>,
 }
 
+// vis, ident, ty
 #[derive(Debug)]
-pub(crate) struct Fields(pub Vec<(String, String)>);
+pub(crate) struct Fields(pub Vec<(String, String, String)>);
 
 impl<'de> Deserialize<'de> for Fields {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
@@ -36,8 +37,13 @@ impl<'de> Visitor<'de> for FieldsVisitor {
         let mut v = vec![];
         loop {
             match map.next_entry::<String, String>() {
-                Ok(Some(pair)) => {
-                    v.push(pair);
+                Ok(Some((ident, decl))) => {
+                    let decl = decl.split_whitespace().collect::<Vec<_>>();
+                    if decl.len() == 1 {
+                        v.push((String::new(), ident, decl[0].to_string()));
+                    } else {
+                        v.push((decl[0].to_string(), ident, decl[1].to_string()));
+                    }
                 }
                 Ok(None) => break Ok(Fields(v)),
                 Err(e) => break Err(e),
