@@ -5,10 +5,11 @@ use std::fmt;
 #[derive(Deserialize, Debug)]
 pub(crate) struct Template {
     pub fields: Fields,
+    pub behaviors: Vec<String>,
 }
 
 #[derive(Debug)]
-pub struct Fields(pub Vec<(String, String)>);
+pub(crate) struct Fields(pub Vec<(String, String)>);
 
 impl<'de> Deserialize<'de> for Fields {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>

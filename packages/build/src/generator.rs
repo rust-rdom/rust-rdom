@@ -1,7 +1,9 @@
 use std::{fs::read_to_string, path::Path};
 
+use crate::behavior::BEHAVIORS;
 use proc_macro2::TokenStream;
 use quote::quote;
+use sourcegen_cli::tokens::NewLine;
 use sourcegen_cli::SourceGenerator;
 
 use crate::template::Template;
@@ -38,7 +40,7 @@ impl SourceGenerator for Generator {
 
         let generics = &item.generics;
 
-        let definition = {
+        let mut output = {
             let fields =
                 template
                     .fields
@@ -58,6 +60,24 @@ impl SourceGenerator for Generator {
             }
         };
 
-        Ok(Some(definition))
+        for behavior in template.behaviors.iter() {
+            let (base, rest) = {
+                let mut split = behavior.split_whitespace();
+                let base = split.next().unwrap();
+                let rest = split.collect::<Vec<_>>();
+                (base, rest)
+            };
+
+            let implementor = BEHAVIORS.get(base).unwrap();
+            let implementation = implementor(rest, item)?;
+
+            output.extend(quote! {
+                #NewLine
+                #[sourcegen::generated]
+                #implementation
+            });
+        }
+
+        Ok(Some(output))
     }
 }

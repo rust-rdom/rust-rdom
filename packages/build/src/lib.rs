@@ -3,6 +3,7 @@ use std::{fs, path::Path};
 use generator::Generator;
 use sourcegen_cli::{run_sourcegen, SourceGenerator, SourcegenParameters};
 
+pub(crate) mod behavior;
 pub(crate) mod generator;
 pub(crate) mod template;
 
