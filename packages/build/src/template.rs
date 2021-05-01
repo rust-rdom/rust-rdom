@@ -48,7 +48,7 @@ impl<'de> Visitor<'de> for FieldsVisitor {
 #[derive(Debug)]
 pub(crate) struct TEntry {
     pub vis: Option<String>,
-    pub ty: String
+    pub ty: String,
 }
 
 impl<'de> Deserialize<'de> for TEntry {
@@ -78,19 +78,15 @@ impl<'de> Visitor<'de> for TEntryVisitor {
         loop {
             match map.next_entry::<String, String>() {
                 Ok(None) => break,
-                Ok(Some((key, val))) => {
-                    match key.as_ref() {
-                        "ty" => {
-                            ty = Some(val);
-                        },
-                        "vis" => {
-                            vis = Some(val);
-                        },
-                        field => {
-                            return Err(A::Error::unknown_field(field, &["vis", "ty"]))
-                        }
+                Ok(Some((key, val))) => match key.as_ref() {
+                    "ty" => {
+                        ty = Some(val);
                     }
-                }
+                    "vis" => {
+                        vis = Some(val);
+                    }
+                    field => return Err(A::Error::unknown_field(field, &["vis", "ty"])),
+                },
                 Err(e) => return Err(e),
                 _ => {}
             }

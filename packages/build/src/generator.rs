@@ -14,7 +14,6 @@ pub(crate) struct Generator(pub Template);
 impl Generator {
     pub(crate) fn load(path: impl AsRef<Path>) -> Generator {
         let contents = read_to_string(path).expect("Could not read to string");
-        println!("contents {}", contents);
         Generator(toml::from_str(&contents).expect("Could not parse TOML"))
     }
 }
