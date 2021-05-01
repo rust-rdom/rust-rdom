@@ -29,7 +29,14 @@ pub fn main() {
     // data storage
     let data = {
         let mut data = Vec::new();
-        read_dir("generators", "".to_string(), &mut data);
+        read_dir(
+            Path::new(file!())
+                .parent()
+                .unwrap()
+                .join("../../../packages/rdom/generators"),
+            "".to_string(),
+            &mut data,
+        );
         data
     };
 
