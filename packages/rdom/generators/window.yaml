@@ -1,6 +1,0 @@
-fields:
-  document: DocumentNodeArc
-  context: Weak<Sandbox>
-
-behaviors:
-  - SandboxMember context

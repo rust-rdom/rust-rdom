@@ -1,6 +1,0 @@
-fields:
-  contents: [pub(crate), NodeContentsArc]
-  common: [pub(crate), Arc<NodeCommon>]
-
-behaviors:
-  - SandboxMember common.context

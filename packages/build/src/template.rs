@@ -1,4 +1,4 @@
-use serde::de::{Deserialize, Deserializer, MapAccess, SeqAccess, Visitor};
+use serde::de::{Deserialize, Deserializer, Error, MapAccess, SeqAccess, Visitor};
 use serde_derive::Deserialize;
 use std::fmt;
 
@@ -34,10 +34,10 @@ impl<'de> Visitor<'de> for FieldsVisitor {
     where
         A: MapAccess<'de>,
     {
-        let mut v = vec![];
+        let mut v: Vec<(String, String, String)> = vec![];
         loop {
             match map.next_entry::<String, TEntry>() {
-                Ok(Some((ident, te))) => v.push((te.0, ident, te.1)),
+                Ok(Some((ident, te))) => v.push((te.vis.unwrap_or("".into()), ident, te.ty)),
                 Ok(None) => break Ok(Fields(v)),
                 Err(e) => break Err(e),
             }
@@ -46,7 +46,10 @@ impl<'de> Visitor<'de> for FieldsVisitor {
 }
 
 #[derive(Debug)]
-pub(crate) struct TEntry(pub String, pub String);
+pub(crate) struct TEntry {
+    pub vis: Option<String>,
+    pub ty: String
+}
 
 impl<'de> Deserialize<'de> for TEntry {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
@@ -66,19 +69,36 @@ impl<'de> Visitor<'de> for TEntryVisitor {
         write!(formatter, "a pair or a string")
     }
 
-    fn visit_str<E>(self, v: &str) -> Result<Self::Value, E>
+    fn visit_map<A>(self, mut map: A) -> Result<Self::Value, A::Error>
     where
-        E: serde::de::Error,
+        A: MapAccess<'de>,
     {
-        Ok(TEntry(String::new(), v.to_string()))
-    }
+        let mut ty: Option<String> = None;
+        let mut vis: Option<String> = None;
+        loop {
+            match map.next_entry::<String, String>() {
+                Ok(None) => break,
+                Ok(Some((key, val))) => {
+                    match key.as_ref() {
+                        "ty" => {
+                            ty = Some(val);
+                        },
+                        "vis" => {
+                            vis = Some(val);
+                        },
+                        field => {
+                            return Err(A::Error::unknown_field(field, &["vis", "ty"]))
+                        }
+                    }
+                }
+                Err(e) => return Err(e),
+                _ => {}
+            }
+        }
 
-    fn visit_seq<A>(self, mut seq: A) -> Result<Self::Value, A::Error>
-    where
-        A: SeqAccess<'de>,
-    {
-        let vis = seq.next_element()?.unwrap();
-        let ty = seq.next_element()?.unwrap();
-        Ok(TEntry(vis, ty))
+        Ok(TEntry {
+            vis,
+            ty: ty.expect("Type was not provided"),
+        })
     }
 }
