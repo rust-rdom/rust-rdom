@@ -32,5 +32,8 @@ jobs:
           override: true
           components: rustfmt
 
+      - name: check-no-sourcegen-changes
+        run: ${{ env.GITHUB_WORKSPACE }}/ci-scripts/check-no-sourcegen-changes.sh
+
       - name: test
         run: cargo test --verbose --all
