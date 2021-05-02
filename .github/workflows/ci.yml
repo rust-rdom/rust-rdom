@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - peterson/test-ci
   schedule:
     - cron: "00 01 * * *"
 jobs:
@@ -33,7 +34,7 @@ jobs:
           components: rustfmt
 
       - name: check-no-sourcegen-changes
-        run: ${{ env.GITHUB_WORKSPACE }}/ci-scripts/check-no-sourcegen-changes.sh
+        run: ci-scripts/check-no-sourcegen-changes.sh
 
       - name: test
         run: cargo test --verbose --all
