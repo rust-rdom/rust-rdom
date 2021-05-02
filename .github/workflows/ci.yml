@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - peterson/test-ci
   schedule:
     - cron: "00 01 * * *"
 jobs:
@@ -31,6 +32,9 @@ jobs:
           profile: minimal
           override: true
           components: rustfmt
+
+      - name: check-no-sourcegen-changes
+        run: ci-scripts/check-no-sourcegen-changes.sh
 
       - name: test
         run: cargo test --verbose --all
