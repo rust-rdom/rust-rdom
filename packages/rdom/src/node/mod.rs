@@ -46,11 +46,21 @@ pub struct NodeCommon {
 // Common and Concrete are unique for each node, hence they
 // are in Arcs, AnyNodeRef and ConcreteNodeRef are just wrappers
 // With this we would actually probably not even need nice
-#[derive(Clone)]
+
 /// A strong reference to any node (abstract, nonspecific type).
+#[sourcegen::sourcegen(generator = "any_node_arc")]
+// Generated. All manual edits to the block annotated with #[sourcegen...] will be discarded.
+#[derive(Clone)]
 pub struct AnyNodeArc {
     pub(crate) contents: NodeContentsArc,
     pub(crate) common: Arc<NodeCommon>,
+}
+
+#[sourcegen::generated]
+impl SandboxMemberBehavior for AnyNodeArc {
+    fn get_context(&self) -> Weak<Sandbox> {
+        self.common.context.clone()
+    }
 }
 
 #[derive(Clone)]
@@ -90,12 +100,6 @@ impl AnyNodeArc {
         });
 
         AnyNodeArc { contents, common }
-    }
-}
-
-impl SandboxMemberBehavior for AnyNodeArc {
-    fn get_context(&self) -> Weak<Sandbox> {
-        self.common.context.clone()
     }
 }
 

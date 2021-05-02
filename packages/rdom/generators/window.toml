@@ -1,0 +1,7 @@
+behaviors = ["SandboxMember context"]
+
+[fields.document]
+ty = "DocumentNodeArc"
+
+[fields.context]
+ty = "Weak<Sandbox>"

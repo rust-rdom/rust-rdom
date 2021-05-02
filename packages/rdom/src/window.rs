@@ -8,9 +8,19 @@ use crate::{
 crate::use_behaviors!(sandbox_member);
 
 /// A simulated window for static rendering
+#[sourcegen(generator = "window")]
+// Generated. All manual edits to the block annotated with #[sourcegen...] will be discarded.
+#[derive(Clone)]
 pub struct Window {
-    context: SandboxMemberBehaviorStorage,
     document: DocumentNodeArc,
+    context: Weak<Sandbox>,
+}
+
+#[sourcegen::generated]
+impl SandboxMemberBehavior for Window {
+    fn get_context(&self) -> Weak<Sandbox> {
+        self.context.clone()
+    }
 }
 
 impl Window {
@@ -22,10 +32,7 @@ impl Window {
                     default_view: win_weak.clone(),
                 }),
             );
-            Window {
-                context: SandboxMemberBehaviorStorage::new(context),
-                document,
-            }
+            Window { context, document }
         })
     }
 
@@ -35,5 +42,3 @@ impl Window {
         self.document.clone()
     }
 }
-
-impl_sandbox_member!(Window, context);
