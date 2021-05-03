@@ -16,3 +16,7 @@ serde = "1.0.125"
 serde_derive = "1.0.125"
 lazy_static = "1.4.0"
 toml = "0.5.8"
+
+[[bin]]
+name = "sourcegen"
+path = "src/main.rs"
