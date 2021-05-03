@@ -2,7 +2,9 @@ use anyhow::anyhow;
 use lazy_static::lazy_static;
 use proc_macro2::TokenStream;
 use quote::quote;
+use sourcegen_cli::tokens::PlainComment;
 use std::collections::HashMap;
+use syn::parse::Parse;
 
 pub(crate) type BehaviorTemplate =
     fn(Vec<&str>, &syn::ItemStruct) -> Result<TokenStream, anyhow::Error>;
@@ -34,9 +36,18 @@ fn sandbox_member(fields: Vec<&str>, item: &syn::ItemStruct) -> Result<TokenStre
     let generics = &item.generics;
 
     Ok(quote! {
+        #[sourcegen::generated]
+        impl #generics #ident #generics {
+            #[doc = " gets `Weak<Sandbox>` to the `Sandbox` that it is in"]
+            pub fn get_context(&self) -> Weak<Sandbox> {
+                self.#field.clone()
+            }
+        }
+
+        #[sourcegen::generated]
         impl #generics SandboxMemberBehavior for #ident #generics {
             fn get_context(&self) -> Weak<Sandbox> {
-                self.#field.clone()
+                self.get_context()
             }
         }
     })

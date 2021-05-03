@@ -57,9 +57,16 @@ pub struct AnyNodeArc {
 }
 
 #[sourcegen::generated]
+impl AnyNodeArc {
+    /// gets `Weak<Sandbox>` to the `Sandbox` that it is in
+    pub fn get_context(&self) -> Weak<Sandbox> {
+        self.common.context.clone()
+    }
+}
+#[sourcegen::generated]
 impl SandboxMemberBehavior for AnyNodeArc {
     fn get_context(&self) -> Weak<Sandbox> {
-        self.common.context.clone()
+        self.get_context()
     }
 }
 

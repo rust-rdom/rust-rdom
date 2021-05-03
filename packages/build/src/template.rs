@@ -1,4 +1,4 @@
-use serde::de::{Deserialize, Deserializer, Error, MapAccess, SeqAccess, Visitor};
+use serde::de::{Deserialize, Deserializer, MapAccess, Visitor};
 use serde_derive::Deserialize;
 use std::fmt;
 

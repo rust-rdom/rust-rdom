@@ -17,9 +17,16 @@ pub struct Window {
 }
 
 #[sourcegen::generated]
+impl Window {
+    /// gets `Weak<Sandbox>` to the `Sandbox` that it is in
+    pub fn get_context(&self) -> Weak<Sandbox> {
+        self.context.clone()
+    }
+}
+#[sourcegen::generated]
 impl SandboxMemberBehavior for Window {
     fn get_context(&self) -> Weak<Sandbox> {
-        self.context.clone()
+        self.get_context()
     }
 }
 

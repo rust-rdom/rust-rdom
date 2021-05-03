@@ -73,7 +73,6 @@ impl SourceGenerator for Generator {
 
             output.extend(quote! {
                 #NewLine
-                #[sourcegen::generated]
                 #implementation
             });
         }
