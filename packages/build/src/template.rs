@@ -45,56 +45,8 @@ impl<'de> Visitor<'de> for FieldsVisitor {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Deserialize)]
 pub(crate) struct TEntry {
     pub vis: Option<String>,
     pub ty: String,
-}
-
-impl<'de> Deserialize<'de> for TEntry {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
-        deserializer.deserialize_any(TEntryVisitor)
-    }
-}
-
-struct TEntryVisitor;
-
-impl<'de> Visitor<'de> for TEntryVisitor {
-    type Value = TEntry;
-
-    fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-        write!(formatter, "a pair or a string")
-    }
-
-    fn visit_map<A>(self, mut map: A) -> Result<Self::Value, A::Error>
-    where
-        A: MapAccess<'de>,
-    {
-        let mut ty: Option<String> = None;
-        let mut vis: Option<String> = None;
-        loop {
-            match map.next_entry::<String, String>() {
-                Ok(None) => break,
-                Ok(Some((key, val))) => match key.as_ref() {
-                    "ty" => {
-                        ty = Some(val);
-                    }
-                    "vis" => {
-                        vis = Some(val);
-                    }
-                    field => return Err(A::Error::unknown_field(field, &["vis", "ty"])),
-                },
-                Err(e) => return Err(e),
-                _ => {}
-            }
-        }
-
-        Ok(TEntry {
-            vis,
-            ty: ty.expect("Type was not provided"),
-        })
-    }
 }
