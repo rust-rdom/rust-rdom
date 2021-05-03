@@ -1,9 +1,15 @@
+doc = "a strong reference to any node (abstract nonspecific type)"
 behaviors = ["SandboxMember common.context"]
+
+weak_doc = "a weak reference to any node (abstract nonspecific type)"
+weak_name = "AnyNodeWeak"
 
 [fields.contents]
 vis = "pub(crate)"
 ty = "NodeContentsArc"
+weak_type = "NodeContentsWeak"
 
 [fields.common]
 vis = "pub(crate)"
 ty = "Arc<NodeCommon>"
+weak_type = "Weak<NodeCommon>"

@@ -1,16 +1,19 @@
+use proc_macro2::TokenStream;
 use serde::de::{Deserialize, Deserializer, MapAccess, Visitor};
 use serde_derive::Deserialize;
 use std::fmt;
 
 #[derive(Deserialize, Debug)]
-pub(crate) struct Template {
+pub struct Template {
     pub fields: Fields,
     pub behaviors: Vec<String>,
+    pub weak_name: Option<String>,
+    pub doc: String,
+    pub weak_doc: Option<String>,
 }
 
-// vis, ident, ty
 #[derive(Debug)]
-pub(crate) struct Fields(pub Vec<(String, String, String)>);
+pub struct Fields(pub Vec<FieldData>);
 
 impl<'de> Deserialize<'de> for Fields {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
@@ -34,10 +37,10 @@ impl<'de> Visitor<'de> for FieldsVisitor {
     where
         A: MapAccess<'de>,
     {
-        let mut v: Vec<(String, String, String)> = vec![];
+        let mut v = vec![];
         loop {
-            match map.next_entry::<String, TEntry>() {
-                Ok(Some((ident, te))) => v.push((te.vis.unwrap_or("".into()), ident, te.ty)),
+            match map.next_entry::<String, FieldDataRaw>() {
+                Ok(Some((name, data))) => v.push(FieldData::new(name, data)),
                 Ok(None) => break Ok(Fields(v)),
                 Err(e) => break Err(e),
             }
@@ -45,8 +48,27 @@ impl<'de> Visitor<'de> for FieldsVisitor {
     }
 }
 
+#[derive(Debug)]
+pub struct FieldData {
+    pub ts: TokenStream,
+    pub wts: Option<TokenStream>,
+}
+
+impl FieldData {
+    pub fn new(name: String, data: FieldDataRaw) -> FieldData {
+        let vis = data.vis.as_ref().map(String::as_str).unwrap_or("");
+        let ts = format!("{} {}: {},", vis, name, data.ty).parse().unwrap();
+        let wts = data
+            .weak_ty
+            .as_ref()
+            .map(|t| format!("{} {}: {},", vis, name, t).parse().unwrap());
+        FieldData { ts, wts }
+    }
+}
+
 #[derive(Debug, Deserialize)]
-pub(crate) struct TEntry {
+pub struct FieldDataRaw {
     pub vis: Option<String>,
     pub ty: String,
+    pub weak_ty: Option<String>,
 }

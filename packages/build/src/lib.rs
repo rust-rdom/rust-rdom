@@ -3,9 +3,9 @@ use std::{fs, path::Path};
 use generator::Generator;
 use sourcegen_cli::{run_sourcegen, SourceGenerator, SourcegenParameters};
 
-pub(crate) mod behavior;
-pub(crate) mod generator;
-pub(crate) mod template;
+pub mod behavior;
+pub mod generator;
+pub mod template;
 
 // recursive function traverses `dir`
 // it also adds prefixes with '-' if the file is in a folder

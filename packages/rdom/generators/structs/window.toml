@@ -1,3 +1,4 @@
+doc = "A simulated window for static rendering"
 behaviors = ["SandboxMember context"]
 
 [fields.document]

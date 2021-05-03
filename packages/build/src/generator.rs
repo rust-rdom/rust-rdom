@@ -9,10 +9,10 @@ use sourcegen_cli::SourceGenerator;
 use crate::template::Template;
 
 #[derive(Debug)]
-pub(crate) struct Generator(pub Template);
+pub struct Generator(pub Template);
 
 impl Generator {
-    pub(crate) fn load(path: impl AsRef<Path>) -> Generator {
+    pub fn load(path: impl AsRef<Path>) -> Generator {
         let contents = read_to_string(path).expect("Could not read to string");
         Generator(toml::from_str(&contents).expect("Could not parse TOML"))
     }
@@ -40,25 +40,49 @@ impl SourceGenerator for Generator {
 
         let generics = &item.generics;
 
-        let mut output =
-            {
-                let fields = template.fields.0.iter().fold(
-                    TokenStream::new(),
-                    |mut acc, (vis, ident, ty)| {
-                        let stream: TokenStream =
-                            format!("{} {}: {},", vis, ident, ty).parse().unwrap();
-                        acc.extend(stream);
-                        acc
-                    },
-                );
+        let mut output = {
+            let fields = template
+                .fields
+                .0
+                .iter()
+                .fold(TokenStream::new(), |mut acc, data| {
+                    acc.extend(data.ts.clone());
+                    acc
+                });
 
-                quote! {
-                    #attrs
-                    #vis struct #ident #generics {
-                        #fields
-                    }
+            let doc: &str = &template.doc;
+
+            quote! {
+                #[doc = #doc]
+                #attrs
+                #vis struct #ident #generics {
+                    #fields
                 }
-            };
+            }
+        };
+
+        if let Some(weak_name) = template.weak_name.as_ref() {
+            let ident: TokenStream = weak_name.parse().unwrap();
+            let fields = template
+                .fields
+                .0
+                .iter()
+                .fold(TokenStream::new(), |mut acc, data| {
+                    acc.extend(data.wts.clone());
+                    acc
+                });
+
+            let doc: &str = template.weak_doc.as_ref().unwrap_or(&template.doc);
+
+            output.extend(quote! {
+                #[doc = #doc]
+                #[sourcegen::generated]
+                #attrs
+                #vis struct #ident #generics {
+                    #fields
+                }
+            })
+        }
 
         for behavior in template.behaviors.iter() {
             let (base, rest) = {

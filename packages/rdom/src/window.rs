@@ -7,9 +7,9 @@ use crate::{
 
 crate::use_behaviors!(sandbox_member);
 
-/// A simulated window for static rendering
 #[sourcegen(generator = "window")]
 // Generated. All manual edits to the block annotated with #[sourcegen...] will be discarded.
+///A simulated window for static rendering
 #[derive(Clone)]
 pub struct Window {
     document: DocumentNodeArc,
