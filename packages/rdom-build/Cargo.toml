@@ -1,5 +1,5 @@
 [package]
-name = "build"
+name = "rdom-build"
 version = "0.1.0"
 authors = ["Maxim <maxim.kosterov@gmail.com>"]
 edition = "2018"
