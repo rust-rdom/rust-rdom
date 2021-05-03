@@ -1,4 +1,4 @@
-use serde::de::{Deserialize, Deserializer, Error, MapAccess, SeqAccess, Visitor};
+use serde::de::{Deserialize, Deserializer, Error, MapAccess, Visitor};
 use serde_derive::Deserialize;
 use std::fmt;
 
@@ -88,7 +88,6 @@ impl<'de> Visitor<'de> for TEntryVisitor {
                     field => return Err(A::Error::unknown_field(field, &["vis", "ty"])),
                 },
                 Err(e) => return Err(e),
-                _ => {}
             }
         }
 

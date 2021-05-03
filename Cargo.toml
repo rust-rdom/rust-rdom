@@ -1,6 +1,8 @@
 [workspace]
 members = [
   "packages/rdom",
-  "packages/examples/hello_world",
-  "packages/build"
+  "packages/examples/hello_world"
+]
+exclude = [
+  "packages/rdom-build"
 ]
