@@ -33,7 +33,7 @@ pub fn main() {
             Path::new(file!())
                 .parent()
                 .unwrap()
-                .join("../../../packages/rdom/generators"),
+                .join("../../../packages/rdom/generators/structs"),
             "".to_string(),
             &mut data,
         );
