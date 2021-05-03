@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - master
-      - peterson/test-ci
   schedule:
     - cron: "00 01 * * *"
 jobs:
