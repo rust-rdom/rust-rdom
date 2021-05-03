@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
-cargo run --bin sourcegen --release
+sh sourcegen.sh
 cargo test --package rdom

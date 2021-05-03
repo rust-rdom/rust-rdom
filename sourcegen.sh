@@ -1,3 +1,4 @@
 #!/usr/bin/env bash
 
-cargo run --bin sourcegen --release
+cd packages/rdom-build
+cargo run

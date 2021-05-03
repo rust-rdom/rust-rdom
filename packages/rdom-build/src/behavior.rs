@@ -2,6 +2,7 @@ use anyhow::anyhow;
 use lazy_static::lazy_static;
 use proc_macro2::TokenStream;
 use quote::quote;
+use sourcegen_cli::tokens::NewLine;
 use std::collections::HashMap;
 
 pub type BehaviorTemplate = fn(Vec<&str>, &syn::ItemStruct) -> Result<TokenStream, anyhow::Error>;
@@ -40,7 +41,7 @@ fn sandbox_member(fields: Vec<&str>, item: &syn::ItemStruct) -> Result<TokenStre
                 self.#field.clone()
             }
         }
-
+        #NewLine
         #[sourcegen::generated]
         impl #generics SandboxMemberBehavior for #ident #generics {
             fn get_context(&self) -> Weak<Sandbox> {
