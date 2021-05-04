@@ -8,7 +8,7 @@ use crate::{
 crate::use_behaviors!(sandbox_member);
 
 /// A simulated window for static rendering
-#[sourcegen(generator = "window")]
+#[sourcegen::sourcegen(generator = "window", config_type = "injected_struct")]
 // Generated. All manual edits to the block annotated with #[sourcegen...] will be discarded.
 #[derive(Clone)]
 pub struct Window {

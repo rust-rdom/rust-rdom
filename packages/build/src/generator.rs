@@ -9,16 +9,16 @@ use sourcegen_cli::SourceGenerator;
 use crate::template::Template;
 
 #[derive(Debug)]
-pub(crate) struct Generator(pub Template);
+pub(crate) struct InjectedStructGenerator(pub Template);
 
-impl Generator {
-    pub(crate) fn load(path: impl AsRef<Path>) -> Generator {
+impl InjectedStructGenerator {
+    pub(crate) fn load(path: impl AsRef<Path>) -> InjectedStructGenerator {
         let contents = read_to_string(path).expect("Could not read to string");
-        Generator(toml::from_str(&contents).expect("Could not parse TOML"))
+        InjectedStructGenerator(toml::from_str(&contents).expect("Could not parse TOML"))
     }
 }
 
-impl SourceGenerator for Generator {
+impl SourceGenerator for InjectedStructGenerator {
     fn generate_struct(
         &self,
         _args: syn::AttributeArgs,

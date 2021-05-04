@@ -1,8 +1,10 @@
 //! Types representing references to DOM nodes.
 
+
+use crate::internal_prelude::*;
 use crate::node_list::NodeList;
 use crate::selector::Selector;
-use crate::{behavior::parent_node_prelude::ParentNodeBehaviorStorage, internal_prelude::*};
+use crate::{behavior::parent_node_prelude::ParentNodeBehaviorStorage};
 
 crate::use_behaviors!(sandbox_member, node);
 
@@ -48,7 +50,7 @@ pub struct NodeCommon {
 // With this we would actually probably not even need nice
 
 /// A strong reference to any node (abstract, nonspecific type).
-#[sourcegen::sourcegen(generator = "any_node_arc")]
+#[sourcegen::sourcegen(generator = "any_node_arc", config_type = "injected_struct")]
 // Generated. All manual edits to the block annotated with #[sourcegen...] will be discarded.
 #[derive(Clone)]
 pub struct AnyNodeArc {
