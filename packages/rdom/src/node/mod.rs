@@ -50,6 +50,7 @@ pub struct NodeCommon {
 #[sourcegen::sourcegen(generator = "any_node_arc")]
 // Generated. All manual edits to the block annotated with #[sourcegen...] will be discarded.
 ///a strong reference to any node (abstract nonspecific type)
+///a strong reference to any node (abstract nonspecific type)
 #[derive(Clone)]
 pub struct AnyNodeArc {
     pub(crate) contents: NodeContentsArc,
@@ -57,6 +58,7 @@ pub struct AnyNodeArc {
 }
 ///a weak reference to any node (abstract nonspecific type)
 #[sourcegen::generated]
+///a strong reference to any node (abstract nonspecific type)
 #[derive(Clone)]
 pub struct AnyNodeWeak {
     pub(crate) contents: NodeContentsWeak,
@@ -65,11 +67,12 @@ pub struct AnyNodeWeak {
 
 #[sourcegen::generated]
 impl AnyNodeArc {
-    /// gets `Weak<Sandbox>` to the `Sandbox` that it is in
+    ///gets `Weak<Sandbox>` to the `Sandbox` that it is in
     pub fn get_context(&self) -> Weak<Sandbox> {
         self.common.context.clone()
     }
 }
+
 #[sourcegen::generated]
 impl SandboxMemberBehavior for AnyNodeArc {
     fn get_context(&self) -> Weak<Sandbox> {

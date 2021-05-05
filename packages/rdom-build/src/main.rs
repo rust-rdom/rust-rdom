@@ -30,10 +30,7 @@ pub fn main() {
     let data = {
         let mut data = Vec::new();
         read_dir(
-            Path::new(file!())
-                .parent()
-                .unwrap()
-                .join("../../../packages/rdom/generators/structs"),
+            "packages/rdom/generators/structs",
             "".to_string(),
             &mut data,
         );

@@ -7,9 +7,9 @@ weak_name = "AnyNodeWeak"
 [fields.contents]
 vis = "pub(crate)"
 ty = "NodeContentsArc"
-weak_type = "NodeContentsWeak"
+weak_ty = "NodeContentsWeak"
 
 [fields.common]
 vis = "pub(crate)"
 ty = "Arc<NodeCommon>"
-weak_type = "Weak<NodeCommon>"
+weak_ty = "Weak<NodeCommon>"

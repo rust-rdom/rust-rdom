@@ -1,4 +1,3 @@
 #!/usr/bin/env bash
 
-cd packages/rdom-build
-cargo run
+cargo run --bin sourcegen
