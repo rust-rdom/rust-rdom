@@ -35,7 +35,6 @@ pub mod parent_node;
 pub mod sandbox_member;
 
 generate_preludes! {
-    sandbox_member SandboxMember,
     parent_node ParentNode
 }
 

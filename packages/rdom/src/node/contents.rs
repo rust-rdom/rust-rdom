@@ -5,8 +5,6 @@ use crate::internal_prelude::*;
 use crate::sandbox::Builder;
 use crate::window::Window;
 
-crate::use_behaviors!(parent_node);
-
 pub use super::element::ElementStore;
 
 macro_rules! declare_contents {

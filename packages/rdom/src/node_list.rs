@@ -3,8 +3,6 @@
 
 use crate::internal_prelude::*;
 
-crate::use_behaviors!(sandbox_member);
-
 /// Represents a [NodeList](https://developer.mozilla.org/en-US/docs/Web/API/NodeList) structure,
 /// which may be either "live" or "static". Note that these are not strongly retained by the
 /// Sandbox, and there is no guarantee they will work after the Sandbox has been dropped. So, to
@@ -14,18 +12,34 @@ crate::use_behaviors!(sandbox_member);
 /// Also note that retaining a NodeList may cause other Nodes to be retained. For example,
 /// `some_node.child_nodes()` and retaining the return value will cause `some_node` to be
 /// retained.
+#[sourcegen::sourcegen(generator = "behave", script = "SandboxMember context")]
+// Generated. All manual edits to the block annotated with #[sourcegen...] will be discarded.
 pub struct NodeList {
     /// Reference to the sandbox to which this NodeList belongs
-    pub context: SandboxMemberBehaviorStorage,
-
+    context: Weak<Sandbox>,
     /// The underlying storage
     pub(crate) nodelist_storage: NodeListStorage,
+}
+
+#[sourcegen::generated]
+impl NodeList {
+    /// gets `Weak<Sandbox>` to the `Sandbox` that it is in
+    pub fn get_context(&self) -> Weak<Sandbox> {
+        self.context.clone()
+    }
+}
+
+#[sourcegen::generated]
+impl SandboxMemberBehavior for NodeList {
+    fn get_context(&self) -> Weak<Sandbox> {
+        self.get_context()
+    }
 }
 
 impl NodeList {
     pub(crate) fn new(context: Weak<Sandbox>, nodelist_storage: NodeListStorage) -> Arc<NodeList> {
         Arc::new(NodeList {
-            context: SandboxMemberBehaviorStorage::new(context),
+            context,
             nodelist_storage,
         })
     }
@@ -67,8 +81,6 @@ impl NodeList {
         self.item(index)
     }
 }
-
-impl_sandbox_member!(NodeList, context);
 
 /// An encapsulation of how the NodeList will respond to operations.
 pub(crate) enum NodeListStorage {

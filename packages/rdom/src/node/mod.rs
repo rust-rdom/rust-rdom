@@ -4,8 +4,7 @@ use crate::node_list::NodeList;
 use crate::selector::Selector;
 use crate::{behavior::parent_node_prelude::ParentNodeBehaviorStorage, internal_prelude::*};
 
-crate::use_behaviors!(sandbox_member, node);
-
+use crate::behavior::sandbox_member::SandboxMemberBehavior;
 use concrete::ElementNodeArc;
 use contents::{NodeContentsArc, NodeContentsWeak};
 use graph_storage::NodeGraphStorage;
@@ -48,19 +47,15 @@ pub struct NodeCommon {
 // With this we would actually probably not even need nice
 
 /// a strong reference to any node (abstract nonspecific type)
+#[sourcegen::sourcegen(generator = "behave", script = "SandboxMember common.context")]
+// Generated. All manual edits to the block annotated with #[sourcegen...] will be discarded.
 #[derive(Clone)]
 pub struct AnyNodeArc {
     pub(crate) contents: NodeContentsArc,
     pub(crate) common: Arc<NodeCommon>,
 }
 
-/// a weak reference to any node (abstract nonspecific type)
-#[derive(Clone)]
-pub struct AnyNodeWeak {
-    pub(crate) contents: NodeContentsWeak,
-    pub(crate) common: Weak<NodeCommon>,
-}
-
+#[sourcegen::generated]
 impl AnyNodeArc {
     /// gets `Weak<Sandbox>` to the `Sandbox` that it is in
     pub fn get_context(&self) -> Weak<Sandbox> {
@@ -68,10 +63,18 @@ impl AnyNodeArc {
     }
 }
 
+#[sourcegen::generated]
 impl SandboxMemberBehavior for AnyNodeArc {
     fn get_context(&self) -> Weak<Sandbox> {
         self.get_context()
     }
+}
+
+/// a weak reference to any node (abstract nonspecific type)
+#[derive(Clone)]
+pub struct AnyNodeWeak {
+    pub(crate) contents: NodeContentsWeak,
+    pub(crate) common: Weak<NodeCommon>,
 }
 
 impl AnyNodeWeak {

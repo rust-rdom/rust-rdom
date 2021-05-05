@@ -7,6 +7,14 @@ use sourcegen_cli::tokens::NewLine;
 use sourcegen_cli::SourceGenerator;
 use syn::{Lit, Meta, MetaNameValue, NestedMeta};
 
+// Behave attribute vscode snippet
+//
+// "Add sourcegen::sourcegen with behave generator": {
+//     "prefix": "behave",
+//     "body": "#[sourcegen::sourcegen(generator = \"behave\", script = \"$1\")]",
+//     "description": "Adds sourcegen attribute with behave script"
+// }
+
 #[derive(Debug)]
 struct BehaviorScript(Vec<BehaviorStatement>);
 
@@ -111,6 +119,7 @@ impl SourceGenerator for BehaviorGenerator {
 
 fn sandbox_member(item: &syn::ItemStruct, args: Vec<String>) -> Result<TokenStream, anyhow::Error> {
     let ident = &item.ident;
+    let (impl_generics, ty_generics, where_clause) = &item.generics.split_for_impl();
 
     let mut args = args.into_iter();
 
@@ -125,7 +134,7 @@ fn sandbox_member(item: &syn::ItemStruct, args: Vec<String>) -> Result<TokenStre
 
     Ok(quote! {
         #[sourcegen::generated]
-        impl #ident {
+        impl #impl_generics #ident #ty_generics #where_clause{
             /// gets `Weak<Sandbox>` to the `Sandbox` that it is in
             pub fn get_context(&self) -> Weak<Sandbox> {
                 self.#field.clone()
@@ -133,7 +142,7 @@ fn sandbox_member(item: &syn::ItemStruct, args: Vec<String>) -> Result<TokenStre
         }
         #NewLine
         #[sourcegen::generated]
-        impl SandboxMemberBehavior for #ident {
+        impl #impl_generics SandboxMemberBehavior for #ident #ty_generics #where_clause{
             fn get_context(&self) -> Weak<Sandbox> {
                 self.get_context()
             }

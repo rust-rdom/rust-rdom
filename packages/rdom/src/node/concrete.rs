@@ -11,20 +11,35 @@ use super::{
     AnyNodeStore, Buildable, NodeBehavior, NodeCommon, NodeContentsArc, NodeContentsWeak,
     NodeGraphStorage,
 };
-use crate::node::element::{
-    ElementStore, HtmlBodyStore, HtmlButtonStore, HtmlElementStore, HtmlHtmlStore,
-};
+use crate::node::element::ElementStore;
 use crate::node_list::NodeList;
 use std::convert::TryFrom;
-crate::use_behaviors!(sandbox_member, parent_node);
+crate::use_behaviors!(parent_node);
 
-#[derive(Clone)]
 /// A strongly-typed handle to a node with a strong reference.
 /// Generic type `S` may be the underlying storage
 /// type of any node class.
+#[sourcegen::sourcegen(generator = "behave", script = "SandboxMember common.context")]
+// Generated. All manual edits to the block annotated with #[sourcegen...] will be discarded.
+#[derive(Clone)]
 pub struct ConcreteNodeArc<S: AnyNodeStore> {
     pub(crate) contents: Arc<S>,
     pub(crate) common: Arc<NodeCommon>,
+}
+
+#[sourcegen::generated]
+impl<S: AnyNodeStore> ConcreteNodeArc<S> {
+    /// gets `Weak<Sandbox>` to the `Sandbox` that it is in
+    pub fn get_context(&self) -> Weak<Sandbox> {
+        self.common.context.clone()
+    }
+}
+
+#[sourcegen::generated]
+impl<S: AnyNodeStore> SandboxMemberBehavior for ConcreteNodeArc<S> {
+    fn get_context(&self) -> Weak<Sandbox> {
+        self.get_context()
+    }
 }
 
 #[derive(Clone)]
@@ -66,12 +81,6 @@ macro_rules! impl_concrete {
 
                 impl Buildable for ConcreteNodeArc<[<$name Store>]> {
                     type Storage = [<$name Store>];
-                }
-
-                impl SandboxMemberBehavior for ConcreteNodeArc<[<$name Store>]> {
-                    fn get_context(&self) -> Weak<Sandbox> {
-                        self.common.context.clone()
-                    }
                 }
 
                 impl TryFrom<AnyNodeArc> for ConcreteNodeArc<[<$name Store>]> {

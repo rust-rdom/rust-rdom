@@ -5,10 +5,8 @@ use crate::{
     node::{concrete::DocumentNodeArc, contents::DocumentStore},
 };
 
-crate::use_behaviors!(sandbox_member);
-
 /// A simulated window for static rendering
-#[sourcegen(generator = "behave", script = "SandboxMember context;")]
+#[sourcegen::sourcegen(generator = "behave", script = "SandboxMember context;")]
 // Generated. All manual edits to the block annotated with #[sourcegen...] will be discarded.
 #[derive(Clone)]
 pub struct Window {
