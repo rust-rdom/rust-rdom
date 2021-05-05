@@ -18,8 +18,8 @@ macro_rules! generate_preludes {
     };
 }
 
-#[macro_export]
 /// Provides use statements for behaviors
+#[macro_export]
 macro_rules! use_behaviors {
     ($($name:ident),*) => {
         paste::paste!{

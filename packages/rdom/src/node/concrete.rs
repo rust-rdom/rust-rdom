@@ -42,10 +42,10 @@ impl<S: AnyNodeStore> SandboxMemberBehavior for ConcreteNodeArc<S> {
     }
 }
 
-#[derive(Clone)]
 /// A strongly-typed handle to a node with a weak reference.
 /// Generic type `S` may be the underlying storage
 /// type of any node class.
+#[derive(Clone)]
 pub struct ConcreteNodeWeak<S: AnyNodeStore> {
     pub(crate) contents: Weak<S>,
     pub(crate) common: Weak<NodeCommon>,
