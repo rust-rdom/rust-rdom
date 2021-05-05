@@ -7,10 +7,9 @@ use crate::{
 
 crate::use_behaviors!(sandbox_member);
 
-#[sourcegen(generator = "window")]
+/// A simulated window for static rendering
+#[sourcegen(generator = "behave", script = "SandboxMember context;")]
 // Generated. All manual edits to the block annotated with #[sourcegen...] will be discarded.
-///A simulated window for static rendering
-///A simulated window for static rendering
 #[derive(Clone)]
 pub struct Window {
     document: DocumentNodeArc,
@@ -19,7 +18,7 @@ pub struct Window {
 
 #[sourcegen::generated]
 impl Window {
-    ///gets `Weak<Sandbox>` to the `Sandbox` that it is in
+    /// gets `Weak<Sandbox>` to the `Sandbox` that it is in
     pub fn get_context(&self) -> Weak<Sandbox> {
         self.context.clone()
     }
