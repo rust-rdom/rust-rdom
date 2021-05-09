@@ -4,7 +4,6 @@ use super::concrete::ConcreteNodeArc;
 use crate::internal_prelude::*;
 use crate::node::concrete::ElementNodeArc;
 use crate::sandbox::Builder;
-use crate::window::Window;
 
 macro_rules! declare_html_elements {
     ($($tag:literal => $name:ident),*) => {

@@ -47,8 +47,8 @@ impl ParentNodeBehaviorStorage {
     }
 }
 
-#[macro_export]
 /// Implements ParentBehavior
+#[macro_export]
 macro_rules! impl_parent_node {
     ($structname: ty, $($fieldname: ident).+) => {
         paste::paste! {

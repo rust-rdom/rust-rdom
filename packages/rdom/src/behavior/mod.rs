@@ -18,8 +18,8 @@ macro_rules! generate_preludes {
     };
 }
 
-#[macro_export]
 /// Provides use statements for behaviors
+#[macro_export]
 macro_rules! use_behaviors {
     ($($name:ident),*) => {
         paste::paste!{
@@ -35,7 +35,6 @@ pub mod parent_node;
 pub mod sandbox_member;
 
 generate_preludes! {
-    sandbox_member SandboxMember,
     parent_node ParentNode
 }
 

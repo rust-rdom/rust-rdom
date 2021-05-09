@@ -1,9 +1,0 @@
-behaviors = ["SandboxMember common.context"]
-
-[fields.contents]
-vis = "pub(crate)"
-ty = "NodeContentsArc"
-
-[fields.common]
-vis = "pub(crate)"
-ty = "Arc<NodeCommon>"
