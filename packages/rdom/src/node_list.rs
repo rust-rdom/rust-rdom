@@ -3,6 +3,19 @@
 
 use crate::internal_prelude::*;
 
+#[sourcegen::sourcegen(generator = "inject", template = "food")]
+// Generated. All manual edits to the block annotated with #[sourcegen...] will be discarded.
+
+struct Fibb {
+    parent_node: Option<AnyNodeWeak>,
+    left_sibling: Option<AnyNodeWeak>,
+    right_sibling: Option<AnyNodeWeak>,
+    child_nodes: RwLock<Vec<AnyNodeArc>>,
+}
+impl Fibb {
+    fn foo(&self) {}
+}
+
 /// Represents a [NodeList](https://developer.mozilla.org/en-US/docs/Web/API/NodeList) structure,
 /// which may be either "live" or "static". Note that these are not strongly retained by the
 /// Sandbox, and there is no guarantee they will work after the Sandbox has been dropped. So, to
