@@ -12,6 +12,7 @@ struct Fibb {
     right_sibling: Option<AnyNodeWeak>,
     child_nodes: RwLock<Vec<AnyNodeArc>>,
 }
+#[sourcegen::generated]
 impl Fibb {
     fn foo(&self) {}
 }

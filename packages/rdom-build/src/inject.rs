@@ -1,5 +1,4 @@
 use anyhow::anyhow;
-use lazy_static::lazy_static;
 use proc_macro2::{Span, TokenStream};
 use quote::quote;
 use sourcegen_cli::tokens::NewLine;
@@ -221,6 +220,7 @@ impl SourceGenerator for InjectionGenerator {
             }
 
             postlude.extend(quote! {
+                #[sourcegen::generated]
                 impl #ident#gen {
                     #stream
                 }
@@ -228,7 +228,6 @@ impl SourceGenerator for InjectionGenerator {
         }
 
         Ok(Some(quote! {
-            // #item
             #NewLine
             struct #ident#gen {
                 #fields
@@ -237,36 +236,3 @@ impl SourceGenerator for InjectionGenerator {
         }))
     }
 }
-
-// fn sandbox_member(item: &syn::ItemStruct, args: Vec<String>) -> Result<TokenStream, anyhow::Error> {
-//     let ident = &item.ident;
-//     let (impl_generics, ty_generics, where_clause) = &item.generics.split_for_impl();
-
-//     let mut args = args.into_iter();
-
-//     let field: TokenStream = match (args.next(), args.next()) {
-//         (Some(field), None) => Ok(field),
-//         _ => Err(anyhow!(
-//             "Correct usage for SandboxMember: SandboxMember context"
-//         )),
-//     }?
-//     .parse()
-//     .unwrap();
-
-//     Ok(quote! {
-//         #[sourcegen::generated]
-//         impl #impl_generics #ident #ty_generics #where_clause{
-//             /// gets `Weak<Sandbox>` to the `Sandbox` that it is in
-//             pub fn get_context(&self) -> Weak<Sandbox> {
-//                 self.#field.clone()
-//             }
-//         }
-//         #NewLine
-//         #[sourcegen::generated]
-//         impl #impl_generics SandboxMemberBehavior for #ident #ty_generics #where_clause{
-//             fn get_context(&self) -> Weak<Sandbox> {
-//                 self.get_context()
-//             }
-//         }
-//     })
-// }
