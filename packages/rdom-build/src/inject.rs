@@ -80,6 +80,7 @@ impl MixinSpec {
                 let field = Ident::new(field, Span::call_site());
 
                 Some(quote! {
+                    #NewLine
                     #[sourcegen::generated]
                     impl #impl_generics #ident #ty_generics #where_clause{
                         /// gets `Weak<Sandbox>` to the `Sandbox` that it is in
@@ -129,7 +130,16 @@ fn get_templates() -> HashMap<String, Template> {
     let mut m = HashMap::new();
     m.insert(
         "food".to_owned(),
-        Template::new(&[], "Fibb", &[MixinSpec::Node]),
+        Template::new(
+            &[],
+            "Fibb",
+            &[
+                MixinSpec::Node,
+                MixinSpec::SandboxMember {
+                    field: "context".to_owned(),
+                },
+            ],
+        ),
     );
     m
 }
@@ -220,6 +230,7 @@ impl SourceGenerator for InjectionGenerator {
             }
 
             postlude.extend(quote! {
+                #NewLine
                 #[sourcegen::generated]
                 impl #ident#gen {
                     #stream

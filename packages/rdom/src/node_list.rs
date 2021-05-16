@@ -12,6 +12,23 @@ struct Fibb {
     right_sibling: Option<AnyNodeWeak>,
     child_nodes: RwLock<Vec<AnyNodeArc>>,
 }
+
+#[sourcegen::generated]
+impl Fibb {
+    /// gets `Weak<Sandbox>` to the `Sandbox` that it is in
+    pub fn get_context(&self) -> Weak<Sandbox> {
+        self.context.clone()
+    }
+}
+
+#[sourcegen::generated]
+impl SandboxMemberBehavior for Fibb {
+    /// gets `Weak<Sandbox>` to the `Sandbox` that it is in
+    fn get_context(&self) -> Weak<Sandbox> {
+        self.get_context()
+    }
+}
+
 #[sourcegen::generated]
 impl Fibb {
     fn foo(&self) {}
