@@ -2,7 +2,7 @@
 
 use crate::internal_prelude::*;
 use crate::selector::Selector;
-use crate::{proxy_parent_node_behavior, proxy_node_behavior};
+use crate::{proxy_node_behavior, proxy_parent_node_behavior};
 
 use super::contents::{
     AttributeStore, CDataSectionStore, CommentStore, DocumentFragmentStore, DocumentStore,

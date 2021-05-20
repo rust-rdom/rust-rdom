@@ -1,5 +1,5 @@
-pub(crate) use super::node::NodeBehavior;
 pub(crate) use self::parent_node::ParentNodeBehavior;
+pub(crate) use super::node::NodeBehavior;
 
 /// Macro for generating preludes and enforcing mod names
 macro_rules! generate_preludes {

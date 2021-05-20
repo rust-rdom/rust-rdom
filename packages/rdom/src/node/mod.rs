@@ -1,10 +1,10 @@
 //! Types representing references to DOM nodes.
 
+use crate::behavior::sandbox_member::SandboxMemberBehavior;
 use crate::node_list::NodeList;
+use crate::proxy_node_behavior;
 use crate::selector::Selector;
 use crate::{behavior::parent_node_prelude::ParentNodeBehaviorStorage, internal_prelude::*};
-use crate::behavior::sandbox_member::SandboxMemberBehavior;
-use crate::proxy_node_behavior;
 
 use concrete::ElementNodeArc;
 use contents::{NodeContentsArc, NodeContentsWeak};
