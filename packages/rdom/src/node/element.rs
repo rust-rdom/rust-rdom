@@ -5,6 +5,8 @@ use crate::internal_prelude::*;
 use crate::node::concrete::ElementNodeArc;
 use crate::sandbox::Builder;
 
+use std::sync::RwLock;
+
 macro_rules! declare_html_elements {
     ($($tag:literal => $name:ident),*) => {
         paste::paste! {
@@ -32,6 +34,18 @@ macro_rules! declare_html_elements {
         }
     }
     };
+}
+
+#[sourcegen::sourcegen(generator = "inject", template = "element_store")]
+// Generated. All manual edits to the block annotated with #[sourcegen...] will be discarded.
+
+#[sourcegen::generated]
+struct ElementStoreOuter {
+    parent_node: Option<AnyNodeWeak>,
+    left_sibling: Option<AnyNodeWeak>,
+    right_sibling: Option<AnyNodeWeak>,
+    child_nodes: RwLock<Vec<AnyNodeArc>>,
+    inner: ElementStore,
 }
 
 /// Enum of all SVGElements

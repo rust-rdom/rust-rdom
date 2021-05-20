@@ -12,12 +12,15 @@ struct Template {
     ident: Ident,
     gen: Option<Generics>,
     mixins: Vec<MixinSpec>,
+    force_struct_declaration: bool,
 }
 
 #[derive(Clone)]
 enum MixinSpec {
+    ElementStoreOuter,
     ParentNode,
-    Node,
+    NodeStorage,
+    Node { node_type: String },
     SandboxMember { field: String },
 }
 
@@ -30,7 +33,7 @@ struct FieldSpec {
 impl MixinSpec {
     fn get_fields(&self) -> Vec<FieldSpec> {
         match self {
-            MixinSpec::Node => {
+            MixinSpec::NodeStorage => {
                 let mut v = Vec::new();
                 v.push(FieldSpec {
                     ident: Ident::new("parent_node", Span::call_site()),
@@ -54,17 +57,44 @@ impl MixinSpec {
                 });
 
                 v
+            },
+            MixinSpec::ElementStoreOuter => {
+                let mut v = Vec::new();
+                v.push(FieldSpec {
+                    ident: Ident::new("inner", Span::call_site()),
+                    ty: syn::parse_str("ElementStore").unwrap(),
+                    vis: syn::parse_str("").unwrap(),
+                });
+
+                v
             }
             _ => Vec::new(),
         }
     }
 
-    fn get_fn_impls(&self, _template: &Template) -> Option<TokenStream> {
+    fn get_fn_impls(&self, template: &Template) -> Option<TokenStream> {
+        let Template { ident, gen, .. } = template.clone();
+
+        let gen = gen.unwrap_or(Default::default());
+        let (impl_generics, ty_generics, where_clause) = gen.split_for_impl();
+
         match self {
-            MixinSpec::Node => Some(quote! {
-                fn foo(&self) {
-                }
-            }),
+            MixinSpec::Node { node_type } => {
+                let ident_store = {
+                    let store_name = format!("{}Store", node_type);
+                    Ident::new(store_name.as_ref(), Span::call_site())
+                };
+                Some(quote! {
+                    pub(crate) fn new(context: Weak<Sandbox>, contents: Arc<#ident_store>) ->
+                    ConcreteNodeArc<#ident_store> {
+                        let common = Arc::new_cyclic(|construction_weak| NodeCommon {
+                            context,
+                        });
+
+                        ConcreteNodeArc { contents, common }
+                    }
+                })
+            },
             _ => None,
         }
     }
@@ -101,10 +131,38 @@ impl MixinSpec {
             _ => None,
         }
     }
+
+    fn get_accessory_types(&self, template: &Template) -> Option<TokenStream> {
+        let Template { ident, gen, .. } = template.clone();
+
+        let gen = gen.unwrap_or(Default::default());
+        let (impl_generics, ty_generics, where_clause) = gen.split_for_impl();
+
+        match self {
+            MixinSpec::Node { node_type } => {
+                let ident_store = Ident::new(&format!("{}Store", node_type), Span::call_site());
+                let ident_weak = Ident::new(&format!("{}NodeWeak", node_type), Span::call_site());
+                let ident_arc = Ident::new(&format!("{}NodeArc", node_type), Span::call_site());
+                Some(quote! {
+                    #[sourcegen::generated]
+                    impl AnyNodeStore for #ident_store {}
+
+                    #[doc = "Convenience alias for a strong reference to a(n) " #ident " node"]
+                    #[sourcegen::generated]
+                    pub type #ident_arc = ConcreteNodeArc<#ident_store>;
+
+                    #[doc = "Convenience alias for a weak reference to a(n) " $name " node"]
+                    #[sourcegen::generated]
+                    pub type #ident_weak = ConcreteNodeWeak<#ident_store>;
+                })
+            },
+            _ => None,
+        }
+    }
 }
 
 impl Template {
-    fn new(args: &[&'static str], signature: &'static str, mixins: &[MixinSpec]) -> Self {
+    fn new(args: &[&'static str], signature: &'static str, mixins: &[MixinSpec], force_struct_declaration: bool) -> Self {
         let (ident_raw, gen_raw) = signature
             .split_once("<")
             .map(|(ty, rest)| (ty, rest.strip_suffix(">").expect("Unclosed <>")))
@@ -122,6 +180,7 @@ impl Template {
             ident,
             gen,
             mixins: mixins.into(),
+            force_struct_declaration,
         }
     }
 }
@@ -129,16 +188,28 @@ impl Template {
 fn get_templates() -> HashMap<String, Template> {
     let mut m = HashMap::new();
     m.insert(
-        "food".to_owned(),
+        "element_store".to_owned(),
         Template::new(
             &[],
-            "Fibb",
+            "ElementStoreOuter",
             &[
-                MixinSpec::Node,
-                MixinSpec::SandboxMember {
-                    field: "context".to_owned(),
+                MixinSpec::NodeStorage,
+                MixinSpec::ElementStoreOuter,
+            ],
+            false,
+        ),
+    );
+    m.insert(
+        "concrete_node_element".to_owned(),
+        Template::new(
+            &[],
+            "ConcreteNodeArc<ElementStore>",
+            &[
+                MixinSpec::Node {
+                    node_type: "Element".to_owned(),
                 },
             ],
+            false,
         ),
     );
     m
@@ -202,23 +273,29 @@ impl SourceGenerator for InjectionGenerator {
             ident,
             gen,
             mixins,
-            args: _,
-        } = template;
+            ..
+        } = template.clone();
 
         let mut postlude = TokenStream::new();
-        for mixin in mixins {
+        for mixin in mixins.clone() {
             if let Some(tokens) = mixin.get_trait_impls(template) {
+                postlude.extend(tokens);
+            }
+
+            if let Some(tokens) = mixin.get_accessory_types(template) {
                 postlude.extend(tokens);
             }
         }
 
         let mut fields = TokenStream::new();
-        for mixin in mixins {
+        let mut has_fields = false;
+        for mixin in mixins.clone() {
             for field in mixin.get_fields() {
                 let FieldSpec { ident, ty, vis } = field;
                 fields.extend(quote! {
                     #vis #ident: #ty,
                 });
+                has_fields = true;
             }
         }
 
@@ -229,21 +306,34 @@ impl SourceGenerator for InjectionGenerator {
                 stream.extend(fn_impl);
             }
 
+            let gen = gen.clone().unwrap_or(Default::default());
+            let (impl_generics, ty_generics, where_clause) = gen.split_for_impl();
+
             postlude.extend(quote! {
                 #NewLine
                 #[sourcegen::generated]
-                impl #ident#gen {
+                impl #ident #ty_generics #where_clause {
                     #stream
                 }
             })
         }
 
-        Ok(Some(quote! {
-            #NewLine
-            struct #ident#gen {
-                #fields
-            }
-            #postlude
-        }))
+
+        if has_fields || template.force_struct_declaration {
+            Ok(Some(quote! {
+                #NewLine
+                #[sourcegen::generated]
+                struct #ident#gen {
+                    #fields
+                }
+                #postlude
+            }))
+        } else {
+            Ok(Some(quote! {
+                #NewLine
+                #postlude
+            }))
+        }
+
     }
 }

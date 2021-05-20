@@ -167,8 +167,32 @@ macro_rules! impl_concrete {
     }
 }
 
+#[sourcegen::sourcegen(generator = "inject", template = "concrete_node_element")]
+const _: () =  { 
+};
+
+#[sourcegen::generated]
+impl AnyNodeStore for ElementStore {}
+///Convenience alias for a strong reference to a(n)
+#[sourcegen::generated]
+pub type ElementNodeArc = ConcreteNodeArc<ElementStore>;
+///Convenience alias for a weak reference to a(n)
+#[sourcegen::generated]
+pub type ElementNodeWeak = ConcreteNodeWeak<ElementStore>;
+
+#[sourcegen::generated]
+impl ConcreteNodeArc<ElementStore> {
+    pub(crate) fn new(
+        context: Weak<Sandbox>,
+        contents: Arc<ElementStore>,
+    ) -> ConcreteNodeArc<ElementStore> {
+        let common = Arc::new_cyclic(|construction_weak| NodeCommon { context });
+        ConcreteNodeArc { contents, common }
+    }
+} 
+
+//    1 => Element,
 impl_concrete! {
-    1 => Element,
     2 => Attribute,
     3 => Text,
     4 => CDataSection,
