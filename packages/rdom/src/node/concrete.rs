@@ -157,7 +157,7 @@ macro_rules! impl_concrete {
                         AnyNodeArc::from(self.clone()).clone_node()
                     }
 
-                    fn get_node_type(&self) -> isize {
+                    fn node_type(&self) -> isize {
                         $ti
                     }
 

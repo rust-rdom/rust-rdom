@@ -23,7 +23,7 @@ pub(crate) trait NodeBehavior {
     /// Clones node
     fn clone_node(&self) -> AnyNodeArc;
     /// [Node.getType](https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType)
-    fn get_node_type(&self) -> isize;
+    fn node_type(&self) -> isize;
     /// [.querySelector](https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector)
     fn query_selector(&self, selector: &Selector) -> Result<Option<ElementNodeArc>, DomError>;
 }
@@ -55,7 +55,7 @@ macro_rules! proxy_node_behavior {
             }
             /// [Node.getType](https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType)
             pub fn node_type(&self) -> isize {
-                <Self as crate::behavior::NodeBehavior>::get_node_type(self)
+                <Self as crate::behavior::NodeBehavior>::node_type(self)
             }
             /// [.querySelector](https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector)
             pub fn query_selector(&self, selector: &Selector) -> Result<Option<ElementNodeArc>, DomError> {

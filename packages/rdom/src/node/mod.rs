@@ -135,7 +135,7 @@ impl NodeBehavior for AnyNodeArc {
         AnyNodeArc::new(self.get_context(), contents)
     }
 
-    fn get_node_type(&self) -> isize {
+    fn node_type(&self) -> isize {
         self.contents.to_node_type().get_node_number()
     }
 
