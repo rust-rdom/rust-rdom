@@ -6,7 +6,7 @@ use crate::node::contents::NodeType;
 use crate::node::NodeCommon;
 use crate::selector::Selector;
 
-pub trait ParentNodeBehavior {
+pub(crate) trait ParentNodeBehavior {
     fn child_element_count(&self) -> Result<usize, DomError>;
 }
 

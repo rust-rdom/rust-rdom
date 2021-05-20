@@ -2,6 +2,7 @@
 
 use crate::internal_prelude::*;
 use crate::selector::Selector;
+use crate::proxy_node_behavior;
 
 use super::contents::{
     AttributeStore, CDataSectionStore, CommentStore, DocumentFragmentStore, DocumentStore,
@@ -77,6 +78,8 @@ macro_rules! impl_concrete {
 
                         ConcreteNodeArc { contents, common }
                     }
+
+                    proxy_node_behavior!();
                 }
 
                 impl Buildable for ConcreteNodeArc<[<$name Store>]> {

@@ -1,6 +1,5 @@
 use rdom::config::ScreenMetrics;
 use rdom::node::concrete::*;
-use rdom::node::NodeBehavior;
 use rdom::sandbox::Sandbox;
 
 fn main() {

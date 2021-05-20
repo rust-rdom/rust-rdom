@@ -1,6 +1,6 @@
 #![macro_use]
 
-pub trait ElementBehavior {}
+pub(crate) trait ElementBehavior {}
 pub struct ElementBehaviorStorage;
 
 /// Implements ElementBehavior
