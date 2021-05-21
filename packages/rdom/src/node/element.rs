@@ -40,7 +40,7 @@ pub enum SvgElementStore {}
 
 /// Enum of all concrete elements
 #[derive(Clone)]
-pub enum ElementStore {
+pub enum ElementNodeStore {
     /// Enum variant for an HTMLElement
     HtmlElement(HtmlElementStore),
 
@@ -48,12 +48,12 @@ pub enum ElementStore {
     SvgElement(SvgElementStore),
 }
 
-impl ElementStore {
+impl ElementNodeStore {
     /// [Element.tagName](https://developer.mozilla.org/en-US/docs/Web/API/Element/tagName)
     pub fn tag_name(&self) -> String {
         match self {
-            ElementStore::HtmlElement(el) => el.tag_name(),
-            ElementStore::SvgElement(_) => {
+            ElementNodeStore::HtmlElement(el) => el.tag_name(),
+            ElementNodeStore::SvgElement(_) => {
                 unimplemented!()
             }
         }
@@ -86,40 +86,40 @@ impl Builder<ElementNodeArc> {
     // concrete types representing each element type.
 
     /// Builds a new HtmlHtmlElement node with a weak reference to its corresponding window
-    pub fn build_html(&self) -> ConcreteNodeArc<ElementStore> {
-        ConcreteNodeArc::<ElementStore>::new(
+    pub fn build_html(&self) -> ConcreteNodeArc<ElementNodeStore> {
+        ConcreteNodeArc::<ElementNodeStore>::new(
             self.sandbox.clone(),
-            Arc::new(ElementStore::HtmlElement(HtmlElementStore::HtmlHtml(
+            Arc::new(ElementNodeStore::HtmlElement(HtmlElementStore::HtmlHtml(
                 HtmlHtmlStore,
             ))),
         )
     }
 
     /// Builds a new HtmlBodyElement node
-    pub fn build_body(&self) -> ConcreteNodeArc<ElementStore> {
-        ConcreteNodeArc::<ElementStore>::new(
+    pub fn build_body(&self) -> ConcreteNodeArc<ElementNodeStore> {
+        ConcreteNodeArc::<ElementNodeStore>::new(
             self.sandbox.clone(),
-            Arc::new(ElementStore::HtmlElement(HtmlElementStore::HtmlBody(
+            Arc::new(ElementNodeStore::HtmlElement(HtmlElementStore::HtmlBody(
                 HtmlBodyStore,
             ))),
         )
     }
 
     /// Builds a new HtmlButtonElement node
-    pub fn build_button(&self) -> ConcreteNodeArc<ElementStore> {
-        ConcreteNodeArc::<ElementStore>::new(
+    pub fn build_button(&self) -> ConcreteNodeArc<ElementNodeStore> {
+        ConcreteNodeArc::<ElementNodeStore>::new(
             self.sandbox.clone(),
-            Arc::new(ElementStore::HtmlElement(HtmlElementStore::HtmlButton(
+            Arc::new(ElementNodeStore::HtmlElement(HtmlElementStore::HtmlButton(
                 HtmlButtonStore,
             ))),
         )
     }
 
     /// Builds a new HtmlUnknownElement node
-    pub fn build_unknown(&self, tag_name: String) -> ConcreteNodeArc<ElementStore> {
-        ConcreteNodeArc::<ElementStore>::new(
+    pub fn build_unknown(&self, tag_name: String) -> ConcreteNodeArc<ElementNodeStore> {
+        ConcreteNodeArc::<ElementNodeStore>::new(
             self.sandbox.clone(),
-            Arc::new(ElementStore::HtmlElement(HtmlElementStore::HtmlUnknown(
+            Arc::new(ElementNodeStore::HtmlElement(HtmlElementStore::HtmlUnknown(
                 HtmlUnknownStore { tag_name },
             ))),
         )

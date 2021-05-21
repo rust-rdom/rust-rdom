@@ -5,7 +5,7 @@ use crate::internal_prelude::*;
 use crate::sandbox::Builder;
 use crate::window::Window;
 
-pub use super::element::ElementStore;
+use super::element::ElementNodeStore as ElementStore;
 
 macro_rules! declare_contents {
     ($($ti:expr => $name:ident),*) => {
