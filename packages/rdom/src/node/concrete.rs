@@ -2,6 +2,7 @@
 
 use crate::internal_prelude::*;
 use crate::selector::Selector;
+use crate::{proxy_node_behavior, proxy_parent_node_behavior};
 
 use super::contents::{
     AttributeStore, CDataSectionStore, CommentStore, DocumentFragmentStore, DocumentStore,
@@ -77,6 +78,8 @@ macro_rules! impl_concrete {
 
                         ConcreteNodeArc { contents, common }
                     }
+
+                    proxy_node_behavior!();
                 }
 
                 impl Buildable for ConcreteNodeArc<[<$name Store>]> {
@@ -154,7 +157,7 @@ macro_rules! impl_concrete {
                         AnyNodeArc::from(self.clone()).clone_node()
                     }
 
-                    fn get_node_type(&self) -> isize {
+                    fn node_type(&self) -> isize {
                         $ti
                     }
 
@@ -181,6 +184,14 @@ impl_concrete! {
 
 impl_parent_node!(ConcreteNodeArc<ElementStore>, common.parent_node_behavior);
 impl_parent_node!(ConcreteNodeArc<DocumentStore>, common.parent_node_behavior);
+
+impl ConcreteNodeArc<ElementStore> {
+    proxy_parent_node_behavior!();
+}
+
+impl ConcreteNodeArc<DocumentStore> {
+    proxy_parent_node_behavior!();
+}
 
 impl DocumentNodeArc {
     /// Creates a new text node with the given text contents

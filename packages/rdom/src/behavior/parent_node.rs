@@ -6,7 +6,8 @@ use crate::node::contents::NodeType;
 use crate::node::NodeCommon;
 use crate::selector::Selector;
 
-pub trait ParentNodeBehavior {
+/// ParentNodeBehavior trait for internal use only.
+pub(crate) trait ParentNodeBehavior {
     fn child_element_count(&self) -> Result<usize, DomError>;
 }
 
@@ -47,7 +48,7 @@ impl ParentNodeBehaviorStorage {
     }
 }
 
-/// Implements ParentBehavior
+/// Implements ParentNodeBehavior
 #[macro_export]
 macro_rules! impl_parent_node {
     ($structname: ty, $($fieldname: ident).+) => {
@@ -56,6 +57,19 @@ macro_rules! impl_parent_node {
                 fn child_element_count(&self) -> Result<usize, DomError> {
                     self.$($fieldname).+.child_element_count()
                 }
+            }
+        }
+    };
+}
+
+/// Passes methods through to ParentNodeBehavior, for public use.
+#[macro_export]
+macro_rules! proxy_parent_node_behavior {
+    () => {
+        paste::paste! {
+            /// Number of child elements
+            pub fn child_element_count(&self) -> Result<usize, DomError> {
+                <Self as crate::behavior::ParentNodeBehavior>::child_element_count(self)
             }
         }
     };

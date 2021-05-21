@@ -1,10 +1,11 @@
 //! Types representing references to DOM nodes.
 
+use crate::behavior::sandbox_member::SandboxMemberBehavior;
 use crate::node_list::NodeList;
+use crate::proxy_node_behavior;
 use crate::selector::Selector;
 use crate::{behavior::parent_node_prelude::ParentNodeBehaviorStorage, internal_prelude::*};
 
-use crate::behavior::sandbox_member::SandboxMemberBehavior;
 use concrete::ElementNodeArc;
 use contents::{NodeContentsArc, NodeContentsWeak};
 use graph_storage::NodeGraphStorage;
@@ -14,7 +15,7 @@ pub mod contents;
 pub mod element;
 pub(crate) mod graph_storage;
 
-pub use crate::behavior::node::NodeBehavior;
+pub(crate) use crate::behavior::node::NodeBehavior;
 
 /// Marker trait implemented by all node storage classes.
 pub trait AnyNodeStore {}
@@ -108,6 +109,8 @@ impl AnyNodeArc {
 
         AnyNodeArc { contents, common }
     }
+
+    proxy_node_behavior!();
 }
 
 impl NodeBehavior for AnyNodeArc {
@@ -132,7 +135,7 @@ impl NodeBehavior for AnyNodeArc {
         AnyNodeArc::new(self.get_context(), contents)
     }
 
-    fn get_node_type(&self) -> isize {
+    fn node_type(&self) -> isize {
         self.contents.to_node_type().get_node_number()
     }
 

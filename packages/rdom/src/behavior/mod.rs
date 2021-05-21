@@ -1,4 +1,5 @@
-pub use super::node::NodeBehavior;
+pub(crate) use self::parent_node::ParentNodeBehavior;
+pub(crate) use super::node::NodeBehavior;
 
 /// Macro for generating preludes and enforcing mod names
 macro_rules! generate_preludes {
@@ -6,12 +7,12 @@ macro_rules! generate_preludes {
         paste::paste! {
             $(
                 pub mod [<$modname _prelude>] {
-                    pub use super::$modname::{
+                    pub(crate) use super::$modname::{
                         [<$traitname Behavior>],
                         [<$traitname BehaviorStorage>]
                     };
 
-                    pub use crate::[<impl_ $modname>];
+                    pub(crate) use crate::[<impl_ $modname>];
                 }
             )*
         }
@@ -40,5 +41,5 @@ generate_preludes! {
 
 pub mod node;
 pub mod node_prelude {
-    pub use super::node::NodeBehavior;
+    pub(crate) use super::node::NodeBehavior;
 }

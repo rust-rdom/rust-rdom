@@ -3,14 +3,13 @@
 use std::convert::{TryFrom, TryInto};
 use std::sync::Arc;
 
-use crate::behavior::parent_node::ParentNodeBehavior;
 use crate::config::ScreenMetrics;
 use crate::node::concrete::*;
 use crate::node::contents::{AttributeStore, CommentStore, NodeType, TextStore};
 use crate::node::element::{
     ElementStore, HtmlBodyStore, HtmlButtonStore, HtmlElementStore, HtmlHtmlStore,
 };
-use crate::node::{AnyNodeArc, NodeBehavior};
+use crate::node::AnyNodeArc;
 use crate::sandbox::Sandbox;
 use crate::selector::Selector;
 
@@ -42,7 +41,7 @@ macro_rules! test_node_creation {
         doc.append_child(node.into());
         assert_eq!(doc.child_nodes().length(), 1);
         assert_eq!(
-            doc.first_child().unwrap().get_node_type(),
+            doc.first_child().unwrap().node_type(),
             $node_type.get_node_number()
         );
 
