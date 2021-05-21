@@ -1,9 +1,9 @@
 //! Data and functionality to each element type live here.
 
 use super::concrete::ConcreteNodeArc;
-use crate::internal_prelude::*;
 use crate::node::concrete::ElementNodeArc;
 use crate::sandbox::Builder;
+use crate::{internal_prelude::*, named_node_map::NamedNodeMap};
 
 macro_rules! declare_html_elements {
     ($($tag:literal => $name:ident),*) => {
@@ -40,7 +40,9 @@ pub enum SvgElementStore {}
 
 /// Data common to all elements
 #[derive(Clone)]
-pub struct ElementCommon {}
+pub struct ElementCommon {
+    attrs: Arc<NamedNodeMap>,
+}
 
 /// Layer at the top of element storage
 #[derive(Clone)]
@@ -50,10 +52,12 @@ pub struct ElementStore {
 }
 
 impl ElementStore {
-    pub(crate) fn new(node_store: ElementKind) -> ElementStore {
+    pub(crate) fn new(node_store: ElementKind, context: Weak<Sandbox>) -> ElementStore {
         ElementStore {
             node_store,
-            element_common: ElementCommon {},
+            element_common: ElementCommon {
+                attrs: NamedNodeMap::new(context),
+            },
         }
     }
 
@@ -114,9 +118,10 @@ impl Builder<ElementNodeArc> {
     pub fn build_html(&self) -> ConcreteNodeArc<ElementStore> {
         ConcreteNodeArc::<ElementStore>::new(
             self.sandbox.clone(),
-            Arc::new(ElementStore::new(ElementKind::HtmlElement(
-                HtmlElementStore::HtmlHtml(HtmlHtmlStore),
-            ))),
+            Arc::new(ElementStore::new(
+                ElementKind::HtmlElement(HtmlElementStore::HtmlHtml(HtmlHtmlStore)),
+                self.sandbox.clone(),
+            )),
         )
     }
 
@@ -124,9 +129,10 @@ impl Builder<ElementNodeArc> {
     pub fn build_body(&self) -> ConcreteNodeArc<ElementStore> {
         ConcreteNodeArc::<ElementStore>::new(
             self.sandbox.clone(),
-            Arc::new(ElementStore::new(ElementKind::HtmlElement(
-                HtmlElementStore::HtmlBody(HtmlBodyStore),
-            ))),
+            Arc::new(ElementStore::new(
+                ElementKind::HtmlElement(HtmlElementStore::HtmlBody(HtmlBodyStore)),
+                self.sandbox.clone(),
+            )),
         )
     }
 
@@ -134,9 +140,10 @@ impl Builder<ElementNodeArc> {
     pub fn build_button(&self) -> ConcreteNodeArc<ElementStore> {
         ConcreteNodeArc::<ElementStore>::new(
             self.sandbox.clone(),
-            Arc::new(ElementStore::new(ElementKind::HtmlElement(
-                HtmlElementStore::HtmlButton(HtmlButtonStore),
-            ))),
+            Arc::new(ElementStore::new(
+                ElementKind::HtmlElement(HtmlElementStore::HtmlButton(HtmlButtonStore)),
+                self.sandbox.clone(),
+            )),
         )
     }
 
@@ -144,9 +151,12 @@ impl Builder<ElementNodeArc> {
     pub fn build_unknown(&self, tag_name: String) -> ConcreteNodeArc<ElementStore> {
         ConcreteNodeArc::<ElementStore>::new(
             self.sandbox.clone(),
-            Arc::new(ElementStore::new(ElementKind::HtmlElement(
-                HtmlElementStore::HtmlUnknown(HtmlUnknownStore { tag_name }),
-            ))),
+            Arc::new(ElementStore::new(
+                ElementKind::HtmlElement(HtmlElementStore::HtmlUnknown(HtmlUnknownStore {
+                    tag_name,
+                })),
+                self.sandbox.clone(),
+            )),
         )
     }
 }

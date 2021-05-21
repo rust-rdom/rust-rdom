@@ -2,7 +2,6 @@
 //! and associated metadata.
 
 use crate::internal_prelude::*;
-use crate::node::AnyNodeWeak;
 
 /// A [NamedNodeMap](https://developer.mozilla.org/en-US/docs/Web/API/NamedNodeMap) structure
 #[sourcegen::sourcegen(generator = "behave", script = "SandboxMember context")]
@@ -14,9 +13,6 @@ pub struct NamedNodeMap {
     /// that they are actually attribute nodes as opposed to another kind
     /// of node. This is where it would be nice to have a `nice` representation.
     pub attribute_list: Vec<AnyNodeArc>,
-    /// Reference back up to the core element
-    /// would be nice to know this is actually an Element (same as above)
-    pub element: AnyNodeWeak,
 }
 
 #[sourcegen::generated]
@@ -35,10 +31,9 @@ impl SandboxMemberBehavior for NamedNodeMap {
 }
 
 impl NamedNodeMap {
-    fn new(context: Weak<Sandbox>, element: AnyNodeWeak) -> Arc<NamedNodeMap> {
+    pub(crate) fn new(context: Weak<Sandbox>) -> Arc<NamedNodeMap> {
         Arc::new(NamedNodeMap {
             context,
-            element,
             attribute_list: Vec::new(),
         })
     }
