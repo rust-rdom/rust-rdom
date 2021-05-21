@@ -40,9 +40,7 @@ pub enum SvgElementStore {}
 
 /// Data common to all elements
 #[derive(Clone)]
-pub struct ElementCommon {
-
-}
+pub struct ElementCommon {}
 
 /// Layer at the top of element storage
 #[derive(Clone)]
@@ -55,7 +53,7 @@ impl ElementStore {
     pub(crate) fn new(node_store: ElementKind) -> ElementStore {
         ElementStore {
             node_store,
-            element_common: ElementCommon {}
+            element_common: ElementCommon {},
         }
     }
 
@@ -116,9 +114,9 @@ impl Builder<ElementNodeArc> {
     pub fn build_html(&self) -> ConcreteNodeArc<ElementStore> {
         ConcreteNodeArc::<ElementStore>::new(
             self.sandbox.clone(),
-            Arc::new(ElementStore::new(ElementKind::HtmlElement(HtmlElementStore::HtmlHtml(
-                HtmlHtmlStore,
-            )))),
+            Arc::new(ElementStore::new(ElementKind::HtmlElement(
+                HtmlElementStore::HtmlHtml(HtmlHtmlStore),
+            ))),
         )
     }
 
@@ -126,9 +124,9 @@ impl Builder<ElementNodeArc> {
     pub fn build_body(&self) -> ConcreteNodeArc<ElementStore> {
         ConcreteNodeArc::<ElementStore>::new(
             self.sandbox.clone(),
-            Arc::new(ElementStore::new(ElementKind::HtmlElement(HtmlElementStore::HtmlBody(
-                HtmlBodyStore,
-            )))),
+            Arc::new(ElementStore::new(ElementKind::HtmlElement(
+                HtmlElementStore::HtmlBody(HtmlBodyStore),
+            ))),
         )
     }
 
@@ -136,9 +134,9 @@ impl Builder<ElementNodeArc> {
     pub fn build_button(&self) -> ConcreteNodeArc<ElementStore> {
         ConcreteNodeArc::<ElementStore>::new(
             self.sandbox.clone(),
-            Arc::new(ElementStore::new(ElementKind::HtmlElement(HtmlElementStore::HtmlButton(
-                HtmlButtonStore,
-            )))),
+            Arc::new(ElementStore::new(ElementKind::HtmlElement(
+                HtmlElementStore::HtmlButton(HtmlButtonStore),
+            ))),
         )
     }
 
@@ -146,9 +144,9 @@ impl Builder<ElementNodeArc> {
     pub fn build_unknown(&self, tag_name: String) -> ConcreteNodeArc<ElementStore> {
         ConcreteNodeArc::<ElementStore>::new(
             self.sandbox.clone(),
-            Arc::new(ElementStore::new(ElementKind::HtmlElement(HtmlElementStore::HtmlUnknown(
-                HtmlUnknownStore { tag_name },
-            )))),
+            Arc::new(ElementStore::new(ElementKind::HtmlElement(
+                HtmlElementStore::HtmlUnknown(HtmlUnknownStore { tag_name }),
+            ))),
         )
     }
 }
