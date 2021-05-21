@@ -22,7 +22,7 @@ fn it_works() {
         Arc::downgrade(&sbox),
         Arc::new(ElementStore::new(ElementKind::HtmlElement(
             HtmlElementStore::HtmlHtml(HtmlHtmlStore {}),
-        ))),
+        ), Arc::downgrade(&sbox))),
     )
     .into();
     let _text = doc.create_text_node("Hello, world!".to_string());
@@ -31,9 +31,8 @@ fn it_works() {
 }
 
 macro_rules! test_node_creation {
-    ($ty: ty, $node_type: expr, $storage: expr) => {{
-        let metrics: ScreenMetrics = Default::default();
-        let sbox = Sandbox::new(metrics);
+    ($ty: ty, $node_type: expr, $storage: expr, $sbox: expr) => {{
+        let sbox = $sbox;
         let doc = sbox.clone().window().document();
         let weak_sbox = Arc::downgrade(&sbox);
 
@@ -51,28 +50,36 @@ macro_rules! test_node_creation {
 
 #[test]
 fn test_element_node_m() {
+    let metrics: ScreenMetrics = Default::default();
+    let sbox = Sandbox::new(metrics);
     let _elem = test_node_creation!(
         ElementNodeArc,
         NodeType::Element,
         Arc::new(ElementStore::new(ElementKind::HtmlElement(
             HtmlElementStore::HtmlButton(HtmlButtonStore)
-        )))
+        ), Arc::downgrade(&sbox))),
+        sbox.clone()
     );
 }
 
 #[test]
 fn test_attr_node() {
-    let _doc = test_node_creation!(AttributeNodeArc, NodeType::Attribute, Default::default());
+    let metrics: ScreenMetrics = Default::default();
+    let sbox = Sandbox::new(metrics);
+    let _doc = test_node_creation!(AttributeNodeArc, NodeType::Attribute, Default::default(), sbox);
 }
 
 #[test]
 fn test_text_node() {
+    let metrics: ScreenMetrics = Default::default();
+    let sbox = Sandbox::new(metrics);
     let text = test_node_creation!(
         TextNodeArc,
         NodeType::Text,
         Arc::new(TextStore {
             data: "test".to_owned()
-        })
+        }),
+        sbox
     );
 
     let node = text.first_child().unwrap();
@@ -89,48 +96,63 @@ fn test_text_node() {
 
 #[test]
 fn test_c_data_section_node_node() {
+    let metrics: ScreenMetrics = Default::default();
+    let sbox = Sandbox::new(metrics);
     let _cds = test_node_creation!(
         CDataSectionNodeArc,
         NodeType::CDataSection,
-        Default::default()
+        Default::default(),
+        sbox
     );
 }
 
 #[test]
 fn test_processing_instruction_node() {
+    let metrics: ScreenMetrics = Default::default();
+    let sbox = Sandbox::new(metrics);
     let _pi = test_node_creation!(
         ProcessingInstructionNodeArc,
         NodeType::ProcessingInstruction,
-        Default::default()
+        Default::default(),
+        sbox
     );
 }
 
 #[test]
 fn test_comment_node() {
+    let metrics: ScreenMetrics = Default::default();
+    let sbox = Sandbox::new(metrics);
     let _com = test_node_creation!(
         CommentNodeArc,
         NodeType::Comment,
         Arc::new(CommentStore {
             data: "test".to_owned()
-        })
+        }),
+        sbox
     );
 }
 
 #[test]
 fn test_document_type_node() {
+    let metrics: ScreenMetrics = Default::default();
+    let sbox = Sandbox::new(metrics);
     let _dt = test_node_creation!(
         DocumentTypeNodeArc,
         NodeType::DocumentType,
-        Default::default()
+        Default::default(),
+        sbox
     );
 }
 
 #[test]
 fn test_document_fragment_node() {
+    let metrics: ScreenMetrics = Default::default();
+    let sbox = Sandbox::new(metrics);
     let _frag = test_node_creation!(
         DocumentFragmentNodeArc,
         NodeType::DocumentFragment,
-        Default::default()
+        Default::default(),
+        sbox
     );
 }
 
@@ -149,12 +171,15 @@ fn can_build_node() {
 
 #[test]
 fn tag_name() {
+    let metrics: ScreenMetrics = Default::default();
+    let sbox = Sandbox::new(metrics);
+    let sbox_weak = Arc::downgrade(&sbox);
     let button = ElementStore::new(ElementKind::HtmlElement(HtmlElementStore::HtmlButton(
         HtmlButtonStore,
-    )));
+    )), sbox_weak.clone());
     let body = ElementStore::new(ElementKind::HtmlElement(HtmlElementStore::HtmlBody(
         HtmlBodyStore,
-    )));
+    )), sbox_weak.clone());
     assert_eq!(button.tag_name(), "BUTTON");
     assert_eq!(body.tag_name(), "BODY");
 }
@@ -168,13 +193,13 @@ fn selector() {
         sbox.clone(),
         Arc::new(ElementStore::new(ElementKind::HtmlElement(
             HtmlElementStore::HtmlButton(HtmlButtonStore),
-        ))),
+        ), sbox.clone())),
     );
     let body = ElementNodeArc::new(
         sbox.clone(),
         Arc::new(ElementStore::new(ElementKind::HtmlElement(
             HtmlElementStore::HtmlBody(HtmlBodyStore),
-        ))),
+        ), sbox.clone())),
     );
 
     let button_any: AnyNodeArc = button.clone().into();
@@ -195,13 +220,13 @@ fn query_selector() {
         sbox.clone(),
         Arc::new(ElementStore::new(ElementKind::HtmlElement(
             HtmlElementStore::HtmlButton(HtmlButtonStore),
-        ))),
+        ), sbox.clone())),
     );
     let body = ElementNodeArc::new(
         sbox.clone(),
         Arc::new(ElementStore::new(ElementKind::HtmlElement(
             HtmlElementStore::HtmlBody(HtmlBodyStore),
-        ))),
+        ), sbox.clone())),
     );
 
     let buttonselector = Selector::try_from("BUTTON").unwrap();
@@ -229,13 +254,13 @@ fn query_selector_child() {
         sbox.clone(),
         Arc::new(ElementStore::new(ElementKind::HtmlElement(
             HtmlElementStore::HtmlButton(HtmlButtonStore),
-        ))),
+        ), sbox.clone())),
     );
     let body = ElementNodeArc::new(
         sbox.clone(),
         Arc::new(ElementStore::new(ElementKind::HtmlElement(
             HtmlElementStore::HtmlBody(HtmlBodyStore),
-        ))),
+        ), sbox.clone())),
     );
 
     let buttonselector = Selector::try_from("BUTTON").unwrap();
