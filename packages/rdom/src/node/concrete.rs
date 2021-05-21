@@ -12,7 +12,7 @@ use super::{
     AnyNodeStore, Buildable, NodeBehavior, NodeCommon, NodeContentsArc, NodeContentsWeak,
     NodeGraphStorage,
 };
-use crate::node::element::{ElementNodeStore as ElementStore};
+use crate::node::element::ElementStore;
 use crate::node_list::NodeList;
 use std::convert::TryFrom;
 crate::use_behaviors!(parent_node);

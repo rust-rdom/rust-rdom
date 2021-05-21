@@ -7,7 +7,7 @@ use crate::config::ScreenMetrics;
 use crate::node::concrete::*;
 use crate::node::contents::{AttributeStore, CommentStore, NodeType, TextStore};
 use crate::node::element::{
-    ElementNodeStore, HtmlBodyStore, HtmlButtonStore, HtmlElementStore, HtmlHtmlStore,
+    ElementStore, ElementKind, HtmlBodyStore, HtmlButtonStore, HtmlElementStore, HtmlHtmlStore,
 };
 use crate::node::AnyNodeArc;
 use crate::sandbox::Sandbox;
@@ -20,9 +20,9 @@ fn it_works() {
     let doc = sbox.clone().window().document();
     let document_element = ElementNodeArc::new(
         Arc::downgrade(&sbox),
-        Arc::new(ElementNodeStore::HtmlElement(HtmlElementStore::HtmlHtml(
+        Arc::new(ElementStore::new(ElementKind::HtmlElement(HtmlElementStore::HtmlHtml(
             HtmlHtmlStore {},
-        ))),
+        )))),
     )
     .into();
     let _text = doc.create_text_node("Hello, world!".to_string());
@@ -54,9 +54,9 @@ fn test_element_node_m() {
     let _elem = test_node_creation!(
         ElementNodeArc,
         NodeType::Element,
-        Arc::new(ElementNodeStore::HtmlElement(HtmlElementStore::HtmlButton(
+        Arc::new(ElementStore::new(ElementKind::HtmlElement(HtmlElementStore::HtmlButton(
             HtmlButtonStore
-        )))
+        ))))
     );
 }
 
@@ -149,8 +149,8 @@ fn can_build_node() {
 
 #[test]
 fn tag_name() {
-    let button = ElementNodeStore::HtmlElement(HtmlElementStore::HtmlButton(HtmlButtonStore));
-    let body = ElementNodeStore::HtmlElement(HtmlElementStore::HtmlBody(HtmlBodyStore));
+    let button = ElementStore::new(ElementKind::HtmlElement(HtmlElementStore::HtmlButton(HtmlButtonStore)));
+    let body = ElementStore::new(ElementKind::HtmlElement(HtmlElementStore::HtmlBody(HtmlBodyStore)));
     assert_eq!(button.tag_name(), "BUTTON");
     assert_eq!(body.tag_name(), "BODY");
 }
@@ -162,15 +162,15 @@ fn selector() {
 
     let button = ElementNodeArc::new(
         sbox.clone(),
-        Arc::new(ElementNodeStore::HtmlElement(HtmlElementStore::HtmlButton(
+        Arc::new(ElementStore::new(ElementKind::HtmlElement(HtmlElementStore::HtmlButton(
             HtmlButtonStore,
-        ))),
+        )))),
     );
     let body = ElementNodeArc::new(
         sbox.clone(),
-        Arc::new(ElementNodeStore::HtmlElement(HtmlElementStore::HtmlBody(
+        Arc::new(ElementStore::new(ElementKind::HtmlElement(HtmlElementStore::HtmlBody(
             HtmlBodyStore,
-        ))),
+        )))),
     );
 
     let button_any: AnyNodeArc = button.clone().into();
@@ -189,15 +189,15 @@ fn query_selector() {
 
     let button = ElementNodeArc::new(
         sbox.clone(),
-        Arc::new(ElementNodeStore::HtmlElement(HtmlElementStore::HtmlButton(
+        Arc::new(ElementStore::new(ElementKind::HtmlElement(HtmlElementStore::HtmlButton(
             HtmlButtonStore,
-        ))),
+        )))),
     );
     let body = ElementNodeArc::new(
         sbox.clone(),
-        Arc::new(ElementNodeStore::HtmlElement(HtmlElementStore::HtmlBody(
+        Arc::new(ElementStore::new(ElementKind::HtmlElement(HtmlElementStore::HtmlBody(
             HtmlBodyStore,
-        ))),
+        )))),
     );
 
     let buttonselector = Selector::try_from("BUTTON").unwrap();
@@ -223,15 +223,15 @@ fn query_selector_child() {
 
     let button = ElementNodeArc::new(
         sbox.clone(),
-        Arc::new(ElementNodeStore::HtmlElement(HtmlElementStore::HtmlButton(
+        Arc::new(ElementStore::new(ElementKind::HtmlElement(HtmlElementStore::HtmlButton(
             HtmlButtonStore,
-        ))),
+        )))),
     );
     let body = ElementNodeArc::new(
         sbox.clone(),
-        Arc::new(ElementNodeStore::HtmlElement(HtmlElementStore::HtmlBody(
+        Arc::new(ElementStore::new(ElementKind::HtmlElement(HtmlElementStore::HtmlBody(
             HtmlBodyStore,
-        ))),
+        )))),
     );
 
     let buttonselector = Selector::try_from("BUTTON").unwrap();
