@@ -58,15 +58,6 @@ pub struct AnyNodeArc {
     pub(crate) common: Arc<NodeCommon>,
 }
 
-impl fmt::Debug for AnyNodeArc {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("AnyNodeArc")
-            .field("contents", &self.contents)
-            .field("common_addr", &format!("{:p}", Arc::as_ptr(&self.common)))
-            .finish()
-    }
-}
-
 #[sourcegen::generated]
 impl AnyNodeArc {
     /// gets `Weak<Sandbox>` to the `Sandbox` that it is in
@@ -79,6 +70,15 @@ impl AnyNodeArc {
 impl SandboxMemberBehavior for AnyNodeArc {
     fn get_context(&self) -> Weak<Sandbox> {
         self.get_context()
+    }
+}
+
+impl fmt::Debug for AnyNodeArc {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("AnyNodeArc")
+            .field("contents", &self.contents)
+            .field("common_addr", &format!("{:p}", Arc::as_ptr(&self.common)))
+            .finish()
     }
 }
 
