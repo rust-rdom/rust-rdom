@@ -17,7 +17,6 @@ pub(crate) mod graph_storage;
 
 pub(crate) use crate::behavior::node::NodeBehavior;
 
-use quote::quote;
 use std::fmt;
 
 /// Marker trait implemented by all node storage classes.

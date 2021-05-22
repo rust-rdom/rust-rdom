@@ -14,6 +14,7 @@ use super::{
 };
 use crate::node::element::ElementStore;
 use crate::node_list::NodeList;
+use arc_new_cyclic_n::arc::new_cyclic_2;
 use std::convert::TryFrom;
 crate::use_behaviors!(parent_node);
 
@@ -77,6 +78,31 @@ macro_rules! impl_concrete {
                         });
 
                         ConcreteNodeArc { contents, common }
+                    }
+
+                    // TODO add tests
+                    pub(crate) fn new_cyclic(context: Weak<Sandbox>,
+                        data_fn: impl FnOnce(&Weak<Arc<[<$name Store>]>>) -> Arc<[<$name Store>]>) ->
+                    ConcreteNodeArc<[<$name Store>]> {
+                        let (common_strong, contents_strong): (
+                            Arc<NodeCommon>,
+                            Arc<Arc<[<$name Store>]>>
+                        ) = new_cyclic_2(|common_weak, contents_weak| {
+                            let contents: Arc<[<$name Store>]> = data_fn(&contents_weak);
+
+                            let common = NodeCommon {
+                                node_graph: NodeGraphStorage::new(AnyNodeWeak {
+                                    contents: (&contents).into(),
+                                    common: common_weak.clone(),
+                                }),
+                                parent_node_behavior: ParentNodeBehaviorStorage::new(common_weak.clone()),
+                                context,
+                            };
+
+                            (common, contents)
+                        });
+
+                        ConcreteNodeArc { contents: (*contents_strong).clone(), common: common_strong }
                     }
 
                     proxy_node_behavior!();
