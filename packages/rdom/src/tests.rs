@@ -18,14 +18,18 @@ fn it_works() {
     let metrics: ScreenMetrics = Default::default();
     let sbox = Sandbox::new(metrics);
     let doc = sbox.clone().window().document();
-    let document_element = ElementNodeArc::new(
+
+    let document_element = ConcreteNodeArc::<ElementStore>::new_cyclic(
         Arc::downgrade(&sbox),
-        Arc::new(ElementStore::new(
-            ElementKind::HtmlElement(HtmlElementStore::HtmlHtml(HtmlHtmlStore {})),
-            Arc::downgrade(&sbox),
-        )),
-    )
-    .into();
+        |node_weak| {
+            ElementStore::new(
+                ElementKind::HtmlElement(HtmlElementStore::HtmlHtml(HtmlHtmlStore)),
+                Arc::downgrade(&sbox),
+                node_weak.clone().into()
+            )
+        }
+    ).into();
+
     let _text = doc.create_text_node("Hello, world!".to_string());
     doc.append_child(document_element);
     assert_eq!(doc.child_nodes().length(), 1);
