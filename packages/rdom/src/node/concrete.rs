@@ -71,7 +71,6 @@ macro_rules! impl_concrete {
                         Self::new_cyclic(context, |_| (*contents).clone())
                     }
 
-                    // TODO add tests
                     pub(crate) fn new_cyclic(context: Weak<Sandbox>,
                         data_fn: impl FnOnce(&ConcreteNodeWeak<[<$name Store>]>) -> [<$name Store>]) ->
                     ConcreteNodeArc<[<$name Store>]> {
