@@ -4,7 +4,7 @@ use std::convert::{TryFrom, TryInto};
 use std::sync::{Arc, Weak};
 
 use crate::node::concrete::*;
-use crate::node::contents::{AttributeStore, CommentStore, NodeType, TextStore, NodeContentsWeak};
+use crate::node::contents::{AttributeStore, CommentStore, NodeContentsWeak, NodeType, TextStore};
 use crate::node::element::{
     ElementKind, ElementStore, HtmlBodyStore, HtmlButtonStore, HtmlElementStore, HtmlHtmlStore,
 };
@@ -238,16 +238,16 @@ fn cyclic_elements() {
         )
     });
 
-    assert!(
-        button.contents.node.common.ptr_eq(
-            &Arc::downgrade(&button.common)
-        )
-    );
+    assert!(button
+        .contents
+        .node
+        .common
+        .ptr_eq(&Arc::downgrade(&button.common)));
 
     match &button.common.node_graph.node.contents {
         NodeContentsWeak::Element(el) => {
             assert!(Weak::ptr_eq(&el, &Arc::downgrade(&button.contents)));
-        },
+        }
         _ => {
             assert!(false);
         }
@@ -256,7 +256,7 @@ fn cyclic_elements() {
     match &button.contents.node.contents {
         NodeContentsWeak::Element(el) => {
             assert!(el.ptr_eq(&Arc::downgrade(&button.contents)));
-        },
+        }
         _ => {
             assert!(false);
         }

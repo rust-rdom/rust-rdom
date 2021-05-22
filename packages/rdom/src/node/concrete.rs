@@ -75,10 +75,7 @@ macro_rules! impl_concrete {
                     pub(crate) fn new_cyclic(context: Weak<Sandbox>,
                         data_fn: impl FnOnce(&ConcreteNodeWeak<[<$name Store>]>) -> [<$name Store>]) ->
                     ConcreteNodeArc<[<$name Store>]> {
-                        let (common_strong, contents_strong): (
-                            Arc<NodeCommon>,
-                            Arc<[<$name Store>]>
-                        ) = new_cyclic_2(|common_weak, contents_weak| {
+                        let (common_strong, contents_strong) = new_cyclic_2(|common_weak, contents_weak| {
                             let node_weak = ConcreteNodeWeak {
                                 contents: contents_weak.clone(),
                                 common: common_weak.clone()
