@@ -187,7 +187,7 @@ pub struct AttributeStore {
     name: String,
 
     /// Value of the attribute
-    value: String,
+    pub(crate) value: String,
 }
 
 impl AttributeStore {
