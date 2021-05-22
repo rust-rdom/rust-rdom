@@ -3,8 +3,8 @@
 
 use crate::internal_prelude::*;
 use crate::node::concrete::AttributeNodeArc;
-use std::convert::TryInto;
 use std::convert::TryFrom;
+use std::convert::TryInto;
 
 /// A [NamedNodeMap](https://developer.mozilla.org/en-US/docs/Web/API/NamedNodeMap) structure
 #[sourcegen::sourcegen(generator = "behave", script = "SandboxMember context")]
@@ -44,8 +44,11 @@ impl NamedNodeMap {
     fn get_named_item(&self, name: String) -> Option<AttributeNodeArc> {
         let name = name.to_ascii_lowercase();
         self.attribute_list.iter().find_map(|attr| {
-            let attr: AttributeNodeArc = attr.clone().try_into().expect("Node in NamedNodeMap was not an Attr node");
-            if (*attr.contents).name == name {
+            let attr: AttributeNodeArc = attr
+                .clone()
+                .try_into()
+                .expect("Node in NamedNodeMap was not an Attr node");
+            if attr.contents.name == name {
                 Some(attr)
             } else {
                 None

@@ -20,9 +20,10 @@ fn it_works() {
     let doc = sbox.clone().window().document();
     let document_element = ElementNodeArc::new(
         Arc::downgrade(&sbox),
-        Arc::new(ElementStore::new(ElementKind::HtmlElement(
-            HtmlElementStore::HtmlHtml(HtmlHtmlStore {}),
-        ), Arc::downgrade(&sbox))),
+        Arc::new(ElementStore::new(
+            ElementKind::HtmlElement(HtmlElementStore::HtmlHtml(HtmlHtmlStore {})),
+            Arc::downgrade(&sbox),
+        )),
     )
     .into();
     let _text = doc.create_text_node("Hello, world!".to_string());
@@ -55,9 +56,10 @@ fn test_element_node_m() {
     let _elem = test_node_creation!(
         ElementNodeArc,
         NodeType::Element,
-        Arc::new(ElementStore::new(ElementKind::HtmlElement(
-            HtmlElementStore::HtmlButton(HtmlButtonStore)
-        ), Arc::downgrade(&sbox))),
+        Arc::new(ElementStore::new(
+            ElementKind::HtmlElement(HtmlElementStore::HtmlButton(HtmlButtonStore)),
+            Arc::downgrade(&sbox)
+        )),
         sbox.clone()
     );
 }
@@ -66,7 +68,12 @@ fn test_element_node_m() {
 fn test_attr_node() {
     let metrics: ScreenMetrics = Default::default();
     let sbox = Sandbox::new(metrics);
-    let _doc = test_node_creation!(AttributeNodeArc, NodeType::Attribute, Default::default(), sbox);
+    let _doc = test_node_creation!(
+        AttributeNodeArc,
+        NodeType::Attribute,
+        Default::default(),
+        sbox
+    );
 }
 
 #[test]
@@ -174,12 +181,14 @@ fn tag_name() {
     let metrics: ScreenMetrics = Default::default();
     let sbox = Sandbox::new(metrics);
     let sbox_weak = Arc::downgrade(&sbox);
-    let button = ElementStore::new(ElementKind::HtmlElement(HtmlElementStore::HtmlButton(
-        HtmlButtonStore,
-    )), sbox_weak.clone());
-    let body = ElementStore::new(ElementKind::HtmlElement(HtmlElementStore::HtmlBody(
-        HtmlBodyStore,
-    )), sbox_weak.clone());
+    let button = ElementStore::new(
+        ElementKind::HtmlElement(HtmlElementStore::HtmlButton(HtmlButtonStore)),
+        sbox_weak.clone(),
+    );
+    let body = ElementStore::new(
+        ElementKind::HtmlElement(HtmlElementStore::HtmlBody(HtmlBodyStore)),
+        sbox_weak.clone(),
+    );
     assert_eq!(button.tag_name(), "BUTTON");
     assert_eq!(body.tag_name(), "BODY");
 }
@@ -191,15 +200,17 @@ fn selector() {
 
     let button = ElementNodeArc::new(
         sbox.clone(),
-        Arc::new(ElementStore::new(ElementKind::HtmlElement(
-            HtmlElementStore::HtmlButton(HtmlButtonStore),
-        ), sbox.clone())),
+        Arc::new(ElementStore::new(
+            ElementKind::HtmlElement(HtmlElementStore::HtmlButton(HtmlButtonStore)),
+            sbox.clone(),
+        )),
     );
     let body = ElementNodeArc::new(
         sbox.clone(),
-        Arc::new(ElementStore::new(ElementKind::HtmlElement(
-            HtmlElementStore::HtmlBody(HtmlBodyStore),
-        ), sbox.clone())),
+        Arc::new(ElementStore::new(
+            ElementKind::HtmlElement(HtmlElementStore::HtmlBody(HtmlBodyStore)),
+            sbox.clone(),
+        )),
     );
 
     let button_any: AnyNodeArc = button.clone().into();
@@ -218,15 +229,17 @@ fn query_selector() {
 
     let button = ElementNodeArc::new(
         sbox.clone(),
-        Arc::new(ElementStore::new(ElementKind::HtmlElement(
-            HtmlElementStore::HtmlButton(HtmlButtonStore),
-        ), sbox.clone())),
+        Arc::new(ElementStore::new(
+            ElementKind::HtmlElement(HtmlElementStore::HtmlButton(HtmlButtonStore)),
+            sbox.clone(),
+        )),
     );
     let body = ElementNodeArc::new(
         sbox.clone(),
-        Arc::new(ElementStore::new(ElementKind::HtmlElement(
-            HtmlElementStore::HtmlBody(HtmlBodyStore),
-        ), sbox.clone())),
+        Arc::new(ElementStore::new(
+            ElementKind::HtmlElement(HtmlElementStore::HtmlBody(HtmlBodyStore)),
+            sbox.clone(),
+        )),
     );
 
     let buttonselector = Selector::try_from("BUTTON").unwrap();
@@ -252,15 +265,17 @@ fn query_selector_child() {
 
     let button = ElementNodeArc::new(
         sbox.clone(),
-        Arc::new(ElementStore::new(ElementKind::HtmlElement(
-            HtmlElementStore::HtmlButton(HtmlButtonStore),
-        ), sbox.clone())),
+        Arc::new(ElementStore::new(
+            ElementKind::HtmlElement(HtmlElementStore::HtmlButton(HtmlButtonStore)),
+            sbox.clone(),
+        )),
     );
     let body = ElementNodeArc::new(
         sbox.clone(),
-        Arc::new(ElementStore::new(ElementKind::HtmlElement(
-            HtmlElementStore::HtmlBody(HtmlBodyStore),
-        ), sbox.clone())),
+        Arc::new(ElementStore::new(
+            ElementKind::HtmlElement(HtmlElementStore::HtmlBody(HtmlBodyStore)),
+            sbox.clone(),
+        )),
     );
 
     let buttonselector = Selector::try_from("BUTTON").unwrap();

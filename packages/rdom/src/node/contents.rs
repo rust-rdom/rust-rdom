@@ -5,8 +5,8 @@ use crate::internal_prelude::*;
 use crate::sandbox::Builder;
 use crate::window::Window;
 
-use quote::quote;
 use super::element::ElementStore;
+use quote::quote;
 use std::fmt;
 
 macro_rules! declare_contents {
