@@ -3,7 +3,6 @@
 
 use crate::internal_prelude::*;
 use crate::node::concrete::AttributeNodeArc;
-use std::convert::TryFrom;
 use std::convert::TryInto;
 
 /// A [NamedNodeMap](https://developer.mozilla.org/en-US/docs/Web/API/NamedNodeMap) structure
