@@ -68,16 +68,7 @@ macro_rules! impl_concrete {
                 impl ConcreteNodeArc<[<$name Store>]> {
                     pub(crate) fn new(context: Weak<Sandbox>, contents: Arc<[<$name Store>]>) ->
                     ConcreteNodeArc<[<$name Store>]> {
-                        let common = Arc::new_cyclic(|construction_weak| NodeCommon {
-                            node_graph: NodeGraphStorage::new(AnyNodeWeak {
-                                contents: (&contents).into(),
-                                common: construction_weak.clone(),
-                            }),
-                            parent_node_behavior: ParentNodeBehaviorStorage::new(construction_weak.clone()),
-                            context,
-                        });
-
-                        ConcreteNodeArc { contents, common }
+                        Self::new_cyclic(context, |_| (*contents).clone())
                     }
 
                     // TODO add tests
