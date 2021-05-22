@@ -95,9 +95,11 @@ macro_rules! impl_concrete {
 
                             let contents: [<$name Store>] = data_fn(&node_weak);
 
+                            let weak_contents_ref: NodeContentsWeak = contents_weak.clone().into();
+
                             let common = NodeCommon {
                                 node_graph: NodeGraphStorage::new(AnyNodeWeak {
-                                    contents: (&Arc::new(contents.clone())).into(),
+                                    contents: weak_contents_ref,
                                     common: common_weak.clone(),
                                 }),
                                 parent_node_behavior: ParentNodeBehaviorStorage::new(common_weak.clone()),

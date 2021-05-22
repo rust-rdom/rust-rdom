@@ -63,6 +63,14 @@ macro_rules! declare_contents {
                 )*
             }
 
+            $(
+                impl From<Weak<[<$name Store>]>> for NodeContentsWeak {
+                    fn from(weak_ref: Weak<[<$name Store>]>) -> Self {
+                        NodeContentsWeak::[<$name>](weak_ref)
+                    }
+                }
+            )*
+
             impl NodeContentsArc {
                 pub(crate) fn to_node_type(&self) -> NodeType {
                     match self {
