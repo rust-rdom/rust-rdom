@@ -54,7 +54,7 @@ pub struct ElementStore {
     node_store: ElementKind,
 
     /// Reference back up to the DOM node
-    node: AnyNodeWeak,
+    pub(crate) node: AnyNodeWeak,
 }
 
 impl ElementStore {

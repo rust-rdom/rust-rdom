@@ -1,10 +1,10 @@
 #![cfg(test)]
 
 use std::convert::{TryFrom, TryInto};
-use std::sync::Arc;
+use std::sync::{Arc, Weak};
 
 use crate::node::concrete::*;
-use crate::node::contents::{AttributeStore, CommentStore, NodeType, TextStore};
+use crate::node::contents::{AttributeStore, CommentStore, NodeType, TextStore, NodeContentsWeak};
 use crate::node::element::{
     ElementKind, ElementStore, HtmlBodyStore, HtmlButtonStore, HtmlElementStore, HtmlHtmlStore,
 };
@@ -223,6 +223,44 @@ fn selector() {
     assert_eq!(selector.matches_selected_node(&button_any).is_some(), true);
     assert!(selector.is_selected_element(button));
     assert!(!selector.is_selected_element(body));
+}
+
+#[test]
+fn cyclic_elements() {
+    let sbox = Sandbox::new(Default::default());
+    let sbox = Arc::downgrade(&sbox);
+
+    let button = ElementNodeArc::new_cyclic(sbox.clone(), |node_weak| {
+        ElementStore::new(
+            ElementKind::HtmlElement(HtmlElementStore::HtmlButton(HtmlButtonStore)),
+            sbox.clone(),
+            node_weak.clone().into(),
+        )
+    });
+
+    assert!(
+        button.contents.node.common.ptr_eq(
+            &Arc::downgrade(&button.common)
+        )
+    );
+
+    match &button.common.node_graph.node.contents {
+        NodeContentsWeak::Element(el) => {
+            assert!(Weak::ptr_eq(&el, &Arc::downgrade(&button.contents)));
+        },
+        _ => {
+            assert!(false);
+        }
+    }
+
+    match &button.contents.node.contents {
+        NodeContentsWeak::Element(el) => {
+            assert!(el.ptr_eq(&Arc::downgrade(&button.contents)));
+        },
+        _ => {
+            assert!(false);
+        }
+    }
 }
 
 #[test]

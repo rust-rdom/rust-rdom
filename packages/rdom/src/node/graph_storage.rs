@@ -6,7 +6,7 @@ use std::sync::RwLock;
 /// to graph of the nodes
 pub struct NodeGraphStorage {
     /// Reference back up to the common Node
-    node: AnyNodeWeak,
+    pub(crate) node: AnyNodeWeak,
 
     parent_node: Option<AnyNodeWeak>,
     left_sibling: Option<AnyNodeWeak>,
