@@ -5,7 +5,9 @@ use crate::internal_prelude::*;
 use crate::sandbox::Builder;
 use crate::window::Window;
 
+use quote::quote;
 use super::element::ElementStore;
+use std::fmt;
 
 macro_rules! declare_contents {
     ($($ti:expr => $name:ident),*) => {
@@ -39,6 +41,21 @@ macro_rules! declare_contents {
                 )*
             }
 
+            impl fmt::Debug for NodeContentsArc {
+                fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+                    match self {
+                        $(
+                            NodeContentsArc::$name(arc) => {
+                                f.debug_struct("NodeContentsArc")
+                                    .field("addr", &format!("{:p}", Arc::as_ptr(&arc)))
+                                    .field("node_kind", &(*self).to_node_name())
+                                    .finish()
+                            },
+                        )*
+                    }
+                }
+            }
+
             #[derive(Clone)]
             pub(crate) enum NodeContentsWeak {
                 $(
@@ -51,6 +68,14 @@ macro_rules! declare_contents {
                     match self {
                         $(
                             NodeContentsArc::$name(_) => NodeType::$name,
+                        )*
+                    }
+                }
+
+                pub(crate) fn to_node_name(&self) -> String {
+                    match self {
+                        $(
+                            NodeContentsArc::$name(_) => (quote! {$name}).to_string(),
                         )*
                     }
                 }
@@ -149,7 +174,10 @@ impl CommentStore {
 
 /// Storage type for AttributeNode
 #[derive(Default, Clone)]
-pub struct AttributeStore;
+pub struct AttributeStore {
+    /// Name of the attribute, stored as lowercase
+    pub(crate) name: String,
+}
 
 /// Storage type for CDataSectionNode
 #[derive(Default, Clone)]

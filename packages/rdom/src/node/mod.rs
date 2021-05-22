@@ -17,6 +17,9 @@ pub(crate) mod graph_storage;
 
 pub(crate) use crate::behavior::node::NodeBehavior;
 
+use std::fmt;
+use quote::quote;
+
 /// Marker trait implemented by all node storage classes.
 pub trait AnyNodeStore {}
 
@@ -54,6 +57,15 @@ pub struct NodeCommon {
 pub struct AnyNodeArc {
     pub(crate) contents: NodeContentsArc,
     pub(crate) common: Arc<NodeCommon>,
+}
+
+impl fmt::Debug for AnyNodeArc {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("AnyNodeArc")
+         .field("contents", &self.contents)
+         .field("common_addr", &format!("{:p}", Arc::as_ptr(&self.common)))
+         .finish()
+    }
 }
 
 #[sourcegen::generated]
