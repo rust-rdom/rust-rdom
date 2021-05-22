@@ -48,7 +48,7 @@ impl NamedNodeMap {
                 .clone()
                 .try_into()
                 .expect("Node in NamedNodeMap was not an Attr node");
-            if attr.contents.name == name {
+            if attr.contents.get_name() == name {
                 Some(attr)
             } else {
                 None

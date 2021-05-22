@@ -175,8 +175,25 @@ impl CommentStore {
 /// Storage type for AttributeNode
 #[derive(Default, Clone)]
 pub struct AttributeStore {
-    /// Name of the attribute, stored as lowercase
-    pub(crate) name: String,
+    /// Name of the attribute, stored as lowercase.
+    /// Read-only
+    name: String,
+
+    /// Value of the attribute
+    value: String,
+}
+
+impl AttributeStore {
+    pub(crate) fn new(name: String) -> AttributeStore {
+        AttributeStore {
+            name,
+            value: "".to_owned(),
+        }
+    }
+
+    pub(crate) fn get_name(&self) -> String {
+        self.name.clone()
+    }
 }
 
 /// Storage type for CDataSectionNode
