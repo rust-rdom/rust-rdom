@@ -47,17 +47,24 @@ pub struct ElementCommon {
 /// Layer at the top of element storage
 #[derive(Clone)]
 pub struct ElementStore {
+    /// Data common to all elements
     element_common: ElementCommon,
+
+    /// Data specific to this particular element
     node_store: ElementKind,
+
+    /// Reference back up to the DOM node
+    node: AnyNodeWeak,
 }
 
 impl ElementStore {
-    pub(crate) fn new(node_store: ElementKind, context: Weak<Sandbox>) -> ElementStore {
+    pub(crate) fn new(node_store: ElementKind, context: Weak<Sandbox>, node: AnyNodeWeak) -> ElementStore {
         ElementStore {
             node_store,
             element_common: ElementCommon {
                 attrs: NamedNodeMap::new(context),
             },
+            node,
         }
     }
 
@@ -116,47 +123,59 @@ impl Builder<ElementNodeArc> {
 
     /// Builds a new HtmlHtmlElement node with a weak reference to its corresponding window
     pub fn build_html(&self) -> ConcreteNodeArc<ElementStore> {
-        ConcreteNodeArc::<ElementStore>::new(
+        ConcreteNodeArc::<ElementStore>::new_cyclic(
             self.sandbox.clone(),
-            Arc::new(ElementStore::new(
-                ElementKind::HtmlElement(HtmlElementStore::HtmlHtml(HtmlHtmlStore)),
-                self.sandbox.clone(),
-            )),
+            |node_weak| {
+                ElementStore::new(
+                    ElementKind::HtmlElement(HtmlElementStore::HtmlHtml(HtmlHtmlStore)),
+                    self.sandbox.clone(),
+                    node_weak.clone().into()
+                )
+            }
         )
     }
 
     /// Builds a new HtmlBodyElement node
     pub fn build_body(&self) -> ConcreteNodeArc<ElementStore> {
-        ConcreteNodeArc::<ElementStore>::new(
+        ConcreteNodeArc::<ElementStore>::new_cyclic(
             self.sandbox.clone(),
-            Arc::new(ElementStore::new(
-                ElementKind::HtmlElement(HtmlElementStore::HtmlBody(HtmlBodyStore)),
-                self.sandbox.clone(),
-            )),
+            |node_weak| {
+                ElementStore::new(
+                    ElementKind::HtmlElement(HtmlElementStore::HtmlBody(HtmlBodyStore)),
+                    self.sandbox.clone(),
+                    node_weak.clone().into()
+                )
+            }
         )
     }
 
     /// Builds a new HtmlButtonElement node
     pub fn build_button(&self) -> ConcreteNodeArc<ElementStore> {
-        ConcreteNodeArc::<ElementStore>::new(
+        ConcreteNodeArc::<ElementStore>::new_cyclic(
             self.sandbox.clone(),
-            Arc::new(ElementStore::new(
-                ElementKind::HtmlElement(HtmlElementStore::HtmlButton(HtmlButtonStore)),
-                self.sandbox.clone(),
-            )),
+            |node_weak| {
+                ElementStore::new(
+                    ElementKind::HtmlElement(HtmlElementStore::HtmlButton(HtmlButtonStore)),
+                    self.sandbox.clone(),
+                    node_weak.clone().into()
+                )
+            }
         )
     }
 
     /// Builds a new HtmlUnknownElement node
     pub fn build_unknown(&self, tag_name: String) -> ConcreteNodeArc<ElementStore> {
-        ConcreteNodeArc::<ElementStore>::new(
+        ConcreteNodeArc::<ElementStore>::new_cyclic(
             self.sandbox.clone(),
-            Arc::new(ElementStore::new(
-                ElementKind::HtmlElement(HtmlElementStore::HtmlUnknown(HtmlUnknownStore {
-                    tag_name,
-                })),
-                self.sandbox.clone(),
-            )),
+            |node_weak| {
+                ElementStore::new(
+                    ElementKind::HtmlElement(HtmlElementStore::HtmlUnknown(HtmlUnknownStore {
+                        tag_name,
+                    })),
+                    self.sandbox.clone(),
+                    node_weak.clone().into()
+                )
+            }
         )
     }
 }
