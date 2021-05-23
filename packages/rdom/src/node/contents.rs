@@ -63,6 +63,21 @@ macro_rules! declare_contents {
                 )*
             }
 
+            impl fmt::Debug for NodeContentsWeak {
+                fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+                    match self {
+                        $(
+                            NodeContentsWeak::$name(weak) => {
+                                f.debug_struct("NodeContentsWeak")
+                                    .field("addr", &format!("{:p}", Weak::as_ptr(&weak)))
+                                    .field("node_kind", &(*self).to_node_name())
+                                    .finish()
+                            },
+                        )*
+                    }
+                }
+            }
+
             impl NodeContentsArc {
                 pub(crate) fn to_node_type(&self) -> NodeType {
                     match self {
@@ -94,6 +109,14 @@ macro_rules! declare_contents {
                     match self {
                         $(
                             NodeContentsWeak::$name(_) => NodeType::$name,
+                        )*
+                    }
+                }
+
+                pub(crate) fn to_node_name(&self) -> String {
+                    match self {
+                        $(
+                            NodeContentsWeak::$name(_) => (quote! {$name}).to_string(),
                         )*
                     }
                 }
@@ -188,13 +211,17 @@ pub struct AttributeStore {
 
     /// Value of the attribute
     pub(crate) value: String,
+
+    /// Owning element
+    pub(crate) element: Option<ElementNodeWeak>,
 }
 
 impl AttributeStore {
-    pub(crate) fn new(name: String) -> AttributeStore {
+    pub(crate) fn new(name: String, owning_element: Option<ElementNodeWeak>) -> AttributeStore {
         AttributeStore {
-            name,
+            name: name.to_ascii_lowercase(),
             value: "".to_owned(),
+            element: owning_element,
         }
     }
 

@@ -19,4 +19,19 @@ pub enum DomError {
     /// sandbox as a whole is out of memory.
     #[error("object out of memory")]
     ObjectOutOfMemory,
+
+    /// The object being operated on is out of memory. This does not mean the
+    /// sandbox as a whole is out of memory.
+    #[error("range error (number was out of range)")]
+    Range,
+
+    /// An attribute node was attempted to be used when it is already in use
+    /// for another element.
+    #[error("attribute is already in use in another element")]
+    InUseAttribute,
+
+    /// An attribute node was attempted to be used when it is already in use
+    /// for another element.
+    #[error("attribute is already in use in another element")]
+    NotFound,
 }

@@ -44,6 +44,17 @@ impl<S: AnyNodeStore> SandboxMemberBehavior for ConcreteNodeArc<S> {
     }
 }
 
+impl<S: AnyNodeStore> PartialEq for ConcreteNodeArc<S> {
+    fn eq(&self, other: &Self) -> bool {
+        let a = Arc::ptr_eq(&self.contents, &other.contents);
+        let b = Arc::ptr_eq(&self.common, &other.common);
+        if a && !b || !a && b {
+            log::warn!("Two ConcreteNodeArc pointers were observed being 'half-equal'; this means there is a bug, probably in RDOM!");
+        }
+        a && b
+    }
+}
+
 /// A strongly-typed handle to a node with a weak reference.
 /// Generic type `S` may be the underlying storage
 /// type of any node class.
@@ -51,6 +62,17 @@ impl<S: AnyNodeStore> SandboxMemberBehavior for ConcreteNodeArc<S> {
 pub struct ConcreteNodeWeak<S: AnyNodeStore> {
     pub(crate) contents: Weak<S>,
     pub(crate) common: Weak<NodeCommon>,
+}
+
+impl<S: AnyNodeStore> PartialEq for ConcreteNodeWeak<S> {
+    fn eq(&self, other: &Self) -> bool {
+        let a = self.contents.ptr_eq(&other.contents);
+        let b = self.common.ptr_eq(&other.common);
+        if a && !b || !a && b {
+            log::warn!("Two ConcreteNodeWeak pointers were observed being 'half-equal'; this means there is a bug, probably in RDOM!");
+        }
+        a && b
+    }
 }
 
 macro_rules! impl_concrete {

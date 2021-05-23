@@ -89,6 +89,15 @@ pub struct AnyNodeWeak {
     pub(crate) common: Weak<NodeCommon>,
 }
 
+impl fmt::Debug for AnyNodeWeak {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("AnyNodeWeak")
+            .field("contents", &self.contents)
+            .field("common_addr", &format!("{:p}", Weak::as_ptr(&self.common)))
+            .finish()
+    }
+}
+
 impl AnyNodeWeak {
     fn upgrade(&self) -> Option<AnyNodeArc> {
         Some(AnyNodeArc {

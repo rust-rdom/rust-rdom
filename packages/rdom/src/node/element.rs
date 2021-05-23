@@ -1,9 +1,10 @@
 //! Data and functionality to each element type live here.
 
-use super::concrete::ConcreteNodeArc;
-use crate::node::concrete::ElementNodeArc;
+use super::concrete::{ConcreteNodeArc, ElementNodeArc, ElementNodeWeak};
 use crate::sandbox::Builder;
 use crate::{internal_prelude::*, named_node_map::NamedNodeMap};
+
+use std::convert::TryInto;
 
 macro_rules! declare_html_elements {
     ($($tag:literal => $name:ident),*) => {
@@ -40,21 +41,15 @@ pub enum SvgElementStore {}
 
 /// Data common to all elements
 #[derive(Clone)]
-pub struct ElementCommon {
-    attrs: Arc<NamedNodeMap>,
-}
-
-/// Layer at the top of element storage
-#[derive(Clone)]
 pub struct ElementStore {
-    /// Data common to all elements
-    element_common: ElementCommon,
-
     /// Data specific to this particular element
     node_store: ElementKind,
 
     /// Reference back up to the DOM node
     pub(crate) node: AnyNodeWeak,
+
+    /// Attributes
+    attrs: Arc<NamedNodeMap>,
 }
 
 impl ElementStore {
@@ -65,9 +60,12 @@ impl ElementStore {
     ) -> ElementStore {
         ElementStore {
             node_store,
-            element_common: ElementCommon {
-                attrs: NamedNodeMap::new(context),
-            },
+            attrs: NamedNodeMap::new(
+                context,
+                node.clone()
+                    .try_into()
+                    .expect("Node was, unexpectedly, not an element"),
+            ),
             node,
         }
     }
