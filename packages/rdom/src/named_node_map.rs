@@ -13,6 +13,7 @@ pub struct NamedNodeMap {
     pub(crate) context: Weak<Sandbox>,
     /// The attribute nodes
     pub(crate) attribute_list: Vec<AttributeNodeArc>,
+    /// The element that this NamedNodeMap belongs to
     pub(crate) owning_element: ElementNodeWeak,
 }
 
@@ -51,7 +52,7 @@ impl NamedNodeMap {
                 .clone()
                 .try_into()
                 .expect("Node in NamedNodeMap was not an Attr node");
-            if attr.contents.get_name() == name {
+            if attr.contents.name() == name {
                 Some(attr)
             } else {
                 None
@@ -64,18 +65,20 @@ impl NamedNodeMap {
         &mut self,
         item: AttributeNodeArc,
     ) -> Result<Option<AttributeNodeArc>, DomError> {
-        match item.contents.element.clone() {
+        match item.contents.owner_element().clone() {
             Some(element) if element != self.owning_element => Err(DomError::InUseAttribute),
             _ => {
-                let name = item.contents.get_name();
+                let name = item.contents.name();
                 let name = name.to_ascii_lowercase();
                 let existing_index = self.get_attribute_idx(name);
+                item.contents.set_owner_element(Some(self.owning_element.clone()));
                 Ok(if let Some(existing_index) = existing_index {
                     let existing_attr = self.attribute_list[existing_index].clone();
                     if existing_attr == item {
                         Some(item)
                     } else {
-                        self.replace_attribute(existing_index, item);
+                        let old = self.replace_attribute(existing_index, item);
+                        old.contents.set_owner_element(None);
                         Some(existing_attr)
                     }
                 } else {
@@ -95,7 +98,11 @@ impl NamedNodeMap {
         let existing_index = self.get_attribute_idx(name);
         match existing_index {
             None => Err(DomError::NotFound),
-            Some(existing_index) => Ok(self.attribute_list.remove(existing_index)),
+            Some(existing_index) => Ok({
+                let old_attr = self.attribute_list.remove(existing_index);
+                old_attr.contents.set_owner_element(None);
+                old_attr
+            }),
         }
     }
 
@@ -106,7 +113,7 @@ impl NamedNodeMap {
                 .clone()
                 .try_into()
                 .expect("Node in NamedNodeMap was not an Attr node");
-            attr.contents.get_name() == local_name
+            attr.contents.name() == local_name
         })
     }
 

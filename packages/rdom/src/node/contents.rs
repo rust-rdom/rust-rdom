@@ -8,6 +8,7 @@ use crate::window::Window;
 use super::element::ElementStore;
 use quote::quote;
 use std::fmt;
+use std::sync::RwLock;
 
 macro_rules! declare_contents {
     ($($ti:expr => $name:ident),*) => {
@@ -210,22 +211,36 @@ pub struct AttributeStore {
     name: String,
 
     /// Value of the attribute
-    pub(crate) value: String,
+    pub(crate) value: Arc<RwLock<String>>,
 
     /// Owning element
-    pub(crate) element: Option<ElementNodeWeak>,
+    pub(crate) owner_element: Arc<RwLock<Option<ElementNodeWeak>>>,
 }
 
 impl AttributeStore {
-    pub(crate) fn new(name: String, owning_element: Option<ElementNodeWeak>) -> AttributeStore {
+    pub(crate) fn new(name: String, owner_element: Option<ElementNodeWeak>) -> AttributeStore {
         AttributeStore {
             name: name.to_ascii_lowercase(),
-            value: "".to_owned(),
-            element: owning_element,
+            value: Arc::new(RwLock::new("".to_owned())),
+            owner_element: Arc::new(RwLock::new(owner_element)),
         }
     }
 
-    pub(crate) fn get_name(&self) -> String {
+    pub(crate) fn owner_element(&self) -> Option<ElementNodeWeak> {
+        self.owner_element.read().unwrap().clone()
+    }
+
+    pub(crate) fn set_owner_element(&self, owner: Option<ElementNodeWeak>) {
+        *self.owner_element.write().unwrap() = owner
+    }
+
+    /// Gives the value of the attribute
+    pub fn value(&self) -> String {
+        self.value.read().unwrap().clone()
+    }
+
+    /// Gives the name of the attribute
+    pub fn name(&self) -> String {
         self.name.clone()
     }
 }
