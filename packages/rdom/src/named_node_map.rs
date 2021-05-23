@@ -11,10 +11,8 @@ use std::convert::TryInto;
 pub struct NamedNodeMap {
     /// SandboxMember implementation
     pub(crate) context: Weak<Sandbox>,
-
     /// The attribute nodes
     pub(crate) attribute_list: Vec<AttributeNodeArc>,
-
     pub(crate) owning_element: ElementNodeWeak,
 }
 
