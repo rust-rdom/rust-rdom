@@ -14,6 +14,7 @@ use super::{
 };
 use crate::node::element::ElementStore;
 use crate::node_list::NodeList;
+use arc_new_cyclic_n::arc::new_cyclic_2;
 use std::convert::TryFrom;
 crate::use_behaviors!(parent_node);
 
@@ -43,6 +44,17 @@ impl<S: AnyNodeStore> SandboxMemberBehavior for ConcreteNodeArc<S> {
     }
 }
 
+impl<S: AnyNodeStore> PartialEq for ConcreteNodeArc<S> {
+    fn eq(&self, other: &Self) -> bool {
+        let a = Arc::ptr_eq(&self.contents, &other.contents);
+        let b = Arc::ptr_eq(&self.common, &other.common);
+        if a && !b || !a && b {
+            log::warn!("Two ConcreteNodeArc pointers were observed being 'half-equal'; this means there is a bug, probably in RDOM!");
+        }
+        a && b
+    }
+}
+
 /// A strongly-typed handle to a node with a weak reference.
 /// Generic type `S` may be the underlying storage
 /// type of any node class.
@@ -50,6 +62,17 @@ impl<S: AnyNodeStore> SandboxMemberBehavior for ConcreteNodeArc<S> {
 pub struct ConcreteNodeWeak<S: AnyNodeStore> {
     pub(crate) contents: Weak<S>,
     pub(crate) common: Weak<NodeCommon>,
+}
+
+impl<S: AnyNodeStore> PartialEq for ConcreteNodeWeak<S> {
+    fn eq(&self, other: &Self) -> bool {
+        let a = self.contents.ptr_eq(&other.contents);
+        let b = self.common.ptr_eq(&other.common);
+        if a && !b || !a && b {
+            log::warn!("Two ConcreteNodeWeak pointers were observed being 'half-equal'; this means there is a bug, probably in RDOM!");
+        }
+        a && b
+    }
 }
 
 macro_rules! impl_concrete {
@@ -67,16 +90,35 @@ macro_rules! impl_concrete {
                 impl ConcreteNodeArc<[<$name Store>]> {
                     pub(crate) fn new(context: Weak<Sandbox>, contents: Arc<[<$name Store>]>) ->
                     ConcreteNodeArc<[<$name Store>]> {
-                        let common = Arc::new_cyclic(|construction_weak| NodeCommon {
-                            node_graph: NodeGraphStorage::new(AnyNodeWeak {
-                                contents: (&contents).into(),
-                                common: construction_weak.clone(),
-                            }),
-                            parent_node_behavior: ParentNodeBehaviorStorage::new(construction_weak.clone()),
-                            context,
+                        Self::new_cyclic(context, |_| (*contents).clone())
+                    }
+
+                    pub(crate) fn new_cyclic(context: Weak<Sandbox>,
+                        data_fn: impl FnOnce(&ConcreteNodeWeak<[<$name Store>]>) -> [<$name Store>]) ->
+                    ConcreteNodeArc<[<$name Store>]> {
+                        let (common_strong, contents_strong) = new_cyclic_2(|common_weak, contents_weak| {
+                            let node_weak = ConcreteNodeWeak {
+                                contents: contents_weak.clone(),
+                                common: common_weak.clone()
+                            };
+
+                            let contents: [<$name Store>] = data_fn(&node_weak);
+
+                            let weak_contents_ref: NodeContentsWeak = contents_weak.clone().into();
+
+                            let common = NodeCommon {
+                                node_graph: NodeGraphStorage::new(AnyNodeWeak {
+                                    contents: weak_contents_ref,
+                                    common: common_weak.clone(),
+                                }),
+                                parent_node_behavior: ParentNodeBehaviorStorage::new(common_weak.clone()),
+                                context,
+                            };
+
+                            (common, contents)
                         });
 
-                        ConcreteNodeArc { contents, common }
+                        ConcreteNodeArc { contents: contents_strong, common: common_strong }
                     }
 
                     proxy_node_behavior!();

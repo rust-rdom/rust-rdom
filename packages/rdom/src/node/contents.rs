@@ -5,7 +5,10 @@ use crate::internal_prelude::*;
 use crate::sandbox::Builder;
 use crate::window::Window;
 
-pub use super::element::ElementStore;
+use super::element::ElementStore;
+use quote::quote;
+use std::fmt;
+use std::sync::RwLock;
 
 macro_rules! declare_contents {
     ($($ti:expr => $name:ident),*) => {
@@ -39,6 +42,21 @@ macro_rules! declare_contents {
                 )*
             }
 
+            impl fmt::Debug for NodeContentsArc {
+                fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+                    match self {
+                        $(
+                            NodeContentsArc::$name(arc) => {
+                                f.debug_struct("NodeContentsArc")
+                                    .field("addr", &format!("{:p}", Arc::as_ptr(&arc)))
+                                    .field("node_kind", &(*self).to_node_name())
+                                    .finish()
+                            },
+                        )*
+                    }
+                }
+            }
+
             #[derive(Clone)]
             pub(crate) enum NodeContentsWeak {
                 $(
@@ -46,11 +64,34 @@ macro_rules! declare_contents {
                 )*
             }
 
+            impl fmt::Debug for NodeContentsWeak {
+                fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+                    match self {
+                        $(
+                            NodeContentsWeak::$name(weak) => {
+                                f.debug_struct("NodeContentsWeak")
+                                    .field("addr", &format!("{:p}", Weak::as_ptr(&weak)))
+                                    .field("node_kind", &(*self).to_node_name())
+                                    .finish()
+                            },
+                        )*
+                    }
+                }
+            }
+
             impl NodeContentsArc {
                 pub(crate) fn to_node_type(&self) -> NodeType {
                     match self {
                         $(
                             NodeContentsArc::$name(_) => NodeType::$name,
+                        )*
+                    }
+                }
+
+                pub(crate) fn to_node_name(&self) -> String {
+                    match self {
+                        $(
+                            NodeContentsArc::$name(_) => (quote! {$name}).to_string(),
                         )*
                     }
                 }
@@ -73,6 +114,14 @@ macro_rules! declare_contents {
                     }
                 }
 
+                pub(crate) fn to_node_name(&self) -> String {
+                    match self {
+                        $(
+                            NodeContentsWeak::$name(_) => (quote! {$name}).to_string(),
+                        )*
+                    }
+                }
+
                 pub(crate) fn upgrade(&self) -> Option<NodeContentsArc> {
                     match self {
                         $(
@@ -82,7 +131,14 @@ macro_rules! declare_contents {
                 }
             }
 
+
             $(
+                impl From<Weak<[<$name Store>]>> for NodeContentsWeak {
+                    fn from(weak_ref: Weak<[<$name Store>]>) -> Self {
+                        NodeContentsWeak::[<$name>](weak_ref)
+                    }
+                }
+
                 impl From<&Arc<[<$name Store>]>> for NodeContentsWeak {
                     fn from(source: &Arc<[<$name Store>]>) -> NodeContentsWeak {
                         NodeContentsWeak::$name(Arc::downgrade(source))
@@ -149,7 +205,45 @@ impl CommentStore {
 
 /// Storage type for AttributeNode
 #[derive(Default, Clone)]
-pub struct AttributeStore;
+pub struct AttributeStore {
+    /// Name of the attribute, stored as lowercase.
+    /// Read-only
+    name: String,
+
+    /// Value of the attribute
+    pub(crate) value: Arc<RwLock<String>>,
+
+    /// Owning element
+    pub(crate) owner_element: Arc<RwLock<Option<ElementNodeWeak>>>,
+}
+
+impl AttributeStore {
+    pub(crate) fn new(name: String, owner_element: Option<ElementNodeWeak>) -> AttributeStore {
+        AttributeStore {
+            name: name.to_ascii_lowercase(),
+            value: Arc::new(RwLock::new("".to_owned())),
+            owner_element: Arc::new(RwLock::new(owner_element)),
+        }
+    }
+
+    pub(crate) fn owner_element(&self) -> Option<ElementNodeWeak> {
+        self.owner_element.read().unwrap().clone()
+    }
+
+    pub(crate) fn set_owner_element(&self, owner: Option<ElementNodeWeak>) {
+        *self.owner_element.write().unwrap() = owner
+    }
+
+    /// Gives the value of the attribute
+    pub fn value(&self) -> String {
+        self.value.read().unwrap().clone()
+    }
+
+    /// Gives the name of the attribute
+    pub fn name(&self) -> String {
+        self.name.clone()
+    }
+}
 
 /// Storage type for CDataSectionNode
 #[derive(Default, Clone)]

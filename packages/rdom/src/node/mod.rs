@@ -17,6 +17,8 @@ pub(crate) mod graph_storage;
 
 pub(crate) use crate::behavior::node::NodeBehavior;
 
+use std::fmt;
+
 /// Marker trait implemented by all node storage classes.
 pub trait AnyNodeStore {}
 
@@ -71,11 +73,29 @@ impl SandboxMemberBehavior for AnyNodeArc {
     }
 }
 
+impl fmt::Debug for AnyNodeArc {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("AnyNodeArc")
+            .field("contents", &self.contents)
+            .field("common_addr", &format!("{:p}", Arc::as_ptr(&self.common)))
+            .finish()
+    }
+}
+
 /// a weak reference to any node (abstract nonspecific type)
 #[derive(Clone)]
 pub struct AnyNodeWeak {
     pub(crate) contents: NodeContentsWeak,
     pub(crate) common: Weak<NodeCommon>,
+}
+
+impl fmt::Debug for AnyNodeWeak {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("AnyNodeWeak")
+            .field("contents", &self.contents)
+            .field("common_addr", &format!("{:p}", Weak::as_ptr(&self.common)))
+            .finish()
+    }
 }
 
 impl AnyNodeWeak {
