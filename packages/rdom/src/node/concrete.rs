@@ -1,10 +1,10 @@
 //! Concrete (as opposed to abstract) types of nodes. Each node class is represented in this module.
 
 use crate::internal_prelude::*;
-use crate::selector::Selector;
 use crate::node::element::ElementStore;
 use crate::node_list::NodeList;
-use crate::{proxy_node_behavior, proxy_parent_node_behavior, impl_parent_node};
+use crate::selector::Selector;
+use crate::{impl_parent_node, proxy_node_behavior, proxy_parent_node_behavior};
 
 use super::contents::{
     AttributeStore, CDataSectionStore, CommentStore, DocumentFragmentStore, DocumentStore,
