@@ -2,7 +2,9 @@
 
 use crate::internal_prelude::*;
 use crate::selector::Selector;
-use crate::{proxy_node_behavior, proxy_parent_node_behavior};
+use crate::node::element::ElementStore;
+use crate::node_list::NodeList;
+use crate::{proxy_node_behavior, proxy_parent_node_behavior, impl_parent_node};
 
 use super::contents::{
     AttributeStore, CDataSectionStore, CommentStore, DocumentFragmentStore, DocumentStore,
@@ -12,10 +14,10 @@ use super::{
     AnyNodeStore, Buildable, NodeBehavior, NodeCommon, NodeContentsArc, NodeContentsWeak,
     NodeGraphStorage,
 };
-use crate::node::element::ElementStore;
-use crate::node_list::NodeList;
+
 use arc_new_cyclic_n::arc::new_cyclic_2;
 use std::convert::TryFrom;
+
 crate::use_behaviors!(parent_node);
 
 /// A strongly-typed handle to a node with a strong reference.
@@ -233,9 +235,7 @@ impl ConcreteNodeArc<ElementStore> {
 
 impl ConcreteNodeArc<DocumentStore> {
     proxy_parent_node_behavior!();
-}
 
-impl DocumentNodeArc {
     /// Creates a new text node with the given text contents
     pub fn create_text_node(&self, text: String) -> Result<TextNodeArc, DomError> {
         match self.get_context().upgrade() {
