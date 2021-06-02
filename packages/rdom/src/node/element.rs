@@ -74,6 +74,20 @@ impl ElementStore {
     pub fn tag_name(&self) -> String {
         self.node_store.tag_name()
     }
+
+    /// [Element.hasAttribute](https://developer.mozilla.org/en-US/docs/Web/API/Element/hasAttribute)
+    pub fn has_attribute(&self, attr_name: String) -> bool {
+        self.attrs.get_named_item(attr_name).is_some()
+    }
+}
+
+// TODO should we rip out NodeBehavior since it doesn't really buy us anything?
+
+impl ConcreteNodeArc<ElementStore> {
+    /// [Element.hasAttribute](https://developer.mozilla.org/en-US/docs/Web/API/Element/hasAttribute)
+    pub fn has_attribute(&self, attr_name: String) -> bool {
+        self.contents.has_attribute(attr_name)
+    }
 }
 
 /// Enum of all concrete elements
