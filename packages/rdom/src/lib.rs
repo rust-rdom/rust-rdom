@@ -15,6 +15,8 @@
 pub(crate) mod behavior;
 pub mod config;
 pub mod error;
+// pub mod closure;
+pub mod function;
 pub(crate) mod internal_prelude;
 pub mod named_node_map;
 
