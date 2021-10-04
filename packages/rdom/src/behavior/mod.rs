@@ -34,6 +34,7 @@ macro_rules! use_behaviors {
 pub mod element;
 pub mod parent_node;
 pub mod sandbox_member;
+mod event_target;
 
 generate_preludes! {
     parent_node ParentNode
