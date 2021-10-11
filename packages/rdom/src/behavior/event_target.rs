@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{collections::HashMap};
 
 use variadic_closure::Function;
 use crate::{node::AnyNodeWeak};
@@ -14,32 +14,28 @@ enum EventKind {
 
 struct EventListenerOptions {}
 
-struct EventListenerEntry {
-    data: EventKind,
-    target: EventTarget,
+struct EventListenerEntry<'a> {
+    // data: EventKind,
+    listener: &'a Function,
+    // target: EventTarget,
     options: EventListenerOptions
 }
 
-pub struct EventTargetBehaviorStorage {
-    target: EventTarget,
-    listeners: HashMap<EventKind, EventListenerEntry>
+pub struct EventTargetBehaviorStorage<'a> {
+    // target: EventTarget,
+    listeners: &'a mut HashMap<String, EventListenerEntry<'a>>
 }
 
-#[derive(Clone)]
-enum EventTarget {
-    Node(AnyNodeWeak),
-    XMLHttpRequest,
-}
-
-impl EventTargetBehaviorStorage {
+impl<'a> EventTargetBehaviorStorage<'a> {
     fn add_event_listener_with_callback(
         &mut self,
-        kind: &str,
-        listener: &Function
+        kind: String,
+        listener: &'a Function
     ) -> Result<(), ()> {
-        self.listeners.insert(EventKind::OnClick, EventListenerEntry {
-            data: EventKind::OnClick,
-            target: self.target.clone(),
+        self.listeners.insert(kind, EventListenerEntry {
+            listener,
+            // data: EventKind::OnClick,
+            // target: self.target.clone(),
             options: EventListenerOptions{}
         });
         Ok(())
