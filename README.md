@@ -3,6 +3,11 @@
 DOM in Rust without a browser
 ===
 
+This repository is archived. The effort was shelved because I do not have a need for it anymore. If you need a DOM in Rust, it is worth considering whether you need something simple, or if you need the full dynamic capabilities of something like JSDom. If the latter, I would suggest maybe using JSDOM + Deno. If the former, picking up development of this library may be worth it. However, we were running into some complicated situations so, I'm just saying there may be dragons.
+
+Old introduction
+---
+
 Hello and welcome. This library provides server-side or browserless simulation of a DOM.
 
 [<img alt="docs.rs" src="https://docs.rs/rdom/badge.svg" />](https://docs.rs/rdom/latest/rdom/)
