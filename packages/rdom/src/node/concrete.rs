@@ -57,6 +57,10 @@ impl<S: AnyNodeStore> PartialEq for ConcreteNodeArc<S> {
     }
 }
 
+// impl<S: AnyNodeStore> EventTargetBehavior for ConcreteNodeArc<S> {
+
+// }
+
 /// A strongly-typed handle to a node with a weak reference.
 /// Generic type `S` may be the underlying storage
 /// type of any node class.
@@ -228,6 +232,8 @@ impl_concrete! {
 
 impl_parent_node!(ConcreteNodeArc<ElementStore>, common.parent_node_behavior);
 impl_parent_node!(ConcreteNodeArc<DocumentStore>, common.parent_node_behavior);
+
+// impl_event_target!(ConcreteNodeArc<DocumentStore>);
 
 impl ConcreteNodeArc<ElementStore> {
     proxy_parent_node_behavior!();
